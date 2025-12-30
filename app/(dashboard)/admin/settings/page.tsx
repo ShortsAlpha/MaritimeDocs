@@ -29,7 +29,7 @@ export default async function AdminSettingsPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {docTypes.map((type) => (
+                                {docTypes.map((type: any) => (
                                     <TableRow key={type.id}>
                                         <TableCell className="font-medium">{type.title}</TableCell>
                                         <TableCell>
