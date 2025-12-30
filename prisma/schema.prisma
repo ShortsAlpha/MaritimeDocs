@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+enum DocStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id        String   @id // Clerk user_id
+  email     String   @unique
+  name      String?
+  role      Role     @default(STUDENT)
+  createdAt DateTime @default(now())
+  
+  documents StudentDocument[]
+}
+
+model DocumentType {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  isRequired  Boolean  @default(true)
+  
+  studentDocs StudentDocument[]
+}
+
+model StudentDocument {
+  id        String    @id @default(cuid())
+  fileUrl   String
+  fileType  String
+  status    DocStatus @default(PENDING)
+  feedback  String?
+  expiryDate DateTime?
+  
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+  documentTypeId String
+  documentType   DocumentType @relation(fields: [documentTypeId], references: [id])
+
+  @@unique([userId, documentTypeId])
+}
