@@ -43,7 +43,7 @@ export default async function AdminStudentsPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {students.map((student) => {
+                            {students.map((student: any) => {
                                 const approvedDocs = student.documents.filter((d: any) => d.status === "APPROVED").length;
                                 const progress = requiredCount > 0 ? Math.round((approvedDocs / requiredCount) * 100) : 100;
 
