@@ -91,7 +91,7 @@ export default function EtherealBeamsHero({ liteMode, setLiteMode }: { liteMode?
 
                         {/* CTA Button */}
                         <div className="flex items-center space-x-4">
-                            <Link href="/sign-in">
+                            <Link href="/portal">
                                 <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
                                     Log In
                                 </Button>
@@ -139,7 +139,7 @@ export default function EtherealBeamsHero({ liteMode, setLiteMode }: { liteMode?
                                     <ArrowRight className="ml-2 h-5 w-5" />
                                 </Button>
                             </Link>
-                            <Link href="/sign-in">
+                            <Link href="/portal">
                                 <Button variant="outline" size="lg" className="font-semibold bg-transparent">
                                     Student Login
                                 </Button>
