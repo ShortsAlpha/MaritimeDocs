@@ -25,7 +25,7 @@ export default async function AdminReviewPage() {
             )}
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {pendingDocs.map((doc) => (
+                {pendingDocs.map((doc: any) => (
                     <ReviewCard key={doc.id} doc={doc} />
                 ))}
             </div>
