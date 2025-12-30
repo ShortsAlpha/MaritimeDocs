@@ -21,7 +21,7 @@ export default async function AdminStudentsPage() {
     });
 
     const docTypes = await db.documentType.findMany();
-    const requiredCount = docTypes.filter(d => d.isRequired).length;
+    const requiredCount = docTypes.filter((d: any) => d.isRequired).length;
 
     return (
         <div className="space-y-6">
@@ -44,7 +44,7 @@ export default async function AdminStudentsPage() {
                         </TableHeader>
                         <TableBody>
                             {students.map((student) => {
-                                const approvedDocs = student.documents.filter(d => d.status === "APPROVED").length;
+                                const approvedDocs = student.documents.filter((d: any) => d.status === "APPROVED").length;
                                 const progress = requiredCount > 0 ? Math.round((approvedDocs / requiredCount) * 100) : 100;
 
                                 return (
