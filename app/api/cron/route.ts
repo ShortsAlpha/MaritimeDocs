@@ -31,14 +31,14 @@ export async function GET(req: Request) {
 
         // 3. Check each student
         for (const student of students) {
-            const missingDocs = requiredTypes.filter(type => {
-                const studentDoc = student.documents.find(d => d.documentTypeId === type.id);
+            const missingDocs = requiredTypes.filter((type: any) => {
+                const studentDoc = student.documents.find((d: any) => d.documentTypeId === type.id);
                 // Missing if no record OR status is Rejected
                 return !studentDoc || studentDoc.status === "REJECTED";
             });
 
             if (missingDocs.length > 0) {
-                const missingNames = missingDocs.map(d => d.title).join(", ");
+                const missingNames = missingDocs.map((d: any) => d.title).join(", ");
 
                 // 4. Send Email
                 await resend.emails.send({
@@ -48,7 +48,7 @@ export async function GET(req: Request) {
                     html: `<p>Dear ${student.name},</p>
                  <p>You have the following missing or rejected documents required for your training:</p>
                  <ul>
-                    ${missingDocs.map(d => `<li>${d.title}</li>`).join('')}
+                    ${missingDocs.map((d: any) => `<li>${d.title}</li>`).join('')}
                  </ul>
                  <p>Please log in to the portal and upload them immediately.</p>`
                 });
