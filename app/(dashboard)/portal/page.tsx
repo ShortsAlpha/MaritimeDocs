@@ -40,7 +40,7 @@ export default async function StudentPortalPage() {
             {/* Progress Bar could go here */}
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {docTypes.map((type) => (
+                {docTypes.map((type: any) => (
                     <UploadCard
                         key={type.id}
                         docType={type}
