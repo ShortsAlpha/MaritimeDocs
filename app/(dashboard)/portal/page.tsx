@@ -18,12 +18,12 @@ export default async function StudentPortalPage() {
     });
 
     // Helper to find doc for a type
-    const getDoc = (typeId: string) => studentDocs.find(d => d.documentTypeId === typeId);
+    const getDoc = (typeId: string) => studentDocs.find((d: any) => d.documentTypeId === typeId);
 
     // Calculate progress
-    const requiredCount = docTypes.filter(d => d.isRequired).length;
-    const approvedCount = studentDocs.filter(d =>
-        d.status === "APPROVED" && docTypes.find(t => t.id === d.documentTypeId)?.isRequired
+    const requiredCount = docTypes.filter((d: any) => d.isRequired).length;
+    const approvedCount = studentDocs.filter((d: any) =>
+        d.status === "APPROVED" && docTypes.find((t: any) => t.id === d.documentTypeId)?.isRequired
     ).length;
 
     const progress = requiredCount > 0 ? (approvedCount / requiredCount) * 100 : 100;
