@@ -16,9 +16,7 @@ export async function saveDocumentRecord(docTypeId: string, fileUrl: string, fil
             },
         },
         update: {
-            fileUrl,
             fileType,
-            status: "PENDING",
             expiryDate: expiryDate ? new Date(expiryDate) : null,
         },
         create: {
@@ -26,7 +24,6 @@ export async function saveDocumentRecord(docTypeId: string, fileUrl: string, fil
             documentTypeId: docTypeId,
             fileUrl,
             fileType,
-            status: "PENDING",
             expiryDate: expiryDate ? new Date(expiryDate) : null,
         },
     });

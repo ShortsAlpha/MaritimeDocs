@@ -52,7 +52,7 @@ export async function POST(req: Request) {
         const { id, email_addresses, first_name, last_name, public_metadata } = evt.data
         const email = email_addresses[0]?.email_address
         // @ts-ignore
-        const role = public_metadata?.role === 'ADMIN' ? 'ADMIN' : 'STUDENT'
+        const role = public_metadata?.role === 'ADMIN' ? 'ADMIN' : 'STAFF'
 
         if (!email) return new Response('No email found', { status: 400 })
 
