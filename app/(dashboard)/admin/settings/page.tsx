@@ -24,6 +24,7 @@ export default async function AdminSettingsPage() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Title</TableHead>
+                                    <TableHead>Category</TableHead>
                                     <TableHead>Required</TableHead>
                                     <TableHead className="text-right">Action</TableHead>
                                 </TableRow>
@@ -32,6 +33,9 @@ export default async function AdminSettingsPage() {
                                 {docTypes.map((type: any) => (
                                     <TableRow key={type.id}>
                                         <TableCell className="font-medium">{type.title}</TableCell>
+                                        <TableCell>
+                                            <Badge variant="outline">{type.category}</Badge>
+                                        </TableCell>
                                         <TableCell>
                                             {type.isRequired ? (
                                                 <Badge variant="destructive">Required</Badge>

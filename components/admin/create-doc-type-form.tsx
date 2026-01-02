@@ -34,6 +34,18 @@ export function CreateDocTypeForm() {
                         <Label htmlFor="description">Description (Optional)</Label>
                         <Textarea id="description" name="description" placeholder="Instructions for the student..." />
                     </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="category">Category</Label>
+                        <select
+                            id="category"
+                            name="category"
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            defaultValue="STUDENT"
+                        >
+                            <option value="STUDENT">Student Document (Passport, etc.)</option>
+                            <option value="OFFICE">Office Document (Contracts, etc.)</option>
+                        </select>
+                    </div>
                     <div className="flex items-center space-x-2">
                         <input type="checkbox" id="isRequired" name="isRequired" className="h-4 w-4 rounded border-gray-300" />
                         <Label htmlFor="isRequired">Is Required?</Label>

@@ -6,51 +6,101 @@ datasource db {
   provider = "postgresql"
 }
 
+// Staff/Admin Users (Authentication)
 enum Role {
-  STUDENT
   ADMIN
-}
-
-enum DocStatus {
-  PENDING
-  APPROVED
-  REJECTED
+  STAFF
 }
 
 model User {
   id        String   @id // Clerk user_id
   email     String   @unique
   name      String?
-  role      Role     @default(STUDENT)
+  role      Role     @default(STAFF)
   createdAt DateTime @default(now())
+}
+
+// ----------------------------------------------------------------------------
+
+// Student Record (Data only, no login)
+model Student {
+  id          String   @id @default(cuid())
   
-  documents StudentDocument[]
+  // Personal Info
+  fullName    String
+  email       String?
+  phone       String?
+  address     String?
+  
+  // Financials
+  totalFee    Decimal  @default(0) // Total course fee in EUR
+  currency    String   @default("EUR")
+  
+  // Meta
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  documents   StudentDocument[]
+  payments    Payment[]
+}
+
+// ----------------------------------------------------------------------------
+
+// Payment / Ledger
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  CREDIT_CARD
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  amount      Decimal
+  date        DateTime      @default(now())
+  method      PaymentMethod @default(CASH)
+  note        String?       // e.g. "Installment 1", "Registration Fee"
+  
+  // Relations
+  studentId   String
+  student     Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime      @default(now())
+}
+
+// ----------------------------------------------------------------------------
+
+// Documents
+enum DocCategory {
+  OFFICE   // Internal docs (Contracts, forms)
+  STUDENT  // Personal docs (Passport, ID)
 }
 
 model DocumentType {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   title       String
   description String?
-  isRequired  Boolean  @default(true)
+  category    DocCategory @default(STUDENT)
+  isRequired  Boolean     @default(true)
   
-  studentDocs StudentDocument[]
+  documents   StudentDocument[]
 }
 
 model StudentDocument {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
+  title     String?  // Optional override or custom name
   fileUrl   String
-  fileType  String
-  status    DocStatus @default(PENDING)
-  feedback  String?
-  expiryDate DateTime?
+  fileType  String   // pdf, img, etc.
   
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  // No approval status needed for internal CRM - upload means valid
+  
+  expiryDate DateTime?
+  createdAt  DateTime  @default(now())
 
-  userId         String
-  user           User         @relation(fields: [userId], references: [id])
+  // Relations
+  studentId      String
+  student        Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
   documentTypeId String
   documentType   DocumentType @relation(fields: [documentTypeId], references: [id])
-
-  @@unique([userId, documentTypeId])
 }

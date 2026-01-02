@@ -10,28 +10,35 @@ export async function POST(req: Request) {
         const { userId } = await auth();
         if (!userId) return new NextResponse("Unauthorized", { status: 401 });
 
-        const { fileType, docTypeId } = await req.json();
+        const formData = await req.formData();
+        const file = formData.get("file") as File;
+        const subFolder = formData.get("subFolder") as string || "uploads";
 
-        // Generate a unique file name
-        const fileName = `${userId}/${docTypeId}-${Date.now()}`;
+        if (!file) {
+            return new NextResponse("No file uploaded", { status: 400 });
+        }
 
-        // Create the command
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const fileName = `${subFolder}/${Date.now()}-${file.name.replace(/\s/g, "-")}`;
+
         const command = new PutObjectCommand({
             Bucket: process.env.R2_BUCKET_NAME,
             Key: fileName,
-            ContentType: fileType,
+            Body: buffer,
+            ContentType: file.type,
         });
 
-        // Generate presigned URL
-        const signedUrl = await getSignedUrl(r2, command, { expiresIn: 3600 });
+        await r2.send(command);
 
         return NextResponse.json({
-            signedUrl,
-            fileUrl: `${process.env.R2_PUBLIC_URL}/${fileName}`, // Assuming public access or worker
+            fileUrl: `${process.env.R2_PUBLIC_URL}/${fileName}`,
             key: fileName
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error("Upload error:", error);
-        return new NextResponse("Internal Error", { status: 500 });
+        return new NextResponse(JSON.stringify({ error: error.message }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+        });
     }
 }

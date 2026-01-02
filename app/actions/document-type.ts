@@ -7,6 +7,7 @@ export async function createDocumentType(formData: FormData) {
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const isRequired = formData.get("isRequired") === "on";
+    const category = formData.get("category") as "OFFICE" | "STUDENT";
 
     if (!title) {
         throw new Error("Title is required");
@@ -17,6 +18,7 @@ export async function createDocumentType(formData: FormData) {
             title,
             description,
             isRequired,
+            category: category || "STUDENT"
         },
     });
 

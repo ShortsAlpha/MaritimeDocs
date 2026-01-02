@@ -1,76 +1,87 @@
 import { db } from "@/lib/db";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import { CreateStudentDialog } from "@/components/admin/create-student-dialog";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
 
 export default async function AdminStudentsPage() {
-    const students = await db.user.findMany({
-        where: { role: "STUDENT" },
+    // Fetch students with their payments to calculate balance
+    const students = await db.student.findMany({
         include: {
-            documents: true,
+            payments: true
         },
         orderBy: { createdAt: "desc" },
     });
 
-    const docTypes = await db.documentType.findMany();
-    const requiredCount = docTypes.filter((d: any) => d.isRequired).length;
-
     return (
         <div className="space-y-6">
-            <h1 className="text-2xl font-bold">Student Management</h1>
+            <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold">Student Management</h1>
+                <CreateStudentDialog />
+            </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Registered Students</CardTitle>
+                    <CardTitle>Register</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Table>
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Name</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead>Joined</TableHead>
-                                <TableHead>Progress</TableHead>
+                                <TableHead>Contact</TableHead>
+                                <TableHead>Course Fee</TableHead>
+                                <TableHead>Paid</TableHead>
+                                <TableHead>Balance</TableHead>
                                 <TableHead className="text-right">Action</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {students.map((student: any) => {
-                                const approvedDocs = student.documents.filter((d: any) => d.status === "APPROVED").length;
-                                const progress = requiredCount > 0 ? Math.round((approvedDocs / requiredCount) * 100) : 100;
+                            {students.map((student) => {
+                                const totalFee = Number(student.totalFee)
+                                const totalPaid = student.payments.reduce((sum, p) => sum + Number(p.amount), 0)
+                                const balance = totalFee - totalPaid
 
                                 return (
                                     <TableRow key={student.id}>
-                                        <TableCell className="font-medium">{student.name || "N/A"}</TableCell>
-                                        <TableCell>{student.email}</TableCell>
-                                        <TableCell>{format(new Date(student.createdAt), "PP")}</TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-full bg-secondary h-2 rounded-full overflow-hidden max-w-[100px]">
-                                                    <div className="bg-primary h-full" style={{ width: `${progress}%` }} />
-                                                </div>
-                                                <span className="text-xs text-muted-foreground">{progress}%</span>
+                                        <TableCell className="font-medium">
+                                            <div className="flex flex-col">
+                                                <span>{student.fullName}</span>
+                                                <span className="text-xs text-muted-foreground">Joined {format(student.createdAt, 'MMM d, yyyy')}</span>
                                             </div>
                                         </TableCell>
+                                        <TableCell>
+                                            <div className="flex flex-col text-sm">
+                                                <span>{student.email || '-'}</span>
+                                                <span className="text-muted-foreground">{student.phone || '-'}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>€{totalFee.toLocaleString()}</TableCell>
+                                        <TableCell className="text-green-600 font-medium">€{totalPaid.toLocaleString()}</TableCell>
+                                        <TableCell>
+                                            <Badge variant={balance > 0 ? "destructive" : "secondary"}>
+                                                €{balance.toLocaleString()}
+                                            </Badge>
+                                        </TableCell>
                                         <TableCell className="text-right">
-                                            <Badge variant="outline">View</Badge>
-                                            {/* Link to detail page could go here */}
+                                            <Link href={`/admin/students/${student.id}`}>
+                                                <Button variant="ghost" size="sm">
+
+                                                    View
+                                                </Button>
+                                            </Link>
                                         </TableCell>
                                     </TableRow>
                                 );
                             })}
                             {students.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center text-muted-foreground">
-                                        No students registered yet.
+                                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                                        No students found. Add one to get started.
                                     </TableCell>
                                 </TableRow>
                             )}
