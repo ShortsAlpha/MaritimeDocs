@@ -173,12 +173,8 @@ const AuthForm = ({ mode }: AuthFormProps) => {
     return (
         <div className="flex items-center justify-center w-full min-h-screen bg-black z-1">
             <div className="w-full max-w-sm p-8 flex flex-col items-center border rounded-3xl shadow-xl bg-zinc-900/50 border-white/10 shadow-black/50 text-white backdrop-blur-xl">
-                <div className="flex items-center justify-center w-14 h-14 mb-6 rounded-2xl bg-white/5 shadow-lg shadow-black/20 ring-1 ring-white/10">
-                    {mode === "signin" ? (
-                        <LogIn className="w-7 h-7 text-white" />
-                    ) : (
-                        <UserPlus className="w-7 h-7 text-white" />
-                    )}
+                <div className="flex items-center justify-center w-20 h-20 mb-6 rounded-2xl bg-white/5 shadow-lg shadow-black/20 ring-1 ring-white/10 p-4">
+                    <img src="/logo.png" alt="Logo" className="w-full h-full object-contain drop-shadow-lg" />
                 </div>
                 <h2 className="mb-2 text-2xl font-semibold text-center text-white">
                     {verifying ? "Verify Email" : (mode === "signin" ? "Sign in" : "Create account")}

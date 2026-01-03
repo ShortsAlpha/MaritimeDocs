@@ -61,7 +61,8 @@ export default function EtherealBeamsHero({ liteMode, setLiteMode }: { liteMode?
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <div className="flex h-16 items-center justify-between">
                         {/* Brand Name Only */}
-                        <div className="flex items-center">
+                        <div className="flex items-center gap-2">
+                            <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
                             <span className="text-xl font-bold text-white">Maritime Academy Docs</span>
                         </div>
 

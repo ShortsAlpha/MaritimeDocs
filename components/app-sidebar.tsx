@@ -28,8 +28,9 @@ export function AppSidebar({ role }: { role: string }) {
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader>
-                <div className="flex items-center justify-between px-2 py-2">
-                    <span className="font-semibold truncate">
+                <div className="flex items-center gap-2 px-2 py-2 group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:!gap-0 group-data-[collapsible=icon]:justify-center">
+                    <img src="/logo.png" alt="Logo" className="w-8 h-8 shrink-0 object-contain group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:translate-x-1 transition-all duration-300" />
+                    <span className="font-semibold truncate group-data-[collapsible=icon]:hidden">
                         Maritime Academy
                     </span>
                 </div>

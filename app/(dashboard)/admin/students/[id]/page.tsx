@@ -20,6 +20,11 @@ export default async function StudentDetailPage({
     params: Promise<{ id: string }>
 }) {
     const { id } = await params;
+    console.log("Student ID page loading:", id);
+    if (!id) {
+        console.error("ID is missing!");
+        return notFound();
+    }
     const student = await db.student.findUnique({
         where: { id },
         include: {
