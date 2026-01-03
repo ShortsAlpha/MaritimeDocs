@@ -7,6 +7,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { DeleteStudentButton } from "@/components/admin/delete-student-button";
 
 // Sub-components will be imported from separate files in next steps
 // Placeholder imports for now, we will create these files next
@@ -45,6 +46,8 @@ export default async function StudentDetailPage({
     const totalPaid = student.payments.reduce((sum, p) => sum + Number(p.amount), 0);
     const balance = totalFee - totalPaid;
 
+    // ... (other imports)
+
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-4">
@@ -66,12 +69,15 @@ export default async function StudentDetailPage({
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-col items-end">
-                    <span className="text-sm text-muted-foreground">Current Balance</span>
-                    <div className="flex items-center gap-2">
-                        <span className={`text-2xl font-bold ${balance > 0 ? "text-red-500" : "text-green-500"}`}>
-                            €{balance.toLocaleString()}
-                        </span>
+                <div className="flex items-center gap-4">
+                    <DeleteStudentButton studentId={student.id} />
+                    <div className="flex flex-col items-end">
+                        <span className="text-sm text-muted-foreground">Current Balance</span>
+                        <div className="flex items-center gap-2">
+                            <span className={`text-2xl font-bold ${balance > 0 ? "text-red-500" : "text-green-500"}`}>
+                                €{balance.toLocaleString()}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

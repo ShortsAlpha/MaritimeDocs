@@ -6,22 +6,39 @@ import { format } from "date-fns";
 import { CreateStudentDialog } from "@/components/admin/create-student-dialog";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { StudentFilter } from "@/components/admin/student-filter";
 
+type Props = {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
 
-export default async function AdminStudentsPage() {
+export default async function AdminStudentsPage(props: Props) {
+    const searchParams = await props.searchParams;
+    const courseFilter = typeof searchParams.course === 'string' ? searchParams.course : undefined;
+
     // Fetch students with their payments to calculate balance
     const students = await db.student.findMany({
+        where: courseFilter ? {
+            course: courseFilter
+        } : undefined,
         include: {
             payments: true
         },
         orderBy: { createdAt: "desc" },
     });
 
+    const courses = await db.course.findMany({
+        orderBy: { title: 'asc' }
+    });
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold">Student Management</h1>
-                <CreateStudentDialog />
+                <div className="flex items-center gap-2">
+                    <StudentFilter courses={courses} />
+                    <CreateStudentDialog courses={courses} />
+                </div>
             </div>
 
             <Card>
@@ -34,6 +51,7 @@ export default async function AdminStudentsPage() {
                             <TableRow>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Contact</TableHead>
+                                <TableHead>Course Name</TableHead>
                                 <TableHead>Course Fee</TableHead>
                                 <TableHead>Paid</TableHead>
                                 <TableHead>Balance</TableHead>
@@ -60,6 +78,9 @@ export default async function AdminStudentsPage() {
                                                 <span className="text-muted-foreground">{student.phone || '-'}</span>
                                             </div>
                                         </TableCell>
+                                        <TableCell>
+                                            <Badge variant="outline">{student.course || 'General'}</Badge>
+                                        </TableCell>
                                         <TableCell>€{totalFee.toLocaleString()}</TableCell>
                                         <TableCell className="text-green-600 font-medium">€{totalPaid.toLocaleString()}</TableCell>
                                         <TableCell>
@@ -70,7 +91,6 @@ export default async function AdminStudentsPage() {
                                         <TableCell className="text-right">
                                             <Link href={`/admin/students/${student.id}`}>
                                                 <Button variant="ghost" size="sm">
-
                                                     View
                                                 </Button>
                                             </Link>
@@ -80,8 +100,8 @@ export default async function AdminStudentsPage() {
                             })}
                             {students.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                                        No students found. Add one to get started.
+                                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                                        No students found.
                                     </TableCell>
                                 </TableRow>
                             )}

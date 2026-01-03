@@ -8,6 +8,7 @@ const StudentSchema = z.object({
     fullName: z.string().min(2, "Name is too short"),
     email: z.string().email().optional().or(z.literal("")),
     phone: z.string().optional(),
+    course: z.string().optional(),
     totalFee: z.coerce.number().min(0, "Fee must be positive"),
 })
 
@@ -17,6 +18,7 @@ export async function createStudent(prevState: any, formData: FormData) {
             fullName: formData.get("fullName"),
             email: formData.get("email"),
             phone: formData.get("phone"),
+            course: formData.get("course"),
             totalFee: formData.get("totalFee"),
         }
 
@@ -27,6 +29,7 @@ export async function createStudent(prevState: any, formData: FormData) {
                 fullName: data.fullName,
                 email: data.email || null,
                 phone: data.phone || null,
+                course: data.course || null,
                 totalFee: data.totalFee,
             }
         })

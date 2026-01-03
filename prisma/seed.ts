@@ -18,6 +18,53 @@ async function main() {
     await prisma.studentDocument.deleteMany()
     await prisma.documentType.deleteMany()
     await prisma.student.deleteMany()
+    await prisma.course.deleteMany()
+
+    // 0. Create Courses
+    console.log('Creating courses...')
+    const COURSE_NAMES = [
+        "STCW BASIC SAFETY TRAINING CERTIFICATE",
+        "SUPERYACHT DECK CREW",
+        "SMALL POWERBOAT & RIB MASTER MCA RECOGNISED",
+        "PROFESSIONAL SUPERYACHT HOSPITALITY",
+        "MARINE COMMUNICATIONS (VHF-SRC)",
+        "ACCREDITED ENGINE-RATING COURSE (AEC)",
+        "PROFESSIONAL SUPERYACHT CHEF",
+        "MASTER OF YACHTS 200 GT COASTAL / MATE",
+        "MASTER OF YACHTS 200 GT LIMITED",
+        "MASTER ON YACHTS LESS THAN 200 GT (MALTA FLAG STATE)",
+        "MASTER OF YACHTS 200 GT UNLIMITED",
+        "OOW ON YACHTS LESS THAN 3000GT",
+        "MASTER OF YACHTS 500 GT / CHIEF MATE 3000 GT",
+        "PROFICIENCY IN ADVANCED FIRE FIGHTING",
+        "MEDICAL FIRST AID",
+        "PROFICIENCY IN MEDICAL CARE",
+        "PROFICIENCY IN SURVIVAL CRAFT AND RESCUE BOATS",
+        "LEADERSHIP AND TEAMWORK (HELM Operational Level)",
+        "LEADERSHIP AND MANAGERIAL SKILLS (MANAGEMENT LEVEL)",
+        "ECDIS - ELECTRONIC CHART DISPLAY AND INFORMATION SYSTEM",
+        "RADAR / ARPA (OPERATIONAL LEVEL)",
+        "RADAR / ARPA (MANAGEMENT LEVEL)",
+        "GMDSS GENERAL OPERATORS CERTIFICATE (GOC) CoC",
+        "EFFICIENT DECK HAND COURSE",
+        "IYT INSTRUCTOR TRAINING PROGRAMME",
+        "PERSONAL WATERCRAFT OPERATOR ( PWC )",
+        "INTERNATIONAL BAREBOAT SKIPPER POWER / SAIL",
+        "NTERNATIONAL BAREBOAT SKIPPER SAIL / CATAMARAN",
+        "INTERNATIONAL CERTIFICATE OF COMPETENCY COURSE",
+        "INTERNATIONAL FLOTILLA SKIPPER",
+        "INTERNATIONAL FLOTILLA SKIPPER SAIL / CATAMARAN",
+        "YACHT MASTER COASTAL POWER / SAIL",
+        "YACHT MASTER COASTAL SAIL / CATAMARAN",
+        "YACHT MASTER OCEAN",
+        "YACHT MASTER OFFSHORE POWER / SAIL",
+        "YACHT MASTER OFFSHORE SAIL / CATAMARAN",
+        "PROFICIENCY IN MARITIME SECURITY AWARENESS"
+    ];
+
+    await prisma.course.createMany({
+        data: COURSE_NAMES.map(title => ({ title }))
+    })
 
     // 1. Create Document Types
     console.log('Creating document types...')
@@ -53,6 +100,7 @@ async function main() {
             email: 'ahmet@example.com',
             phone: '+90 555 123 4567',
             totalFee: 5000, // 5000 EUR
+            course: 'STCW BASIC SAFETY TRAINING CERTIFICATE'
         }
     })
 
@@ -62,6 +110,17 @@ async function main() {
             email: 'ayse@example.com',
             phone: '+90 555 987 6543',
             totalFee: 4500, // 4500 EUR
+            course: 'MEDICAL FIRST AID'
+        }
+    })
+
+    const student3 = await prisma.student.create({
+        data: {
+            fullName: 'Mehmet Ozturk',
+            email: 'mehmet@example.com',
+            phone: '+90 532 111 2233',
+            totalFee: 3500,
+            course: 'GMDSS GENERAL OPERATORS CERTIFICATE (GOC) CoC'
         }
     })
 

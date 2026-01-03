@@ -1,9 +1,7 @@
-import { SignUp } from "@clerk/nextjs";
+import { AuthForm } from "@/components/ui/clean-minimal-sign-in";
 
 export default function Page() {
     return (
-        <div className="flex h-screen items-center justify-center">
-            <SignUp forceRedirectUrl="/admin" />
-        </div>
+        <AuthForm mode="signup" />
     );
 }

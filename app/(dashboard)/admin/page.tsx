@@ -1,6 +1,9 @@
 import { db } from "@/lib/db";
 import StatsCard from "@/components/statistics-card-1";
+import StatsCardsWithLinks from "@/components/ui/stats-cards-with-links";
+import StatsWithChart from "@/components/ui/stats-with-chart";
 import { format } from "date-fns";
+
 
 export default async function AdminPage() {
     // 1. Fetch Data
@@ -61,9 +64,21 @@ export default async function AdminPage() {
     ];
 
     return (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold mb-6">Overview</h1>
-            <StatsCard stats={stats} />
+        <div className="p-6 space-y-8">
+            <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold tracking-tight">Dashboard Overview</h1>
+            </div>
+
+            {/* <StatsCard stats={stats} /> */}
+            <div className="space-y-4">
+                <h2 className="text-lg font-semibold">Quick Stats</h2>
+                <StatsCardsWithLinks />
+            </div>
+
+            <div className="space-y-4">
+                <h2 className="text-lg font-semibold">Performance & Revenue</h2>
+                <StatsWithChart />
+            </div>
         </div>
     );
 }

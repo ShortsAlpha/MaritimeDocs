@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Plus, Loader2 } from "lucide-react"
 import { createStudent } from "@/app/actions/students"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Course } from "@prisma/client"
 
 function SubmitButton() {
     const { pending } = useFormStatus()
@@ -18,7 +20,11 @@ function SubmitButton() {
     )
 }
 
-export function CreateStudentDialog() {
+type Props = {
+    courses: Course[]
+}
+
+export function CreateStudentDialog({ courses = [] }: Props) {
     const [open, setOpen] = useState(false)
 
     async function handleSubmit(formData: FormData) {
@@ -26,7 +32,6 @@ export function CreateStudentDialog() {
         if (res.success) {
             setOpen(false)
         } else {
-            // Optional: Handle error (e.g. toast)
             console.error(res.message);
         }
     }
@@ -57,6 +62,19 @@ export function CreateStudentDialog() {
                             <Label htmlFor="phone">Phone (Optional)</Label>
                             <Input id="phone" name="phone" placeholder="+1 234 567 890" />
                         </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="course">Course</Label>
+                        <Select name="course">
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a course" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {courses.map((c) => (
+                                    <SelectItem key={c.id} value={c.title}>{c.title}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="totalFee">Total Course Fee (€)</Label>

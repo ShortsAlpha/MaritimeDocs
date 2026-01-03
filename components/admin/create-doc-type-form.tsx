@@ -51,7 +51,7 @@ export function CreateDocTypeForm() {
                         <Label htmlFor="isRequired">Is Required?</Label>
                     </div>
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="pt-6">
                     <SubmitButton />
                 </CardFooter>
             </form>

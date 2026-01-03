@@ -1,7 +1,7 @@
 'use client'
 
 import React from "react"
-import { ArrowRight, Github, Star, Sun, Moon } from "lucide-react"
+import { ArrowRight, Github, Star } from "lucide-react"
 import Link from "next/link"
 
 // ============================================================================
@@ -74,29 +74,22 @@ export default function EtherealBeamsHero({ liteMode, setLiteMode }: { liteMode?
                                 Home
                             </Link>
                             <Link
-                                href="#"
+                                href="/about"
                                 className="rounded-full px-4 py-2 text-sm font-medium transition-all text-white/90 hover:bg-white/10 hover:text-white"
                             >
                                 About Us
                             </Link>
-                            <button
-                                onClick={() => setLiteMode?.(!liteMode)}
-                                className="rounded-full p-2 transition-all text-white/90 hover:bg-white/10 hover:text-white"
-                                aria-label="Toggle Animation"
-                                title="Toggle Background Animation"
-                            >
-                                {liteMode ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-                            </button>
+
                         </div>
 
                         {/* CTA Button */}
                         <div className="flex items-center space-x-4">
-                            <Link href="/portal">
+                            <Link href="/sign-in">
                                 <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
                                     Log In
                                 </Button>
                             </Link>
-                            <Link href="/portal">
+                            <Link href="/sign-up">
                                 <Button size="sm">
                                     Get Started
                                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -118,33 +111,18 @@ export default function EtherealBeamsHero({ liteMode, setLiteMode }: { liteMode?
                         </div>
 
                         {/* Main Heading */}
+                        {/* Main Heading */}
                         <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl text-white">
-                            Navigate your{" "}
+                            Maritime Academy{" "}
                             <span className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 bg-clip-text text-transparent">
-                                career
-                            </span>{" "}
-                            with confidence
+                                Docs
+                            </span>
                         </h1>
 
                         {/* Subtitle */}
                         <p className="mb-10 text-lg leading-8 sm:text-xl lg:text-2xl max-w-3xl mx-auto text-white/80">
-                            Securely manage your seafarer documents, track expirations, and stay compliant with international maritime regulations.
+                            Maritime Academy Docs System
                         </p>
-
-                        {/* CTA Buttons */}
-                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-                            <Link href="/portal">
-                                <Button size="lg" className="shadow-2xl font-semibold shadow-white/25">
-                                    Start Uploading
-                                    <ArrowRight className="ml-2 h-5 w-5" />
-                                </Button>
-                            </Link>
-                            <Link href="/portal">
-                                <Button variant="outline" size="lg" className="font-semibold bg-transparent">
-                                    Student Login
-                                </Button>
-                            </Link>
-                        </div>
 
 
                     </div>

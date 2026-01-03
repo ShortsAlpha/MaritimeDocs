@@ -48,7 +48,7 @@ export async function deleteStudentDocument(docId: string, studentId: string) {
     }
 }
 
-export async function getDownloadUrl(fileUrl: string) {
+export async function getDownloadUrl(fileUrl: string, options?: { inline?: boolean }) {
     try {
         if (!fileUrl) throw new Error("No file URL provided");
 
@@ -69,10 +69,12 @@ export async function getDownloadUrl(fileUrl: string) {
             }
         }
 
+        const disposition = options?.inline ? 'inline' : `attachment; filename="${key.split('/').pop()}"`;
+
         const command = new GetObjectCommand({
             Bucket: process.env.R2_BUCKET_NAME,
             Key: key,
-            ResponseContentDisposition: `attachment; filename="${key.split('/').pop()}"`,
+            ResponseContentDisposition: disposition,
         });
 
         const signedUrl = await getSignedUrl(r2, command, { expiresIn: 3600 });

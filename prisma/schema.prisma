@@ -31,6 +31,7 @@ model Student {
   email       String?
   phone       String?
   address     String?
+  course      String?
   
   // Financials
   totalFee    Decimal  @default(0) // Total course fee in EUR
@@ -103,4 +104,11 @@ model StudentDocument {
   
   documentTypeId String
   documentType   DocumentType @relation(fields: [documentTypeId], references: [id])
+}
+
+model Course {
+  id        String   @id @default(cuid())
+  title     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

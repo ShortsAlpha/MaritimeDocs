@@ -15,7 +15,7 @@ import {
 import { LayoutDashboard, Users, Settings } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
+
 
 const adminRoutes = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -30,9 +30,8 @@ export function AppSidebar({ role }: { role: string }) {
             <SidebarHeader>
                 <div className="flex items-center justify-between px-2 py-2">
                     <span className="font-semibold truncate">
-                        {role === "ADMIN" ? "Admin Panel" : "Student Portal"}
+                        Maritime Academy
                     </span>
-                    <ThemeToggle />
                 </div>
             </SidebarHeader>
             <SidebarContent>

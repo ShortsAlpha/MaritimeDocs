@@ -1,9 +1,10 @@
-import { UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
+import UserProfile from "@/components/ui/user-profile";
 import { db } from "@/lib/db";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default async function DashboardLayout({
     children,
@@ -27,8 +28,10 @@ export default async function DashboardLayout({
                     <SidebarTrigger className="-ml-1" />
                     <Separator orientation="vertical" className="mr-2 h-4" />
                     <div className="flex flex-1 items-center justify-between">
-                        <h1 className="font-semibold text-lg">Maritime LMS</h1>
-                        <UserButton afterSignOutUrl="/" />
+                        <div className="flex items-center gap-2">
+                            <ThemeToggle />
+                        </div>
+                        <UserProfile />
                     </div>
                 </header>
                 <main className="flex-1 overflow-auto p-6">{children}</main>
