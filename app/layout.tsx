@@ -12,9 +12,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+import type { Viewport } from "next";
+
 export const metadata: Metadata = {
   title: "Xone Superyacht Academy",
   description: "Xone Superyacht Academy Student Management System",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false, // Prevent zooming issues
+  viewportFit: "cover", // Extend to notch area
 };
 
 import { ClerkProvider } from "@clerk/nextjs";

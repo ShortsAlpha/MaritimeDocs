@@ -131,7 +131,15 @@
     @apply border-border outline-ring/50;
   }
 
+  html {
+    background-color: #000000;
+  }
+
   body {
     @apply bg-background text-foreground;
+    background-color: #000000;
+    /* Force black for overscroll */
+    overscroll-behavior-y: none;
+    /* Optional: simpler wipe effect */
   }
 }
