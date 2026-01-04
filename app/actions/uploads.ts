@@ -82,6 +82,9 @@ export async function getDownloadUrl(fileUrl: string, options?: { inline?: boole
             }
         }
 
+        // Ensure key is decoded (e.g. %20 -> space) to match S3 key stored
+        key = decodeURIComponent(key);
+
         const disposition = options?.inline ? 'inline' : `attachment; filename="${key.split('/').pop()}"`;
 
         const command = new GetObjectCommand({

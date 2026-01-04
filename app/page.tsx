@@ -8,9 +8,9 @@ export default function Home() {
   const [liteMode, setLiteMode] = useState(false);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-black transition-colors duration-500">
-      {/* Background Layer */}
-      <div className={`absolute inset-0 z-0 transition-opacity duration-1000 ${liteMode ? 'opacity-0' : 'opacity-100'}`}>
+    <div className="relative w-full min-h-screen bg-black transition-colors duration-500">
+      {/* Background Layer - Fixed to viewport */}
+      <div className={`fixed inset-0 z-0 transition-opacity duration-1000 ${liteMode ? 'opacity-0' : 'opacity-100'}`}>
         <Particles
           className="absolute inset-0"
           quantity={100}
@@ -20,8 +20,8 @@ export default function Home() {
         />
       </div>
 
-      {/* Content Layer */}
-      <div className="absolute inset-0 z-10 overflow-y-auto">
+      {/* Content Layer - Scrolls naturally */}
+      <div className="relative z-10">
         <EtherealBeamsHero liteMode={liteMode} setLiteMode={setLiteMode} />
       </div>
     </div>

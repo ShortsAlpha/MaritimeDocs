@@ -61,13 +61,13 @@ export default function EtherealBeamsHero({ liteMode, setLiteMode }: { liteMode?
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
                     <div className="flex h-16 items-center justify-between">
                         {/* Brand Name Only */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 shrink-0">
                             <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
-                            <span className="text-xl font-bold text-white">Xone Superyacht Academy</span>
+                            <span className="text-sm sm:text-lg md:text-xl font-bold text-white whitespace-nowrap">Xone Superyacht Academy</span>
                         </div>
 
                         {/* Glassmorphic Navigation Pills */}
-                        <div className="hidden md:flex items-center space-x-1 rounded-full bg-white/5 border-white/10 backdrop-blur-xl border p-1 -mr-6">
+                        <div className="hidden md:flex items-center space-x-1 rounded-full bg-white/5 border-white/10 backdrop-blur-xl border p-1">
                             <Link
                                 href="#"
                                 className="rounded-full px-4 py-2 text-sm font-medium transition-all text-white/90 hover:bg-white/10 hover:text-white"
