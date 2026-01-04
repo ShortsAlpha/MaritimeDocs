@@ -120,26 +120,57 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
         return { success: false, message: "Failed to update profile: " + (error.message || String(error)) }
     }
 }
+// ... existing code ...
 
-export async function deleteStudent(id: string) {
+export async function fixStudentFolder(id: string) {
     try {
-        // 1. Fetch all documents for this student to clean up R2
-        const docs = await db.studentDocument.findMany({
-            where: { studentId: id }
-        });
+        const student = await db.student.findUnique({
+            where: { id },
+            include: { documents: true }
+        })
 
-        // 2. Parallel delete from R2
-        await Promise.all(
-            docs.map(doc => deleteFileFromR2(doc.fileUrl))
-        );
+        if (!student) throw new Error("Student not found")
 
-        // 3. Delete student (Cascade deletes document records in DB)
-        await db.student.delete({ where: { id } })
+        // 1. Calculate Expected Path (Clean Slug)
+        const safeName = slugify(student.fullName)
+        const targetFolder = `students/${safeName}`
 
-        revalidatePath("/admin/students")
-        return { success: true }
-    } catch (error) {
-        console.error("Delete Student Error:", error)
-        return { success: false, message: "Failed to delete student" }
+        // 2. Calculate "Broken" Path (Old Regex used previously)
+        // Previous bad logic: trim().replace(/[^a-z0-9]/gi, '_').toLowerCase()
+        const brokenName = student.fullName.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase()
+        const brokenFolder = `students/${brokenName}`
+
+        console.log(`Fix Attempt for ${student.fullName}: Broken=${brokenFolder} -> Target=${targetFolder}`)
+
+        if (brokenFolder === targetFolder) {
+            return { success: false, message: "Folder names match, no fix needed (or manually check R2)" }
+        }
+
+        // 3. Rename/Move files from Broken to Target
+        const success = await renameFolderInR2(brokenFolder, targetFolder)
+
+        if (success) {
+            // 4. Update DB references to point to Target
+            for (const doc of student.documents) {
+                // If doc URL contains broken folder, update it
+                if (doc.fileUrl.includes(brokenFolder)) {
+                    const newUrl = doc.fileUrl.replace(brokenFolder, targetFolder)
+                    await db.studentDocument.update({
+                        where: { id: doc.id },
+                        data: { fileUrl: newUrl }
+                    })
+                }
+                // OR if doc URL ALREADY points to target (but files were missing),
+                // we don't need to change URL, just the file move above fixed it.
+            }
+            revalidatePath(`/admin/students/${id}`)
+            return { success: true, message: "Folders resynced successfully" }
+        } else {
+            return { success: false, message: "Could not move files (Folders empty or R2 error)" }
+        }
+
+    } catch (error: any) {
+        console.error("Fix Folder Error:", error)
+        return { success: false, message: error.message }
     }
 }
