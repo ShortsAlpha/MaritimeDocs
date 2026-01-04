@@ -122,6 +122,29 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
 }
 // ... existing code ...
 
+export async function deleteStudent(id: string) {
+    try {
+        // 1. Fetch all documents for this student to clean up R2
+        const docs = await db.studentDocument.findMany({
+            where: { studentId: id }
+        });
+
+        // 2. Parallel delete from R2
+        await Promise.all(
+            docs.map(doc => deleteFileFromR2(doc.fileUrl))
+        );
+
+        // 3. Delete student (Cascade deletes document records in DB)
+        await db.student.delete({ where: { id } })
+
+        revalidatePath("/admin/students")
+        return { success: true }
+    } catch (error) {
+        console.error("Delete Student Error:", error)
+        return { success: false, message: "Failed to delete student" }
+    }
+}
+
 export async function fixStudentFolder(id: string) {
     try {
         const student = await db.student.findUnique({
