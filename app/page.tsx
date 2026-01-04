@@ -8,7 +8,7 @@ export default function Home() {
   const [liteMode, setLiteMode] = useState(false);
 
   return (
-    <div className="relative w-full min-h-screen bg-black transition-colors duration-500">
+    <div className="relative w-full min-h-[100dvh] bg-black transition-colors duration-500">
       {/* Background Layer - Fixed to viewport */}
       <div className={`fixed inset-0 z-0 transition-opacity duration-1000 ${liteMode ? 'opacity-0' : 'opacity-100'}`}>
         <Particles
