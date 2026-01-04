@@ -8,6 +8,7 @@ import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { DeleteStudentButton } from "@/components/admin/delete-student-button";
+import { EditableField } from "@/components/admin/editable-field";
 
 // Sub-components will be imported from separate files in next steps
 // Placeholder imports for now, we will create these files next
@@ -50,8 +51,6 @@ export default async function StudentDetailPage({
     const totalFee = Number(student.totalFee);
     const totalPaid = student.payments.reduce((sum, p) => sum + Number(p.amount), 0);
     const balance = totalFee - totalPaid;
-
-    // ... (other imports)
 
     return (
         <div className="space-y-6">
@@ -105,43 +104,61 @@ export default async function StudentDetailPage({
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <div className="grid gap-3">
-                                    <div className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors">
-                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                <div className="grid gap-1">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                                             <User className="h-4 w-4 text-primary" />
                                         </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground">Full Name</p>
-                                            <p className="text-sm font-semibold">{student.fullName}</p>
+                                        <div className="flex-1">
+                                            <EditableField
+                                                studentId={student.id}
+                                                label="Full Name"
+                                                name="fullName"
+                                                value={student.fullName}
+                                            />
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors">
-                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                                             <Mail className="h-4 w-4 text-primary" />
                                         </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground">Email Address</p>
-                                            <p className="text-sm text-blue-600 hover:underline">
-                                                <a href={`mailto:${student.email}`}>{student.email || "N/A"}</a>
-                                            </p>
+                                        <div className="flex-1">
+                                            <EditableField
+                                                studentId={student.id}
+                                                label="Email Address"
+                                                name="email"
+                                                value={student.email}
+                                            />
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors">
-                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                                             <Phone className="h-4 w-4 text-primary" />
                                         </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground">Phone Number</p>
-                                            <p className="text-sm">{student.phone || "N/A"}</p>
+                                        <div className="flex-1">
+                                            <EditableField
+                                                studentId={student.id}
+                                                label="Phone Number"
+                                                name="phone"
+                                                value={student.phone}
+                                            />
                                         </div>
                                     </div>
-                                    <div className="flex items-start gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors">
-                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
+
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                                             <MapPin className="h-4 w-4 text-primary" />
                                         </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-muted-foreground">Address</p>
-                                            <p className="text-sm text-balance max-w-xs">{student.address || "No address provided"}</p>
+                                        <div className="flex-1">
+                                            <EditableField
+                                                studentId={student.id}
+                                                label="Address"
+                                                name="address"
+                                                value={student.address}
+                                                isMultiline
+                                            />
                                         </div>
                                     </div>
                                 </div>

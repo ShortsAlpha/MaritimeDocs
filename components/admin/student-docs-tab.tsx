@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { slugify } from "@/lib/utils";
 import { FileText, Download, Trash2, UploadCloud, Eye, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { uploadStudentDocument, deleteStudentDocument, getDownloadUrl } from "@/app/actions/uploads";
@@ -11,6 +12,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { toast } from "sonner";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -36,7 +38,7 @@ function DocUploadDialog({ studentId, studentName, docType, onUploadComplete }: 
             formData.append("file", file);
 
             // Create a safe folder name from student name
-            const safeName = studentName.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            const safeName = slugify(studentName);
             formData.append("subFolder", `students/${safeName}`);
 
             const res = await fetch('/api/upload', {
@@ -58,7 +60,7 @@ function DocUploadDialog({ studentId, studentName, docType, onUploadComplete }: 
             setOpen(false);
         } catch (error) {
             console.error("Upload failed", error);
-            alert("Upload failed");
+            toast.error("Upload failed")
         } finally {
             setUploading(false);
         }

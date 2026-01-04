@@ -182,7 +182,7 @@ const AuthForm = ({ mode }: AuthFormProps) => {
                 <p className="mb-6 text-sm text-center text-gray-400">
                     {verifying
                         ? `Enter the code sent to ${email}`
-                        : (mode === "signin" ? "Welcome back to Maritime Academy" : "Join Maritime Academy today")}
+                        : (mode === "signin" ? "Welcome back to Xone Superyacht Academy" : "Join Xone Superyacht Academy today")}
                 </p>
 
                 <div className="flex flex-col w-full gap-3 mb-2">

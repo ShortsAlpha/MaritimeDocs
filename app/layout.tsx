@@ -13,12 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Maritime Academy Docs",
-  description: "Student Management System for Maritime Academy",
+  title: "Xone Superyacht Academy",
+  description: "Xone Superyacht Academy Student Management System",
 };
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "sonner";
 
 export default function RootLayout({
   children,
@@ -38,6 +39,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
+            <Toaster richColors />
           </ThemeProvider>
         </body>
       </html>

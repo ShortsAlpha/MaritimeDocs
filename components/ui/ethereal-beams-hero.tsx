@@ -63,7 +63,7 @@ export default function EtherealBeamsHero({ liteMode, setLiteMode }: { liteMode?
                         {/* Brand Name Only */}
                         <div className="flex items-center gap-2">
                             <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
-                            <span className="text-xl font-bold text-white">Maritime Academy Docs</span>
+                            <span className="text-xl font-bold text-white">Xone Superyacht Academy</span>
                         </div>
 
                         {/* Glassmorphic Navigation Pills */}
@@ -114,7 +114,7 @@ export default function EtherealBeamsHero({ liteMode, setLiteMode }: { liteMode?
                         {/* Main Heading */}
                         {/* Main Heading */}
                         <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl text-white">
-                            Maritime Academy{" "}
+                            Xone Superyacht Academy{" "}
                             <span className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 bg-clip-text text-transparent">
                                 Docs
                             </span>
@@ -122,7 +122,7 @@ export default function EtherealBeamsHero({ liteMode, setLiteMode }: { liteMode?
 
                         {/* Subtitle */}
                         <p className="mb-10 text-lg leading-8 sm:text-xl lg:text-2xl max-w-3xl mx-auto text-white/80">
-                            Maritime Academy Docs System
+                            Xone Superyacht Academy Student Management System
                         </p>
 
 

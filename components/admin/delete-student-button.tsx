@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Trash, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -35,10 +36,11 @@ export function DeleteStudentButton({ studentId }: Props) {
         try {
             const res = await deleteStudent(studentId)
             if (res.success) {
+                toast.success("Student deleted successfully")
                 router.push("/admin/students")
                 router.refresh()
             } else {
-                alert("Hata: " + res.message)
+                toast.error("Error: " + res.message)
                 setIsDeleting(false)
             }
         } catch (error) {
