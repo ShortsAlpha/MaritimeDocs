@@ -11,6 +11,16 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 function DocUploadDialog({ studentId, studentName, docType, onUploadComplete }: { studentId: string, studentName: string, docType: any, onUploadComplete: () => void }) {
     const [open, setOpen] = useState(false);
@@ -100,6 +110,8 @@ function DocList({ title, docs, docTypes, category, studentId, studentName }: { 
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [previewTitle, setPreviewTitle] = useState("");
     const [previewOpen, setPreviewOpen] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [docToDelete, setDocToDelete] = useState<string | null>(null);
 
     return (
         <>
@@ -112,6 +124,32 @@ function DocList({ title, docs, docTypes, category, studentId, studentName }: { 
                     if (!open) setPreviewUrl(null);
                 }}
             />
+
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the document from both the database and storage.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                            onClick={async () => {
+                                if (docToDelete) {
+                                    await deleteStudentDocument(docToDelete, studentId);
+                                    setDocToDelete(null);
+                                }
+                            }}
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
             <Card>
                 <CardHeader>
                     <CardTitle>{title}</CardTitle>
@@ -189,10 +227,9 @@ function DocList({ title, docs, docTypes, category, studentId, studentName }: { 
                                                         variant="ghost"
                                                         size="icon"
                                                         className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                                                        onClick={async () => {
-                                                            if (confirm("Delete this document?")) {
-                                                                await deleteStudentDocument(latestDoc.id, studentId);
-                                                            }
+                                                        onClick={() => {
+                                                            setDocToDelete(latestDoc.id);
+                                                            setDeleteDialogOpen(true);
                                                         }}
                                                     >
                                                         <Trash2 className="h-4 w-4" />

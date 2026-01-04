@@ -10,6 +10,16 @@ import { Label } from "@/components/ui/label"
 import { createCourse, deleteCourse, updateCourse } from "@/app/actions/courses"
 import { Pencil, Trash, Loader2, Save } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { useFormStatus } from "react-dom"
 
 function SubmitButton({ label = "Add Course" }: { label?: string }) {
@@ -63,6 +73,8 @@ const initialState = {
 
 export function CourseSettings({ courses }: { courses: Course[] }) {
     const [isDeleting, setIsDeleting] = useState<string | null>(null)
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+    const [courseToDelete, setCourseToDelete] = useState<string | null>(null)
     const [state, formAction] = useActionState(createCourse, initialState)
     const formRef = useRef<HTMLFormElement>(null)
 
@@ -72,11 +84,18 @@ export function CourseSettings({ courses }: { courses: Course[] }) {
         }
     }, [state.success])
 
-    async function handleDelete(id: string) {
-        if (!confirm("Are you sure you want to delete this course?")) return
-        setIsDeleting(id)
-        await deleteCourse(id)
+    function handleDeleteClick(id: string) {
+        setCourseToDelete(id)
+        setDeleteDialogOpen(true)
+    }
+
+    async function confirmDelete() {
+        if (!courseToDelete) return
+        setIsDeleting(courseToDelete)
+        await deleteCourse(courseToDelete)
         setIsDeleting(null)
+        setDeleteDialogOpen(false)
+        setCourseToDelete(null)
     }
 
     return (
@@ -104,7 +123,7 @@ export function CourseSettings({ courses }: { courses: Course[] }) {
                                             variant="ghost"
                                             size="icon"
                                             className="h-8 w-8 text-red-500 hover:text-red-600"
-                                            onClick={() => handleDelete(course.id)}
+                                            onClick={() => handleDeleteClick(course.id)}
                                             disabled={isDeleting === course.id}
                                         >
                                             {isDeleting === course.id ? (
@@ -148,6 +167,26 @@ export function CourseSettings({ courses }: { courses: Course[] }) {
                     </form>
                 </CardContent>
             </Card>
+
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Course</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to delete this course? This action implies data loss.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                            onClick={confirmDelete}
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }

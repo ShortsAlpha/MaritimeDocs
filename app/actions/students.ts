@@ -3,6 +3,7 @@
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { deleteFileFromR2 } from "@/lib/r2"
 
 const StudentSchema = z.object({
     fullName: z.string().min(2, "Name is too short"),
@@ -44,10 +45,23 @@ export async function createStudent(prevState: any, formData: FormData) {
 
 export async function deleteStudent(id: string) {
     try {
+        // 1. Fetch all documents for this student to clean up R2
+        const docs = await db.studentDocument.findMany({
+            where: { studentId: id }
+        });
+
+        // 2. Parallel delete from R2
+        await Promise.all(
+            docs.map(doc => deleteFileFromR2(doc.fileUrl))
+        );
+
+        // 3. Delete student (Cascade deletes document records in DB)
         await db.student.delete({ where: { id } })
+
         revalidatePath("/admin/students")
         return { success: true }
     } catch (error) {
+        console.error("Delete Student Error:", error)
         return { success: false, message: "Failed to delete student" }
     }
 }

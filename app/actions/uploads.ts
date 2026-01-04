@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { r2 } from "@/lib/r2";
+import { r2, deleteFileFromR2 } from "@/lib/r2";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
@@ -38,12 +38,25 @@ export async function uploadStudentDocument(
 
 export async function deleteStudentDocument(docId: string, studentId: string) {
     try {
+        // 1. Find the document to get the file URL
+        const doc = await db.studentDocument.findUnique({
+            where: { id: docId }
+        });
+
+        if (doc && doc.fileUrl) {
+            // 2. Delete from R2
+            await deleteFileFromR2(doc.fileUrl);
+        }
+
+        // 3. Delete from DB
         await db.studentDocument.delete({
             where: { id: docId }
         });
+
         revalidatePath(`/admin/students/${studentId}`);
         return { success: true };
     } catch (error) {
+        console.error("Delete error:", error);
         return { success: false, message: "Failed to delete document" };
     }
 }
