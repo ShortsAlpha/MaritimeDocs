@@ -257,39 +257,11 @@ function DocList({ title, docs, docTypes, category, studentId, studentName }: { 
     )
 }
 
-import { fixStudentFolder } from "@/app/actions/students";
-import { RefreshCw } from "lucide-react";
-
 // ... existing code ...
 
 export function StudentDocsTab({ student, docTypes }: { student: any, docTypes: any[] }) {
-    const [fixing, setFixing] = useState(false);
-
-    const handleFixSync = async () => {
-        setFixing(true);
-        try {
-            const res = await fixStudentFolder(student.id);
-            if (res.success) {
-                toast.success(res.message);
-            } else {
-                toast.error(res.message);
-            }
-        } catch (error) {
-            toast.error("Sync failed");
-        } finally {
-            setFixing(false);
-        }
-    };
-
     return (
         <div className="space-y-6">
-            <div className="flex justify-end">
-                <Button variant="outline" size="sm" onClick={handleFixSync} disabled={fixing}>
-                    <RefreshCw className={`mr-2 h-4 w-4 ${fixing ? 'animate-spin' : ''}`} />
-                    Sync Folders
-                </Button>
-            </div>
-
             <DocList
                 title="Office Documents"
                 docs={student.documents}
