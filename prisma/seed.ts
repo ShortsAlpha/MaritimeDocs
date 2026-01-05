@@ -141,6 +141,40 @@ async function main() {
 
     // Ayse has no payments yet
 
+    // 4. Create 10 Random English Students
+    console.log('Creating 10 English students...')
+    const englishNames = [
+        "John Smith", "Emily Johnson", "Michael Brown", "Sarah Davis", "David Wilson",
+        "Jessica Taylor", "James Anderson", "Jennifer Thomas", "Robert Jackson", "Lisa White"
+    ];
+
+    for (const name of englishNames) {
+        const randomCourse = COURSE_NAMES[Math.floor(Math.random() * COURSE_NAMES.length)];
+        const fee = Math.floor(Math.random() * 5000) + 2000; // Random fee 2000-7000
+
+        const student = await prisma.student.create({
+            data: {
+                fullName: name,
+                email: `${name.toLowerCase().replace(' ', '.')}@example.com`,
+                phone: `+44 ${Math.floor(Math.random() * 7000000000) + 7000000000}`,
+                totalFee: fee,
+                course: randomCourse
+            }
+        });
+
+        // Add random payment
+        if (Math.random() > 0.3) {
+            await prisma.payment.create({
+                data: {
+                    studentId: student.id,
+                    amount: Math.floor(fee * 0.3), // 30% down payment
+                    method: 'BANK_TRANSFER',
+                    note: 'Down payment'
+                }
+            });
+        }
+    }
+
     console.log('✅ Seed complete!')
 }
 
