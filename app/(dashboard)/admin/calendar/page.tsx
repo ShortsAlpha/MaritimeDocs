@@ -2,6 +2,8 @@ import { db } from "@/lib/db";
 
 import { CalendarPageContent } from "@/components/admin/calendar-page-content";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminCalendarPage() {
     const events = await db.courseEvent.findMany({
         include: {
