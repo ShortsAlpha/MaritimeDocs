@@ -41,7 +41,16 @@ const getEmailTemplate = (title: string, content: string, baseUrl: string, cta?:
     <body>
         <div class="container">
             <div class="header">
-                <img src="${baseUrl}/logo.png" alt="Xone Superyacht Academy" style="max-height: 60px; width: auto; display: block; margin: 0 auto;" />
+                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation">
+                    <tr>
+                        <td style="padding-right: 12px;">
+                            <img src="${baseUrl}/logo.png" alt="Xone" height="40" style="display: block; max-height: 40px; width: auto;" />
+                        </td>
+                        <td>
+                            <span style="color: #ffffff; font-size: 20px; font-weight: 600; letter-spacing: -0.5px;">Xone Superyacht Academy</span>
+                        </td>
+                    </tr>
+                </table>
             </div>
             <div class="content">
                 <h2>${title}</h2>
