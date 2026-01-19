@@ -130,15 +130,20 @@ export async function sendStudentWelcomeEmail(studentId: string) {
 }
 
 export async function sendExamNotesEmail(studentId: string, courseName: string, notesUrl: string) {
+    console.log(`Sending exam notes email to student ${studentId} for course ${courseName}`);
     try {
         const student = await db.student.findUnique({ where: { id: studentId } });
-        if (!student || !student.email) throw new Error("Student not found or no email");
+        if (!student || !student.email) {
+            console.error("Student not found or no email for ID:", studentId);
+            throw new Error("Student not found or no email");
+        }
 
         // Resolve Base URL
         const headersList = await headers();
         const host = headersList.get('host') || 'localhost:3000';
         const protocol = headersList.get('x-forwarded-proto') || 'http';
         const baseUrl = `${protocol}://${host}`;
+        console.log("Base URL resolved:", baseUrl);
 
         await resend.emails.send({
             from: 'Xone Academy <academics@resend.dev>',
@@ -153,13 +158,13 @@ export async function sendExamNotesEmail(studentId: string, courseName: string, 
                 baseUrl,
                 { text: 'Download Exam Notes', url: notesUrl }
             ),
-            // attachments: [ { filename: 'notes.pdf', path: notesUrl } ] // Optional: can attach if preferred
         });
+        console.log("Email sent successfully via Resend");
 
         return { success: true };
-    } catch (error) {
-        console.error("Send Exam Notes Error:", error);
-        return { success: false, message: "Failed to send email" };
+    } catch (error: any) {
+        console.error("Send Exam Notes Email Error:", error);
+        return { success: false, message: error.message || "Failed to send email" };
     }
 }
 

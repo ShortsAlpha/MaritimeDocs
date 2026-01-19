@@ -55,6 +55,8 @@ export default async function StudentDetailPage({
     const totalPaid = student.payments.reduce((sum, p) => sum + Number(p.amount), 0);
     const balance = totalFee - totalPaid;
 
+    const courses = await db.course.findMany({ orderBy: { title: 'asc' } });
+
     return (
         <div className="space-y-6">
             <div className="flex items-center gap-4">
@@ -84,7 +86,11 @@ export default async function StudentDetailPage({
                     <div className="h-8 w-px bg-border mx-2"></div>
 
                     <SendWelcomeEmailButton studentId={student.id} />
-                    <SendExamNotesDialog studentId={student.id} courseName={student.course || ""} />
+                    <SendExamNotesDialog
+                        studentId={student.id}
+                        courseName={student.course || ""}
+                        courses={courses}
+                    />
 
                     <div className="h-8 w-px bg-border mx-2"></div>
                     <DeleteStudentButton studentId={student.id} />

@@ -89,7 +89,15 @@ export function CalendarTwin({
                                 {events && (
                                     <div className="flex flex-col gap-1 w-full px-1 mt-1">
                                         {events
-                                            .filter(e => new Date(e.start).toDateString() === day.toDateString())
+                                            .filter(e => {
+                                                const start = new Date(e.start)
+                                                start.setHours(0, 0, 0, 0)
+                                                const end = new Date(e.end)
+                                                end.setHours(23, 59, 59, 999) // Ensure end date includes the full day
+                                                const current = new Date(day)
+                                                current.setHours(12, 0, 0, 0) // Avoid timezone edge cases
+                                                return current >= start && current <= end
+                                            })
                                             .slice(0, 3)
                                             .map((e, idx) => (
                                                 <div

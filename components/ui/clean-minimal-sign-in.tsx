@@ -32,6 +32,11 @@ const AuthForm = ({ mode }: AuthFormProps) => {
     };
 
     const handleSubmit = async () => {
+        if (isSignedIn) {
+            router.push("/admin");
+            return;
+        }
+
         if (!email && !verifying) {
             setError("Please enter email.");
             return;
@@ -65,7 +70,16 @@ const AuthForm = ({ mode }: AuthFormProps) => {
                         // If not complete, check factors
                     }
                 } catch (err: any) {
+                    console.error("Login inner error:", err);
                     const errorCode = err.errors?.[0]?.code;
+                    const errorMessage = err.errors?.[0]?.message;
+
+                    if (errorCode === "session_already_exists" || errorMessage?.includes("already signed in")) {
+                        // User is technically already logged in, so just redirect
+                        router.push("/admin");
+                        return;
+                    }
+
                     // Check if error implies we need another strategy (e.g. no password setup).
                     if (errorCode === "strategy_for_user_invalid" || errorCode === "form_password_missing") {
                         // Expected error for OAuth users trying password login

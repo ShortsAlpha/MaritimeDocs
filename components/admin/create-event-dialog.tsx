@@ -39,6 +39,9 @@ export function CreateEventDialog({ instructors, open, onOpenChange, defaultDate
     const [checklist, setChecklist] = useState<string[]>([""])
 
     useEffect(() => {
+        if (open) {
+            setChecklist([""])
+        }
         if (defaultDate) {
             const start = new Date(defaultDate)
             start.setHours(9, 0, 0, 0)
@@ -89,13 +92,23 @@ export function CreateEventDialog({ instructors, open, onOpenChange, defaultDate
                             <div className="col-span-3">
                                 <DateTimePicker date={startDate} setDate={(date) => {
                                     setStartDate(date);
-                                    if (date) {
+                                    // Auto-update end date if it's before start date or to keep a default 1-day duration if needed
+                                    // For now, let's just ensure end date is at least start date if not set
+                                    if (date && (!endDate || endDate < date)) {
                                         const end = new Date(date);
-                                        end.setHours(23, 30, 0, 0);
+                                        end.setHours(23, 30, 0, 0); // Default to end of day
                                         setEndDate(end);
                                     }
                                 }} />
                                 <input type="hidden" name="startDate" value={startDate ? startDate.toISOString() : ''} />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="endDate" className="text-right">
+                                End
+                            </Label>
+                            <div className="col-span-3">
+                                <DateTimePicker date={endDate} setDate={setEndDate} />
                                 <input type="hidden" name="endDate" value={endDate ? endDate.toISOString() : ''} />
                             </div>
                         </div>

@@ -8,34 +8,68 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { addPayment, updateStudentFee, updatePaymentAmount } from "@/app/actions/accounting";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Loader2, Save, X, Edit2 } from "lucide-react";
 
 // ... existing imports ...
 
 function EditablePaymentAmount({ paymentId, initialAmount, forceEdit }: { paymentId: string, initialAmount: number, forceEdit: boolean }) {
     const router = useRouter();
-    const [amount, setAmount] = useState(initialAmount);
+    const [amount, setAmount] = useState(initialAmount.toString());
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [hasChanged, setHasChanged] = useState(false);
+
+    // Sync state with prop when it changes
+    useEffect(() => {
+        // If we are getting new data from server, sync it
+        setAmount(initialAmount.toString());
+        setHasChanged(false);
+    }, [initialAmount]);
+
+    // Save on Done (forceEdit toggles from true to false)
+    useEffect(() => {
+        if (!forceEdit && hasChanged) {
+            handleSave();
+        }
+    }, [forceEdit]);
 
     // Sync with forceEdit
     const isEffectiveEditing = isEditing || forceEdit;
 
     async function handleSave() {
+        // Prevent double save or save if no change
+        if (!hasChanged && amount === initialAmount.toString()) return;
+
         setLoading(true);
-        const res = await updatePaymentAmount(paymentId, amount);
+        const numericAmount = parseFloat(amount.replace(/,/, '.')); // Handle comma decimals if any
+
+        if (isNaN(numericAmount)) {
+            toast.error("Invalid amount");
+            setLoading(false);
+            return;
+        }
+
+        const res = await updatePaymentAmount(paymentId, numericAmount);
         if (res.success) {
+            toast.success("Payment saved automatically");
             setIsEditing(false);
-            router.refresh(); // Refresh to update totals
+            setHasChanged(false);
+            router.refresh();
         } else {
-            // Revert or show error
-            setAmount(initialAmount);
+            toast.error("Failed to update");
+            setAmount(initialAmount.toString());
         }
         setLoading(false);
     }
+
+    const handleChange = (val: string) => {
+        setAmount(val);
+        setHasChanged(true);
+    };
 
     if (isEffectiveEditing) {
         return (
@@ -45,13 +79,15 @@ function EditablePaymentAmount({ paymentId, initialAmount, forceEdit }: { paymen
                     step="0.01"
                     className="h-8 w-24 text-right"
                     value={amount}
-                    onChange={(e) => setAmount(Number(e.target.value))}
+                    onChange={(e) => handleChange(e.target.value)}
                 />
-                <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600" onClick={handleSave} disabled={loading}>
-                    {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
-                </Button>
                 {!forceEdit && (
-                    <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground" onClick={() => { setIsEditing(false); setAmount(initialAmount); }}>
+                    <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600" onClick={handleSave} disabled={loading}>
+                        {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+                    </Button>
+                )}
+                {!forceEdit && (
+                    <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground" onClick={() => { setIsEditing(false); setAmount(initialAmount.toString()); }}>
                         <X className="h-3 w-3" />
                     </Button>
                 )}
@@ -59,9 +95,10 @@ function EditablePaymentAmount({ paymentId, initialAmount, forceEdit }: { paymen
         )
     }
 
+    // Displays the persisted value (initialAmount) to ensure no confusion about unsaved state
     return (
         <div className="flex items-center justify-end gap-2 group">
-            <span className="font-medium">€{Number(amount).toLocaleString()}</span>
+            <span className="font-medium">€{Number(initialAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
         </div>
     )
 }

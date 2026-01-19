@@ -162,15 +162,29 @@ export async function rejectDocument(docId: string) {
 }
 
 export async function uploadExamNoteFile(formData: FormData) {
+    console.log("Starting uploadExamNoteFile...");
     try {
         const file = formData.get("file") as File;
         const studentId = formData.get("studentId") as string;
 
-        if (!file || !studentId) throw new Error("Missing file or studentId");
+        console.log(`Upload request for student: ${studentId}, File: ${file?.name}, Size: ${file?.size}, Type: ${file?.type}`);
 
-        const buffer = Buffer.from(await file.arrayBuffer());
+        if (!file || !studentId) {
+            console.error("Missing file or studentId");
+            return { success: false, message: "Missing file or studentId" };
+        }
+
+        console.log("Reading file buffer...");
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        console.log("Buffer created:", buffer.byteLength);
+
         const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
         const key = `students/${studentId}/exam-notes/${Date.now()}-${safeName}`;
+        console.log("Generated Key:", key);
+
+        console.log("Uploading to R2...");
+        if (!process.env.R2_BUCKET_NAME) throw new Error("R2_BUCKET_NAME not set");
 
         await r2.send(new PutObjectCommand({
             Bucket: process.env.R2_BUCKET_NAME,
@@ -178,7 +192,9 @@ export async function uploadExamNoteFile(formData: FormData) {
             Body: buffer,
             ContentType: file.type,
         }));
+        console.log("Upload successful");
 
+        console.log("Generating signed URL...");
         const command = new GetObjectCommand({
             Bucket: process.env.R2_BUCKET_NAME,
             Key: key,
@@ -186,11 +202,12 @@ export async function uploadExamNoteFile(formData: FormData) {
         });
 
         const signedUrl = await getSignedUrl(r2, command, { expiresIn: 604800 }); // 7 Days
+        console.log("Signed URL generated:", signedUrl.substring(0, 50) + "...");
 
         return { success: true, url: signedUrl };
-    } catch (error) {
-        console.error("Upload Exam Note Error:", error);
-        return { success: false };
+    } catch (error: any) {
+        console.error("Upload Exam Note Logic Error (Catch Block):", error);
+        return { success: false, message: error.message || "Unknown error" };
     }
 }
 

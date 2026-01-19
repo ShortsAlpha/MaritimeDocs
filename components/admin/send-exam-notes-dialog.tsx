@@ -1,13 +1,6 @@
 'use client';
 
 import { sendExamNotesEmail } from "@/app/actions/email";
-import { uploadPendingDocument } from "@/app/actions/documents"; // We can reuse logic or direct R2 upload
-// Actually, better to have a specific upload action for this so it doesn't create a 'StudentDocument' record linked to checking?
-// Or just upload to a temp folder.
-// I'll create a simple helper in this file or use a new action.
-// Let's use a new simple action in this file? No, server actions in separate file.
-// I'll add `uploadExamNote` to `app/actions/documents.ts`.
-
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -19,49 +12,58 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileText, Loader2, Send } from "lucide-react";
+import { FileText, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { uploadExamNoteFile } from "@/app/actions/documents";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export function SendExamNotesDialog({ studentId, courseName }: { studentId: string, courseName?: string }) {
+export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { studentId: string, courseName?: string, courses?: any[] }) {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [course, setCourse] = useState(courseName || "");
+    const [file, setFile] = useState<File | null>(null);
 
-    async function handleSubmit(formData: FormData) {
+    async function handleSend(e: React.FormEvent) {
+        e.preventDefault();
         setIsLoading(true);
-        const file = formData.get("file") as File;
 
         if (!file || !course) {
-            toast.error("Please fill all fields");
+            toast.error("Please select a course and a file");
             setIsLoading(false);
             return;
         }
 
-        // 1. Upload File
-        const uploadFormData = new FormData();
-        uploadFormData.append("file", file);
-        uploadFormData.append("studentId", studentId);
+        try {
+            // 1. Upload File
+            const uploadFormData = new FormData();
+            uploadFormData.append("file", file);
+            uploadFormData.append("studentId", studentId);
 
-        const uploadRes = await uploadExamNoteFile(uploadFormData);
+            const uploadRes = await uploadExamNoteFile(uploadFormData);
 
-        if (!uploadRes.success || !uploadRes.url) {
-            toast.error("Failed to upload note");
+            if (!uploadRes.success || !uploadRes.url) {
+                toast.error("Failed to upload note");
+                setIsLoading(false);
+                return;
+            }
+
+            // 2. Send Email
+            const emailRes = await sendExamNotesEmail(studentId, course, uploadRes.url);
+
+            if (emailRes.success) {
+                toast.success("Exam notes sent successfully!");
+                setIsOpen(false);
+                setFile(null);
+            } else {
+                toast.error("Failed to send email");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("An unexpected error occurred");
+        } finally {
             setIsLoading(false);
-            return;
         }
-
-        // 2. Send Email
-        const emailRes = await sendExamNotesEmail(studentId, course, uploadRes.url);
-
-        if (emailRes.success) {
-            toast.success("Exam notes sent!");
-            setIsOpen(false);
-        } else {
-            toast.error("Failed to send email");
-        }
-        setIsLoading(false);
     }
 
     return (
@@ -79,19 +81,35 @@ export function SendExamNotesDialog({ studentId, courseName }: { studentId: stri
                         Upload a file (PDF) to send to the student.
                     </DialogDescription>
                 </DialogHeader>
-                <form action={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSend} className="space-y-4">
                     <div className="space-y-2">
                         <Label>Course Name</Label>
-                        <Input
-                            value={course}
-                            onChange={e => setCourse(e.target.value)}
-                            placeholder="e.g. Navigation 101"
-                            required
-                        />
+                        <Select value={course} onValueChange={setCourse} required>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select course" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {courses.map((c) => (
+                                    <SelectItem key={c.id} value={c.title}>
+                                        {c.title}
+                                    </SelectItem>
+                                ))}
+                                {/* Fallback if current course is not in list */}
+                                {courseName && !courses.find(c => c.title === courseName) && (
+                                    <SelectItem value={courseName}>{courseName}</SelectItem>
+                                )}
+                            </SelectContent>
+                        </Select>
                     </div>
                     <div className="space-y-2">
                         <Label>Exam Note File</Label>
-                        <Input type="file" name="file" required accept=".pdf,.doc,.docx" />
+                        <Input
+                            type="file"
+                            name="file"
+                            required
+                            accept=".pdf,.doc,.docx"
+                            onChange={(e) => setFile(e.target.files?.[0] || null)}
+                        />
                     </div>
                     <Button type="submit" disabled={isLoading} className="w-full">
                         {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send Email"}

@@ -20,9 +20,15 @@ export function CalendarPageContent({ events, instructors }: Props) {
     const [selectedDate, setSelectedDate] = useState<Date>(new Date())
 
     // Derive events for the selected date ensuring reactivity
-    const selectedEvents = events.filter(event =>
-        new Date(event.start).toDateString() === selectedDate.toDateString()
-    )
+    const selectedEvents = events.filter(event => {
+        const start = new Date(event.start)
+        start.setHours(0, 0, 0, 0)
+        const end = new Date(event.end)
+        end.setHours(23, 59, 59, 999)
+        const current = new Date(selectedDate)
+        current.setHours(12, 0, 0, 0)
+        return current >= start && current <= end
+    })
 
     const handleDateChange = (newDate: Date) => {
         setDate(newDate)
@@ -30,8 +36,13 @@ export function CalendarPageContent({ events, instructors }: Props) {
 
         // Find events specifically for the click action logic
         const dayEvents = events.filter(event => {
-            const eventDate = new Date(event.start)
-            return eventDate.toDateString() === newDate.toDateString()
+            const start = new Date(event.start)
+            start.setHours(0, 0, 0, 0)
+            const end = new Date(event.end)
+            end.setHours(23, 59, 59, 999)
+            const current = new Date(newDate)
+            current.setHours(12, 0, 0, 0)
+            return current >= start && current <= end
         })
 
         if (dayEvents.length > 0) {
