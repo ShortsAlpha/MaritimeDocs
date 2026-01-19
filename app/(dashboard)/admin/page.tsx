@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import StatsCard from "@/components/statistics-card-1";
 import StatsCardsWithLinks from "@/components/ui/stats-cards-with-links";
-import StatsWithChart from "@/components/ui/stats-with-chart";
+
 import { format } from "date-fns";
 import { UpcomingCourses } from "@/components/dashboard/upcoming-courses";
 import { PendingDocsWidget } from "@/components/dashboard/pending-docs-widget";
@@ -66,54 +66,13 @@ export default async function AdminPage() {
     // In a real app, we would query group-by date.
 
     // Mocking chart data based on real total to look nice but representing "Recent Activity"
-    const chartData = [
-        { date: "Current", "Total Enrolls": studentCount, "Completions": completionsCount, "Revenue": totalRevenue }
-    ];
+
 
     // Better Mock: 7 Days history generator (constant for stable UI, or randomized around average)
-    const historyData = Array.from({ length: 7 }).map((_, i) => {
-        return {
-            date: `Day ${i + 1}`,
-            "Total Enrolls": Math.max(0, Math.floor(studentCount * (0.8 + Math.random() * 0.4))),
-            "Completions": Math.max(0, Math.floor(completionsCount * (0.8 + Math.random() * 0.4))),
-            "Revenue": Math.max(0, Math.floor(totalRevenue * (0.8 + Math.random() * 0.4))),
-        }
-    });
-    // Ensure last point matches current for consistency (optional, but good for "current state")
-    historyData[6] = {
-        date: "Today",
-        "Total Enrolls": studentCount,
-        "Completions": completionsCount,
-        "Revenue": totalRevenue
-    };
 
 
-    const chartSummary = [
-        {
-            name: "Total Enrolls",
-            label: "Total Enrolls",
-            value: studentCount.toString(),
-            change: "Live",
-            percentageChange: "100%",
-            changeType: "positive" as const,
-        },
-        {
-            name: "Completions",
-            label: "Completions",
-            value: completionsCount.toString(),
-            change: "Graduated",
-            percentageChange: `${((completionsCount / (studentCount || 1)) * 100).toFixed(1)}%`,
-            changeType: "positive" as const,
-        },
-        {
-            name: "Revenue",
-            label: "Revenue",
-            value: `€${totalRevenue.toLocaleString('en-EU')}`,
-            change: "Collected",
-            percentageChange: "100%",
-            changeType: "positive" as const,
-        },
-    ];
+
+
 
     // 5. Fetch Pending Documents
     const pendingDocs = await db.studentDocument.findMany({
@@ -138,10 +97,7 @@ export default async function AdminPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-7 gap-6">
                 <div className="col-span-4 space-y-6">
-                    <div className="space-y-4">
-                        <h2 className="text-lg font-semibold">Performance & Revenue</h2>
-                        <StatsWithChart summary={chartSummary} data={historyData} />
-                    </div>
+
                     <div className="space-y-4">
                         <h2 className="text-lg font-semibold">Upcoming Courses</h2>
                         <UpcomingCourses />

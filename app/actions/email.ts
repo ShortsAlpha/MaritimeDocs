@@ -64,7 +64,6 @@ const getEmailTemplate = (title: string, content: string, baseUrl: string, cta?:
             </div>
             <div class="footer">
                 <p>© ${new Date().getFullYear()} Xone Superyacht Academy. All rights reserved.</p>
-                <p>Add: Göcek, Fethiye / Muğla, Turkey</p>
             </div>
         </div>
     </body>

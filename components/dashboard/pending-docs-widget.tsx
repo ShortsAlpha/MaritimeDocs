@@ -21,6 +21,7 @@ interface PendingDocument {
     id: string;
     title: string | null;
     fileUrl: string;
+    fileType: string;
     createdAt: Date;
     student: {
         id: string;
@@ -197,7 +198,7 @@ export function PendingDocsWidget({ documents }: { documents: PendingDocument[] 
                     </DialogHeader>
                     <div className="flex-1 overflow-hidden bg-neutral-100 dark:bg-neutral-900 relative">
                         {selectedDoc ? (
-                            selectedDoc.fileUrl.toLowerCase().endsWith('.pdf') ? (
+                            selectedDoc.fileType === 'pdf' ? (
                                 <iframe
                                     src={selectedDoc.fileUrl}
                                     className="w-full h-full border-0"
