@@ -4,17 +4,16 @@ import { db } from "@/lib/db";
 import { Resend } from 'resend';
 import { v4 as uuidv4 } from 'uuid';
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers"; // Dynamically get host from request
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const getBaseUrl = () => {
-    if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
-    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-    return 'http://localhost:3000';
-}
+// 1. Remove synchronous getBaseUrl
+// 2. Add baseUrl argument to getEmailTemplate
+// 3. Resolve baseUrl inside each server action
 
 // Professional Email Template Helper
-const getEmailTemplate = (title: string, content: string, cta?: { text: string, url: string }) => {
+const getEmailTemplate = (title: string, content: string, baseUrl: string, cta?: { text: string, url: string }) => {
     return `
     <!DOCTYPE html>
     <html>
@@ -42,7 +41,7 @@ const getEmailTemplate = (title: string, content: string, cta?: { text: string, 
     <body>
         <div class="container">
             <div class="header">
-                <img src="${getBaseUrl()}/logo.png" alt="Xone Superyacht Academy" style="max-height: 60px; width: auto; display: block; margin: 0 auto;" />
+                <img src="${baseUrl}/logo.png" alt="Xone Superyacht Academy" style="max-height: 60px; width: auto; display: block; margin: 0 auto;" />
             </div>
             <div class="content">
                 <h2>${title}</h2>
@@ -84,7 +83,13 @@ export async function sendStudentWelcomeEmail(studentId: string) {
         });
 
 
-        const uploadLink = `${getBaseUrl()}/upload/${token}`;
+        // Resolve Base URL dynamically
+        const headersList = await headers();
+        const host = headersList.get('host') || 'localhost:3000';
+        const protocol = headersList.get('x-forwarded-proto') || 'http';
+        const baseUrl = `${protocol}://${host}`;
+
+        const uploadLink = `${baseUrl}/upload/${token}`;
         console.log(`Attempting to send welcome email to: ${student.email}`);
 
         // Send Email
@@ -98,6 +103,7 @@ export async function sendStudentWelcomeEmail(studentId: string) {
                 <p>Welcome aboard! We are excited to have you join us at Xone Superyacht Academy.</p>
                 <p>To finalize your enrollment and ensure a smooth start, we require you to upload some essential documents.</p>
                 <p>Please click the button below to access your secure upload portal. This link is valid for <strong>7 days</strong>.</p>`,
+                baseUrl,
                 { text: 'Upload Documents Securely', url: uploadLink }
             )
         });
@@ -120,6 +126,12 @@ export async function sendExamNotesEmail(studentId: string, courseName: string, 
         const student = await db.student.findUnique({ where: { id: studentId } });
         if (!student || !student.email) throw new Error("Student not found or no email");
 
+        // Resolve Base URL
+        const headersList = await headers();
+        const host = headersList.get('host') || 'localhost:3000';
+        const protocol = headersList.get('x-forwarded-proto') || 'http';
+        const baseUrl = `${protocol}://${host}`;
+
         await resend.emails.send({
             from: 'Xone Academy <academics@resend.dev>',
             to: student.email,
@@ -130,6 +142,7 @@ export async function sendExamNotesEmail(studentId: string, courseName: string, 
                 <p>We have prepared the study notes for your upcoming exam in <strong>${courseName}</strong>.</p>
                 <p>You can download them directly using the link below. We recommend reviewing them thoroughly before your assessment.</p>
                 <p>Good luck with your studies!</p>`,
+                baseUrl,
                 { text: 'Download Exam Notes', url: notesUrl }
             ),
             // attachments: [ { filename: 'notes.pdf', path: notesUrl } ] // Optional: can attach if preferred
@@ -147,6 +160,12 @@ export async function sendDocumentRejectionEmail(studentId: string, documentTitl
         const student = await db.student.findUnique({ where: { id: studentId } });
         if (!student || !student.email) throw new Error("Student not found or no email");
 
+        // Resolve Base URL
+        const headersList = await headers();
+        const host = headersList.get('host') || 'localhost:3000';
+        const protocol = headersList.get('x-forwarded-proto') || 'http';
+        const baseUrl = `${protocol}://${host}`;
+
         await resend.emails.send({
             from: 'Xone Academy <support@resend.dev>',
             to: student.email,
@@ -161,7 +180,8 @@ export async function sendDocumentRejectionEmail(studentId: string, documentTitl
                     <li>Phone: +90 (555) 123 45 67</li>
                     <li>Email: <a href="mailto:support@xone.com" class="link">support@xone.com</a></li>
                 </ul>`,
-                { text: 'Go to Student Portal', url: `${getBaseUrl()}/admin/students/${studentId}` } // Redirect to portal or specialized re-upload link if available
+                baseUrl,
+                { text: 'Go to Student Portal', url: `${baseUrl}/admin/students/${studentId}` } // Redirect to portal
             )
         });
 
