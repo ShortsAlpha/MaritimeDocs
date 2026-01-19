@@ -130,77 +130,19 @@ function ChartContainer({
     );
 }
 
-const data = [
-    {
-        date: "Nov 24, 2023",
-        "Student Enrolls": 12,
-        "Course Completes": 5,
-        "Revenue": 830,
-    },
-    {
-        date: "Nov 25, 2023",
-        "Student Enrolls": 15,
-        "Course Completes": 8,
-        "Revenue": 960,
-    },
-    {
-        date: "Nov 26, 2023",
-        "Student Enrolls": 18,
-        "Course Completes": 12,
-        "Revenue": 1100,
-    },
-    {
-        date: "Nov 27, 2023",
-        "Student Enrolls": 14,
-        "Course Completes": 9,
-        "Revenue": 890,
-    },
-    {
-        date: "Nov 28, 2023",
-        "Student Enrolls": 8,
-        "Course Completes": 15,
-        "Revenue": 1200,
-    },
-    {
-        date: "Nov 29, 2023",
-        "Student Enrolls": 22,
-        "Course Completes": 18,
-        "Revenue": 1500,
-    },
-    {
-        date: "Nov 30, 2023",
-        "Student Enrolls": 19,
-        "Course Completes": 14,
-        "Revenue": 1350,
-    },
-];
+export type StatsWithChartSummary = {
+    name: string
+    label: string
+    value: string
+    change: string
+    percentageChange: string
+    changeType: "positive" | "negative"
+}
 
-const summary = [
-    {
-        name: "Student Enrolls",
-        label: "Total Enrolls",
-        value: "145",
-        change: "+12",
-        percentageChange: "+8.4%",
-        changeType: "positive",
-    },
-    {
-        name: "Course Completes",
-        label: "Completions",
-        value: "86",
-        change: "+8",
-        percentageChange: "+6.3%",
-        changeType: "positive",
-    },
-    {
-        name: "Revenue",
-        label: "Revenue",
-        value: "€12,450",
-        change: "+1250",
-        percentageChange: "+11.2%",
-        changeType: "positive",
-    },
-];
+type Props = {
+    summary: StatsWithChartSummary[]
+    data: any[]
+}
 
 const sanitizeName = (name: string) => {
     return name
@@ -209,7 +151,7 @@ const sanitizeName = (name: string) => {
         .toLowerCase();
 };
 
-export default function StatsWithChart() {
+export default function StatsWithChart({ summary, data }: Props) {
     return (
         <div className="w-full">
             <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 w-full">

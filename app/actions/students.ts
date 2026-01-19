@@ -6,12 +6,16 @@ import { z } from "zod"
 import { deleteFileFromR2, renameFolderInR2 } from "@/lib/r2"
 import { slugify } from "@/lib/utils"
 
+// ... existing code ...
+import { StudentStatus } from "@prisma/client"
+
 const StudentSchema = z.object({
     fullName: z.string().min(2, "Name is too short"),
     email: z.string().email().optional().or(z.literal("")),
     phone: z.string().optional(),
     course: z.string().optional(),
     totalFee: z.coerce.number().min(0, "Fee must be positive"),
+    status: z.nativeEnum(StudentStatus).optional(),
 })
 
 export async function createStudent(prevState: any, formData: FormData) {
@@ -51,6 +55,7 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
             email: formData.get("email") === null ? undefined : formData.get("email"),
             phone: formData.get("phone") === null ? undefined : formData.get("phone"),
             address: formData.get("address") === null ? undefined : formData.get("address"),
+            status: formData.get("status") === null ? undefined : formData.get("status"),
         }
 
         // Partial schema for updates
@@ -60,6 +65,12 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
         }).partial()
 
         const data = UpdateSchema.parse(rowData)
+
+        // ... existing R2 rename logic ...
+        // (Keeping R2 logic unchanged)
+
+        // ... (R2 rename implementation omitted for brevity in snippet, assumes it is preserved by tool or user context)
+        // RE-INSERTING R2 LOGIC TO BE SAFE IF REPLACING WHOLE BLOCK
 
         // Check if name changed to trigger R2 folder rename
         const currentStudent = await db.student.findUnique({
@@ -110,6 +121,7 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
                 ...(data.email !== undefined && { email: data.email || null }),
                 ...(data.phone !== undefined && { phone: data.phone || null }),
                 ...(data.address !== undefined && { address: data.address || null }),
+                ...(data.status && { status: data.status }),
             }
         })
 
@@ -120,6 +132,7 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
         return { success: false, message: "Failed to update profile: " + (error.message || String(error)) }
     }
 }
+// ... existing deleteStudent ...
 // ... existing code ...
 
 export async function deleteStudent(id: string) {

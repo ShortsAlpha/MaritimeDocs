@@ -9,11 +9,14 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { DeleteStudentButton } from "@/components/admin/delete-student-button";
 import { EditableField } from "@/components/admin/editable-field";
+import { StudentStatusSelect } from "@/components/admin/student-status-select";
 
 // Sub-components will be imported from separate files in next steps
 // Placeholder imports for now, we will create these files next
 import { StudentDocsTab } from "@/components/admin/student-docs-tab";
 import { StudentAccountingTab } from "@/components/admin/student-accounting-tab";
+import { SendWelcomeEmailButton } from "@/components/admin/send-welcome-button";
+import { SendExamNotesDialog } from "@/components/admin/send-exam-notes-dialog";
 
 export default async function StudentDetailPage({
     params,
@@ -74,6 +77,16 @@ export default async function StudentDetailPage({
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
+                    <div className="flex flex-col items-end gap-1">
+                        <span className="text-xs text-muted-foreground">Status</span>
+                        <StudentStatusSelect studentId={student.id} currentStatus={student.status} />
+                    </div>
+                    <div className="h-8 w-px bg-border mx-2"></div>
+
+                    <SendWelcomeEmailButton studentId={student.id} />
+                    <SendExamNotesDialog studentId={student.id} courseName={student.course || ""} />
+
+                    <div className="h-8 w-px bg-border mx-2"></div>
                     <DeleteStudentButton studentId={student.id} />
                     <div className="flex flex-col items-end">
                         <span className="text-sm text-muted-foreground">Current Balance</span>

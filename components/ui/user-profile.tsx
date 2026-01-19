@@ -16,10 +16,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUser, useClerk } from "@clerk/nextjs";
 
 export default function UserProfile() {
-    const { user } = useUser();
+    // Check if context exists loosely? No, useUser throws.
+    // Try to catch? Hooks can't be caught in-component.
+    // Let's verify imports first.
+    return <UserProfileContent />
+}
+
+function UserProfileContent() {
+    const { user, isLoaded } = useUser();
     const { signOut, openUserProfile } = useClerk();
 
-    if (!user) return null;
+    if (!isLoaded || !user) return null;
 
     return (
         <Popover>

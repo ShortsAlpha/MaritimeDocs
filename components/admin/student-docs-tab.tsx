@@ -1,283 +1,247 @@
-'use client'
+'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { slugify } from "@/lib/utils";
-import { FileText, Download, Trash2, UploadCloud, Eye, Loader2 } from "lucide-react";
-import { format } from "date-fns";
-import { uploadStudentDocument, deleteStudentDocument, getDownloadUrl } from "@/app/actions/uploads";
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { toast } from "sonner";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { FileText, Download, Trash2, CloudUpload, Eye } from "lucide-react";
+import { format } from "date-fns";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { deleteStudentDocument, getDocumentPreviewUrl } from "@/app/actions/documents";
 
-function DocUploadDialog({ studentId, studentName, docType, onUploadComplete }: { studentId: string, studentName: string, docType: any, onUploadComplete: () => void }) {
-    const [open, setOpen] = useState(false);
-    const [uploading, setUploading] = useState(false);
+interface DocumentType {
+    id: string;
+    title: string;
+    description: string | null;
+    category: "OFFICE" | "STUDENT" | "CERTIFICATE" | "MEDICAL" | "INSTRUCTOR";
+    isRequired: boolean;
+}
 
-    async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-        const file = e.target.files?.[0];
-        if (!file) return;
+interface StudentDocument {
+    id: string;
+    title: string | null;
+    fileUrl: string;
+    fileType: string;
+    status: "PENDING" | "APPROVED" | "REJECTED";
+    createdAt: Date;
+    documentTypeId: string;
+    documentType: DocumentType;
+}
 
-        setUploading(true);
-        try {
-            const formData = new FormData();
-            formData.append("file", file);
+interface StudentDocsTabProps {
+    student: {
+        id: string;
+        documents: StudentDocument[];
+    };
+    docTypes: DocumentType[];
+}
 
-            // Create a safe folder name from student name
-            const safeName = slugify(studentName);
-            formData.append("subFolder", `students/${safeName}`);
+export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
+    const router = useRouter();
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [selectedDoc, setSelectedDoc] = useState<StudentDocument | null>(null);
+    const [loadingPreview, setLoadingPreview] = useState(false);
 
-            const res = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData,
-            });
+    const categories = ["OFFICE", "STUDENT", "MEDICAL", "CERTIFICATE"];
 
-            if (!res.ok) {
-                const err = await res.text();
-                throw new Error(err || "Upload failed");
-            }
-
-            const { fileUrl } = await res.json();
-
-            // Save Record
-            await uploadStudentDocument(studentId, docType.id, fileUrl, file.type);
-
-            onUploadComplete();
-            setOpen(false);
-        } catch (error) {
-            console.error("Upload failed", error);
-            toast.error("Upload failed")
-        } finally {
-            setUploading(false);
+    async function handlePreview(doc: StudentDocument) {
+        setLoadingPreview(true);
+        const res = await getDocumentPreviewUrl(doc.id);
+        if (res.success && res.url) {
+            setSelectedDoc({ ...doc, fileUrl: res.url });
+        } else {
+            toast.error("Preview failed");
+            // Fallback to public URL just in case
+            setSelectedDoc(doc);
         }
+        setLoadingPreview(false);
+    }
+
+    async function handleDelete(docId: string) {
+        if (!confirm("Are you sure you want to delete this document?")) return;
+        setDeletingId(docId);
+        const res = await deleteStudentDocument(docId);
+        if (res.success) {
+            toast.success("Document deleted");
+            router.refresh();
+        } else {
+            toast.error("Failed to delete document");
+        }
+        setDeletingId(null);
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                    <UploadCloud className="mr-2 h-4 w-4" />
-                    Upload
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Upload {docType.title}</DialogTitle>
-                </DialogHeader>
-                <div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label htmlFor="file">Document</Label>
-                    <Input id="file" type="file" onChange={handleFileChange} disabled={uploading} />
-                    {uploading && <p className="text-sm text-muted-foreground flex items-center"><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading...</p>}
-                </div>
-            </DialogContent>
-        </Dialog>
-    )
-}
+        <div className="space-y-8">
+            {categories.map((category) => {
+                const categoryTypes = docTypes.filter((dt) => dt.category === category);
+                if (categoryTypes.length === 0) return null;
 
-function DocPreviewDialog({ url, title, open, onOpenChange }: { url: string | null, title: string, open: boolean, onOpenChange: (open: boolean) => void }) {
-    return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[95vw] w-full h-[95vh] p-4 flex flex-col">
-                <DialogHeader className="px-0">
-                    <DialogTitle>{title}</DialogTitle>
-                </DialogHeader>
-                {url ? (
-                    <iframe src={url} className="w-full h-full rounded-md border flex-1" />
-                ) : (
-                    <div className="flex items-center justify-center h-full">
-                        <Loader2 className="h-8 w-8 animate-spin" />
-                    </div>
-                )}
-            </DialogContent>
-        </Dialog>
-    )
-}
+                const categoryName = category.charAt(0) + category.slice(1).toLowerCase() + " Documents";
 
-function DocList({ title, docs, docTypes, category, studentId, studentName }: { title: string, docs: any[], docTypes: any[], category: string, studentId: string, studentName: string }) {
-    const categoryTypes = docTypes.filter(dt => dt.category === category);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-    const [previewTitle, setPreviewTitle] = useState("");
-    const [previewOpen, setPreviewOpen] = useState(false);
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [docToDelete, setDocToDelete] = useState<string | null>(null);
-
-    return (
-        <>
-            <DocPreviewDialog
-                url={previewUrl}
-                title={previewTitle}
-                open={previewOpen}
-                onOpenChange={(open) => {
-                    setPreviewOpen(open);
-                    if (!open) setPreviewUrl(null);
-                }}
-            />
-
-            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete the document from both the database and storage.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            className="bg-red-600 hover:bg-red-700 text-white"
-                            onClick={async () => {
-                                if (docToDelete) {
-                                    await deleteStudentDocument(docToDelete, studentId);
-                                    setDocToDelete(null);
-                                }
-                            }}
-                        >
-                            Delete
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-
-            <Card>
-                <CardHeader>
-                    <CardTitle>{title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Document Type</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Uploaded</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {categoryTypes.map(type => {
-                                const uploadedDocs = docs.filter(d => d.documentTypeId === type.id);
-                                const hasDoc = uploadedDocs.length > 0;
-                                const latestDoc = hasDoc ? uploadedDocs[0] : null;
-
-                                return (
-                                    <TableRow key={type.id}>
-                                        <TableCell className="font-medium">
-                                            <div className="flex items-center">
-                                                <FileText className="mr-2 h-4 w-4 text-muted-foreground" />
-                                                {type.title}
-                                                {type.isRequired && <Badge variant="secondary" className="ml-2 text-xs">Required</Badge>}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            {hasDoc ? (
-                                                <Badge className="bg-green-500 hover:bg-green-600">Uploaded</Badge>
-                                            ) : (
-                                                <Badge variant="outline" className="text-muted-foreground">Missing</Badge>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            {latestDoc ? format(new Date(latestDoc.createdAt), "MMM d, yyyy") : "-"}
-                                        </TableCell>
-                                        <TableCell className="text-right space-x-2">
-                                            {latestDoc ? (
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={async () => {
-                                                            setPreviewTitle(type.title);
-                                                            setPreviewOpen(true);
-                                                            const res = await getDownloadUrl(latestDoc.fileUrl, { inline: true });
-                                                            if (res.success && res.url) {
-                                                                setPreviewUrl(res.url + "#zoom=100");
-                                                            } else {
-                                                                alert("Failed to load preview");
-                                                                setPreviewOpen(false);
-                                                            }
-                                                        }}
-                                                    >
-                                                        <Eye className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={async () => {
-                                                            const res = await getDownloadUrl(latestDoc.fileUrl);
-                                                            if (res.success && res.url) {
-                                                                window.location.href = res.url;
-                                                            } else {
-                                                                alert("Failed to download: " + (res.message || "Unknown error"));
-                                                            }
-                                                        }}
-                                                    >
-                                                        <Download className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                                                        onClick={() => {
-                                                            setDocToDelete(latestDoc.id);
-                                                            setDeleteDialogOpen(true);
-                                                        }}
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            ) : (
-                                                <DocUploadDialog
-                                                    studentId={studentId}
-                                                    studentName={studentName}
-                                                    docType={type}
-                                                    onUploadComplete={() => { }} // revalidatePath handles UI update
-                                                />
-                                            )}
-                                        </TableCell>
+                return (
+                    <div key={category} className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-semibold tracking-tight">{categoryName}</h3>
+                        </div>
+                        <div className="rounded-md border bg-card">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="hover:bg-transparent">
+                                        <TableHead className="w-[40%]">Document Type</TableHead>
+                                        <TableHead>Uploaded</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
-                                )
-                            })}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
-        </>
-    )
-}
+                                </TableHeader>
+                                <TableBody>
+                                    {categoryTypes.map((type) => {
+                                        const uploadedDoc = student.documents.find(
+                                            (d) => d.documentTypeId === type.id
+                                        );
 
-// ... existing code ...
+                                        return (
+                                            <TableRow key={type.id}>
+                                                <TableCell>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="p-2 bg-muted rounded-md text-muted-foreground">
+                                                            <FileText className="h-4 w-4" />
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="font-medium text-sm flex items-center gap-2">
+                                                                {type.title}
+                                                                {type.isRequired && (
+                                                                    <Badge variant="secondary" className="text-[10px] h-5 px-1.5 font-normal">
+                                                                        Required
+                                                                    </Badge>
+                                                                )}
+                                                            </span>
+                                                            {uploadedDoc && uploadedDoc.title && uploadedDoc.title !== type.title && (
+                                                                <span className="text-xs text-muted-foreground truncate max-w-[200px]">
+                                                                    {uploadedDoc.title}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {uploadedDoc ? (
+                                                        <span className="text-sm text-foreground">
+                                                            {format(new Date(uploadedDoc.createdAt), "MMM d, yyyy")}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-sm text-muted-foreground">-</span>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        {uploadedDoc ? (
+                                                            <>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-8 w-8"
+                                                                    onClick={() => handlePreview(uploadedDoc)}
+                                                                    disabled={loadingPreview}
+                                                                >
+                                                                    {loadingPreview && selectedDoc?.id === uploadedDoc.id ? (
+                                                                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                                                                    ) : (
+                                                                        <Eye className="h-4 w-4" />
+                                                                    )}
+                                                                </Button>
+                                                                <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                                                                    <a href={uploadedDoc.fileUrl} target="_blank" rel="noopener noreferrer">
+                                                                        <Download className="h-4 w-4" />
+                                                                    </a>
+                                                                </Button>
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                                    onClick={() => handleDelete(uploadedDoc.id)}
+                                                                    disabled={!!deletingId}
+                                                                >
+                                                                    {deletingId === uploadedDoc.id ? (
+                                                                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                                                                    ) : (
+                                                                        <Trash2 className="h-4 w-4" />
+                                                                    )}
+                                                                </Button>
+                                                            </>
+                                                        ) : (
+                                                            <Button variant="outline" size="sm" className="h-8 gap-2">
+                                                                <CloudUpload className="h-3 w-3" />
+                                                                Upload
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </div>
+                );
+            })}
 
-export function StudentDocsTab({ student, docTypes }: { student: any, docTypes: any[] }) {
-    return (
-        <div className="space-y-6">
-            <DocList
-                title="Office Documents"
-                docs={student.documents}
-                docTypes={docTypes}
-                category="OFFICE"
-                studentId={student.id}
-                studentName={student.fullName}
-            />
-            <DocList
-                title="Student Documents"
-                docs={student.documents}
-                docTypes={docTypes}
-                category="STUDENT"
-                studentId={student.id}
-                studentName={student.fullName}
-            />
+            {/* Preview Dialog */}
+            <Dialog open={!!selectedDoc} onOpenChange={(open) => !open && setSelectedDoc(null)}>
+                <DialogContent className="w-[90vw] max-w-[90vw] h-[90vh] flex flex-col p-0 gap-0 sm:max-w-[90vw]">
+                    <DialogHeader className="p-4 border-b shrink-0">
+                        <DialogTitle className="flex items-center gap-2">
+                            <span className="truncate max-w-[500px]">{selectedDoc?.title || "Document Preview"}</span>
+                            {selectedDoc && (
+                                <Badge variant="outline" className="ml-2 font-normal">
+                                    {selectedDoc.fileType.toUpperCase()}
+                                </Badge>
+                            )}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="flex-1 overflow-hidden bg-neutral-100 dark:bg-neutral-900 relative">
+                        {selectedDoc ? (
+                            selectedDoc.fileType === 'pdf' ? (
+                                <iframe
+                                    src={selectedDoc.fileUrl}
+                                    className="w-full h-full border-0"
+                                    title="PDF Preview"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center p-4">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                        src={selectedDoc.fileUrl}
+                                        alt="Preview"
+                                        className="max-w-full max-h-full object-contain shadow-lg rounded-sm"
+                                    />
+                                </div>
+                            )
+                        ) : (
+                            <div className="flex items-center justify-center h-full text-muted-foreground">
+                                Loading preview...
+                            </div>
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {student.documents.length === 0 && docTypes.length === 0 && (
+                <div className="text-center py-12 text-zinc-500">No documents or document types found.</div>
+            )}
         </div>
-    )
+    );
 }

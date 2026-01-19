@@ -1,5 +1,4 @@
-"use client";
-
+import Link from "next/link";
 import * as React from "react";
 
 import { clsx, type ClassValue } from "clsx";
@@ -109,35 +108,19 @@ const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
 );
 CardFooter.displayName = "CardFooter";
 
-const data = [
-    {
-        name: "Total Students",
-        value: "145",
-        change: "+12.5%",
-        changeType: "positive",
-        href: "/admin/students",
-    },
-    {
-        name: "Active Courses",
-        value: "12",
-        change: "+2.1%",
-        changeType: "positive",
-        href: "#",
-    },
-    {
-        name: "Outstanding Payments",
-        value: "€4,250",
-        change: "-5.4%",
-        changeType: "positive", // negative outstanding is good
-        href: "#",
-    },
-];
+export type StatsCardProps = {
+    name: string
+    value: string
+    change: string
+    changeType: "positive" | "negative"
+    href: string
+}
 
-export default function StatsCardsWithLinks() {
+export default function StatsCardsWithLinks({ stats }: { stats: StatsCardProps[] }) {
     return (
         <div className="w-full">
             <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 w-full">
-                {data.map((item) => (
+                {stats.map((item) => (
                     <Card key={item.name} className="p-0 gap-0">
                         <CardContent className="p-6">
                             <dd className="flex items-start justify-between space-x-2">
@@ -160,12 +143,12 @@ export default function StatsCardsWithLinks() {
                             </dd>
                         </CardContent>
                         <CardFooter className="flex justify-end border-t border-border !p-0">
-                            <a
+                            <Link
                                 href={item.href}
                                 className="px-6 py-3 text-sm font-medium text-primary hover:text-primary/90"
                             >
                                 View more →
-                            </a>
+                            </Link>
                         </CardFooter>
                     </Card>
                 ))}

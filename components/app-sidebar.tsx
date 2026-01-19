@@ -12,7 +12,7 @@ import {
     SidebarMenuItem,
     SidebarFooter,
 } from "@/components/ui/sidebar"
-import { LayoutDashboard, Users, Settings } from "lucide-react"
+import { LayoutDashboard, Users, Settings, Calendar } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -20,6 +20,8 @@ import { usePathname } from "next/navigation"
 const adminRoutes = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/students", label: "Students", icon: Users },
+    { href: "/admin/instructors", label: "Instructors", icon: Users },
+    { href: "/admin/calendar", label: "Calendar", icon: Calendar },
 ]
 
 export function AppSidebar({ role }: { role: string }) {

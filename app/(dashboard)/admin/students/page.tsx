@@ -43,7 +43,7 @@ export default async function AdminStudentsPage(props: Props) {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Register</CardTitle>
+                    <CardTitle>Student List</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Table>
@@ -52,8 +52,8 @@ export default async function AdminStudentsPage(props: Props) {
                                 <TableHead>Name</TableHead>
                                 <TableHead>Contact</TableHead>
                                 <TableHead>Course Name</TableHead>
+                                <TableHead>Status</TableHead>
                                 <TableHead>Course Fee</TableHead>
-                                <TableHead>Paid</TableHead>
                                 <TableHead>Balance</TableHead>
                                 <TableHead className="text-right">Action</TableHead>
                             </TableRow>
@@ -63,6 +63,16 @@ export default async function AdminStudentsPage(props: Props) {
                                 const totalFee = Number(student.totalFee)
                                 const totalPaid = student.payments.reduce((sum, p) => sum + Number(p.amount), 0)
                                 const balance = totalFee - totalPaid
+
+                                const statusMap: Record<string, { label: string, color: string }> = {
+                                    REGISTERED: { label: "Registered", color: "bg-blue-500" },
+                                    ONGOING: { label: "Ongoing", color: "bg-green-500" },
+                                    EXAM_PHASE: { label: "In Exam", color: "bg-amber-500" },
+                                    DOCS_PENDING: { label: "Docs Pending", color: "bg-red-500" },
+                                    GRADUATED: { label: "Graduated", color: "bg-purple-500" },
+                                    CANCELLED: { label: "Cancelled", color: "bg-gray-500" }
+                                };
+                                const statusInfo = statusMap[student.status] || { label: student.status, color: "bg-gray-400" };
 
                                 return (
                                     <TableRow key={student.id}>
@@ -81,8 +91,13 @@ export default async function AdminStudentsPage(props: Props) {
                                         <TableCell>
                                             <Badge variant="outline">{student.course || 'General'}</Badge>
                                         </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2">
+                                                <div className={`h-2 w-2 rounded-full ${statusInfo.color}`} />
+                                                <span className="text-sm">{statusInfo.label}</span>
+                                            </div>
+                                        </TableCell>
                                         <TableCell>€{totalFee.toLocaleString()}</TableCell>
-                                        <TableCell className="text-green-600 font-medium">€{totalPaid.toLocaleString()}</TableCell>
                                         <TableCell>
                                             <Badge variant={balance > 0 ? "destructive" : "secondary"}>
                                                 €{balance.toLocaleString()}
@@ -100,7 +115,7 @@ export default async function AdminStudentsPage(props: Props) {
                             })}
                             {students.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                                         No students found.
                                     </TableCell>
                                 </TableRow>

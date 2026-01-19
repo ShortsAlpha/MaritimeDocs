@@ -23,7 +23,20 @@ model User {
 
 // ----------------------------------------------------------------------------
 
+// ... existing imports
+
+// ----------------------------------------------------------------------------
+
 // Student Record (Data only, no login)
+enum StudentStatus {
+  REGISTERED
+  ONGOING
+  EXAM_PHASE
+  DOCS_PENDING
+  GRADUATED
+  CANCELLED
+}
+
 model Student {
   id          String   @id @default(cuid())
   
@@ -34,9 +47,15 @@ model Student {
   address     String?
   course      String?
   
+  status      StudentStatus @default(REGISTERED)
+  
   // Financials
   totalFee    Decimal  @default(0) // Total course fee in EUR
   currency    String   @default("EUR")
+  
+  // Magic Link for Uploads
+  uploadToken       String?   @unique
+  uploadTokenExpiry DateTime?
   
   // Meta
   createdAt   DateTime @default(now())
@@ -45,6 +64,75 @@ model Student {
   // Relations
   documents   StudentDocument[]
   payments    Payment[]
+}
+
+// ----------------------------------------------------------------------------
+
+enum InstructorEmploymentType {
+  FULL_TIME
+  PART_TIME
+}
+
+model Instructor {
+  id          String   @id @default(cuid())
+  fullName    String
+  email       String?
+  phone       String?
+  bio         String?
+  specialties String?  // Comma separated or simplified text
+  employmentType InstructorEmploymentType @default(FULL_TIME)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  documents   InstructorDocument[]
+  events      CourseEvent[]
+}
+
+model InstructorDocument {
+  id        String   @id @default(cuid())
+  title     String? 
+  fileUrl   String
+  fileType  String   
+  
+  createdAt  DateTime  @default(now())
+
+  instructorId   String
+  instructor     Instructor @relation(fields: [instructorId], references: [id], onDelete: Cascade)
+
+  documentTypeId String?
+  documentType   DocumentType? @relation(fields: [documentTypeId], references: [id])
+}
+
+// ----------------------------------------------------------------------------
+
+model CourseEvent {
+  id        String   @id @default(cuid())
+  title     String
+  
+  startDate DateTime
+  endDate   DateTime
+  location  String?
+  
+  color     String?  // For UI coloring
+
+  // Relations
+  instructorId String?
+  instructor   Instructor? @relation(fields: [instructorId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  checklist EventChecklistItem[]
+}
+
+model EventChecklistItem {
+  id            String      @id @default(cuid())
+  label         String
+  isCompleted   Boolean     @default(false)
+  
+  courseEventId String
+  courseEvent   CourseEvent @relation(fields: [courseEventId], references: [id], onDelete: Cascade)
 }
 
 // ----------------------------------------------------------------------------
@@ -74,8 +162,17 @@ model Payment {
 
 // Documents
 enum DocCategory {
-  OFFICE   // Internal docs (Contracts, forms)
-  STUDENT  // Personal docs (Passport, ID)
+  OFFICE       // Internal docs
+  STUDENT      // Personal docs
+  CERTIFICATE  // New Category 1
+  MEDICAL      // New Category 2
+  INSTRUCTOR   // Instructor docs
+}
+
+enum DocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 model DocumentType {
@@ -86,6 +183,7 @@ model DocumentType {
   isRequired  Boolean     @default(true)
   
   documents   StudentDocument[]
+  instructorDocuments InstructorDocument[]
 }
 
 model StudentDocument {
@@ -94,7 +192,7 @@ model StudentDocument {
   fileUrl   String
   fileType  String   // pdf, img, etc.
   
-  // No approval status needed for internal CRM - upload means valid
+  status     DocumentStatus @default(APPROVED)
   
   expiryDate DateTime?
   createdAt  DateTime  @default(now())
@@ -113,3 +211,4 @@ model Course {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+

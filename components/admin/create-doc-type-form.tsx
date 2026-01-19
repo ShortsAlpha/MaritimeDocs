@@ -44,6 +44,9 @@ export function CreateDocTypeForm() {
                         >
                             <option value="STUDENT">Student Document (Passport, etc.)</option>
                             <option value="OFFICE">Office Document (Contracts, etc.)</option>
+                            <option value="CERTIFICATE">Certificate (STCW, Tech, etc.)</option>
+                            <option value="MEDICAL">Medical Report (Health, Eyes, etc.)</option>
+                            <option value="INSTRUCTOR">Instructor Document (CV, Certs, etc.)</option>
                         </select>
                     </div>
                     <div className="flex items-center space-x-2">
