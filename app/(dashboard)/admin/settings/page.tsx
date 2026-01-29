@@ -10,6 +10,8 @@ import { EditDocTypeDialog } from "@/components/admin/edit-doc-type-dialog";
 
 import { CourseSettings } from "@/components/admin/course-settings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CreateIntakeForm } from "@/components/admin/create-intake-form";
+import { DeleteIntakeButton } from "@/components/admin/delete-intake-button";
 
 function DocTypeTable({ types }: { types: any[] }) {
     return (
@@ -69,8 +71,58 @@ export default async function AdminSettingsPage() {
         orderBy: { title: 'asc' }
     });
 
+    const intakes = await db.intake.findMany({
+        orderBy: { startDate: 'desc' } // or createdAt desc
+    });
+
     return (
         <div className="space-y-12 pb-12">
+
+            {/* INTAKE MANAGEMENT SECTION */}
+            <section>
+                <h2 className="text-2xl font-bold tracking-tight">Intake Management</h2>
+                <p className="text-muted-foreground mb-6">Manage student intake periods (e.g. March 2025).</p>
+                <div className="grid gap-6 md:grid-cols-2">
+                    <div>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Existing Intakes</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Name</TableHead>
+                                            <TableHead className="text-right">Action</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {intakes.map((intake) => (
+                                            <TableRow key={intake.id}>
+                                                <TableCell className="font-medium">{intake.name}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <DeleteIntakeButton id={intake.id} />
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                        {intakes.length === 0 && (
+                                            <TableRow>
+                                                <TableCell colSpan={2} className="text-center text-muted-foreground">
+                                                    No intakes defined.
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
+                    </div>
+                    <div>
+                        <CreateIntakeForm />
+                    </div>
+                </div>
+            </section>
+
             <section>
                 <h2 className="text-2xl font-bold tracking-tight">Document Types</h2>
                 <p className="text-muted-foreground mb-6">Manage the specific document requirements and categories for student applications.</p>

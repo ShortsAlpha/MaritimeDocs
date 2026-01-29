@@ -5,6 +5,11 @@ import StatsCardsWithLinks from "@/components/ui/stats-cards-with-links";
 import { format } from "date-fns";
 import { UpcomingCourses } from "@/components/dashboard/upcoming-courses";
 import { PendingDocsWidget } from "@/components/dashboard/pending-docs-widget";
+import { ActionsSummaryWidget } from "@/components/dashboard/actions-summary-widget";
+import { checkDocumentCompleteness } from "@/app/actions/student-automation";
+import { StudentStatus } from "@prisma/client";
+import { addDays } from "date-fns";
+import { ExpiringCertificatesWidget } from "@/components/dashboard/expiring-certificates-widget";
 
 
 
@@ -84,6 +89,97 @@ export default async function AdminPage() {
         orderBy: { createdAt: 'desc' }
     });
 
+    // 6. Fetch Students for Automation Suggestions
+    // Students who need document requests (REGISTERED status)
+    const documentsNeeded = await db.student.findMany({
+        where: { status: 'REGISTERED' },
+        select: {
+            id: true,
+            fullName: true,
+            email: true,
+            status: true
+        }
+    });
+
+    // Students with documents ready for lecture notes
+    // (DOCS_REQ_SENT or PAYMENT_COMPLETED with all required docs approved)
+    const potentialNotesReady = await db.student.findMany({
+        where: {
+            OR: [
+                { status: 'DOCS_REQ_SENT' as any },
+                { status: 'PAYMENT_COMPLETED' as any }
+            ]
+        },
+        select: {
+            id: true,
+            fullName: true,
+            email: true,
+            status: true
+        }
+    });
+
+    // Check which students have all documents complete (Optimized Bulk Check)
+    const requiredDocTypes = await db.documentType.findMany({
+        where: { isRequired: true },
+        select: { id: true }
+    });
+    const requiredDocTypeIds = new Set(requiredDocTypes.map(d => d.id));
+
+    const studentIds = potentialNotesReady.map(s => s.id);
+
+    // Fetch all approved documents for these students in one query
+    const allApprovedDocs = await db.studentDocument.findMany({
+        where: {
+            studentId: { in: studentIds },
+            status: "APPROVED"
+        },
+        select: { studentId: true, documentTypeId: true }
+    });
+
+    // Group documents by student for efficient lookup
+    const studentDocsMap = new Map<string, Set<string>>();
+    allApprovedDocs.forEach(doc => {
+        if (!studentDocsMap.has(doc.studentId)) {
+            studentDocsMap.set(doc.studentId, new Set());
+        }
+        studentDocsMap.get(doc.studentId)!.add(doc.documentTypeId);
+    });
+
+    // Filter students who have ALL required document types
+    const notesReady = potentialNotesReady.filter(student => {
+        if (requiredDocTypeIds.size === 0) return true; // No required docs = ready
+
+        const uploadedDocTypes = studentDocsMap.get(student.id);
+        if (!uploadedDocTypes) return false;
+
+        // Check if every required doc ID exists in the student's uploaded docs
+        for (const reqId of requiredDocTypeIds) {
+            if (!uploadedDocTypes.has(reqId)) return false;
+        }
+        return true;
+    });
+
+    // 7. Fetch Expiring Certificates (Next 30 Days)
+    const expiringStudents = await db.student.findMany({
+        where: {
+            certificateExpiryDate: {
+                gte: new Date(),
+                lte: addDays(new Date(), 30)
+            }
+        },
+        select: {
+            id: true,
+            fullName: true,
+            email: true,
+            phone: true,
+            certificateExpiryDate: true
+        },
+        orderBy: {
+            certificateExpiryDate: 'asc'
+        },
+        take: 10
+    } as any);
+
     return (
         <div className="p-6 space-y-8">
             <div className="flex items-center justify-between">
@@ -95,19 +191,32 @@ export default async function AdminPage() {
                 <StatsCardsWithLinks stats={quickStats} />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-7 gap-6">
-                <div className="col-span-4 space-y-6">
-
-                    <div className="space-y-4">
-                        <h2 className="text-lg font-semibold">Upcoming Courses</h2>
-                        <UpcomingCourses />
-                    </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-24">
+                {/* Upcoming Courses (Top Left) */}
+                <div className="space-y-4">
+                    <h2 className="text-lg font-semibold">Upcoming Courses</h2>
+                    <UpcomingCourses />
                 </div>
-                <div className="col-span-3 space-y-6">
-                    <div className="space-y-4">
-                        {/* Pending Docs Widget */}
-                        <PendingDocsWidget documents={pendingDocs as any} />
-                    </div>
+
+                {/* Pending Documents (Top Right) */}
+                <div className="space-y-4">
+                    <h2 className="text-lg font-semibold">Pending Documents</h2>
+                    <PendingDocsWidget documents={pendingDocs as any} />
+                </div>
+
+                {/* Automation Suggestions (Bottom Left) */}
+                <div className="space-y-4">
+                    <h2 className="text-lg font-semibold">Suggested Actions</h2>
+                    <ActionsSummaryWidget
+                        documentsNeeded={documentsNeeded}
+                        notesReady={notesReady}
+                    />
+                </div>
+
+                {/* Expiring Certificates (Bottom Right) */}
+                <div className="space-y-4">
+                    <h2 className="text-lg font-semibold">Expiring Certificates</h2>
+                    <ExpiringCertificatesWidget students={expiringStudents as any} />
                 </div>
             </div>
         </div>

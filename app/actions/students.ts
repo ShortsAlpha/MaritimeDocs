@@ -5,9 +5,47 @@ import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { deleteFileFromR2, renameFolderInR2 } from "@/lib/r2"
 import { slugify } from "@/lib/utils"
+import { addMonths } from "date-fns"
 
 // ... existing code ...
 import { StudentStatus } from "@prisma/client"
+
+// Helper to generate student number
+async function generateStudentNumber(date = new Date()): Promise<string> {
+    const year = date.getFullYear().toString().slice(-2);
+    const prefix = year; // "25"
+
+    // Fetch all student numbers starting with this prefix
+    const students = await db.student.findMany({
+        where: {
+            studentNumber: {
+                startsWith: prefix
+            }
+        },
+        select: {
+            studentNumber: true
+        }
+    });
+
+    const numbers = students
+        .map(s => s.studentNumber ? parseInt(s.studentNumber.slice(2)) : 0) // Extract sequence part
+        .filter(n => !isNaN(n))
+        .sort((a, b) => a - b);
+
+    // Find the first gap
+    let nextSequence = 1;
+    for (let i = 0; i < numbers.length; i++) {
+        if (numbers[i] === nextSequence) {
+            nextSequence++;
+        } else if (numbers[i] > nextSequence) {
+            // Found a gap
+            break;
+        }
+    }
+
+    // Format: YY + 4 digit sequence (e.g., 250001)
+    return `${prefix}${nextSequence.toString().padStart(4, '0')}`;
+}
 
 const StudentSchema = z.object({
     fullName: z.string().min(2, "Name is too short"),
@@ -16,6 +54,12 @@ const StudentSchema = z.object({
     course: z.string().optional(),
     totalFee: z.coerce.number().min(0, "Fee must be positive"),
     status: z.nativeEnum(StudentStatus).optional(),
+    address: z.string().optional(),
+    certificateIssueDate: z.string().optional().or(z.literal("")),
+    certificateExpiryDate: z.string().optional().or(z.literal("")),
+    nationality: z.string().optional(),
+    dateOfBirth: z.string().optional().or(z.literal("")),
+    intakeId: z.string().optional(),
 })
 
 export async function createStudent(prevState: any, formData: FormData) {
@@ -26,17 +70,27 @@ export async function createStudent(prevState: any, formData: FormData) {
             phone: formData.get("phone"),
             course: formData.get("course"),
             totalFee: formData.get("totalFee"),
+            nationality: formData.get("nationality"),
+            dateOfBirth: formData.get("dateOfBirth"),
+            intakeId: formData.get("intakeId"),
         }
 
         const data = StudentSchema.parse(rowData)
 
+        // Generate Student Number
+        const studentNumber = await generateStudentNumber();
+
         await db.student.create({
             data: {
                 fullName: data.fullName,
+                studentNumber: studentNumber,
                 email: data.email || null,
                 phone: data.phone || null,
                 course: data.course || null,
                 totalFee: data.totalFee,
+                nationality: data.nationality || null,
+                dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
+                intakeId: data.intakeId || null,
             }
         })
 
@@ -48,6 +102,33 @@ export async function createStudent(prevState: any, formData: FormData) {
     }
 }
 
+// Temporary Action to Backfill Numbers
+export async function backfillStudentNumbers() {
+    try {
+        // Fetch all students without a number, sorted by creation date
+        const studentsWithoutNumber = await db.student.findMany({
+            where: { studentNumber: null },
+            orderBy: { createdAt: 'asc' }
+        });
+
+        console.log(`Found ${studentsWithoutNumber.length} students to backfill.`);
+
+        for (const student of studentsWithoutNumber) {
+            const number = await generateStudentNumber(student.createdAt);
+            await db.student.update({
+                where: { id: student.id },
+                data: { studentNumber: number }
+            });
+            console.log(`Assigned ${number} to ${student.fullName}`);
+        }
+
+        return { success: true, count: studentsWithoutNumber.length };
+    } catch (error) {
+        console.error("Backfill error:", error);
+        return { success: false, error };
+    }
+}
+
 export async function updateStudent(id: string, prevState: any, formData: FormData) {
     try {
         const rowData = {
@@ -56,6 +137,11 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
             phone: formData.get("phone") === null ? undefined : formData.get("phone"),
             address: formData.get("address") === null ? undefined : formData.get("address"),
             status: formData.get("status") === null ? undefined : formData.get("status"),
+            certificateIssueDate: formData.get("certificateIssueDate") === null ? undefined : formData.get("certificateIssueDate"),
+            certificateExpiryDate: formData.get("certificateExpiryDate") === null ? undefined : formData.get("certificateExpiryDate"),
+            nationality: formData.get("nationality") === null ? undefined : formData.get("nationality"),
+            dateOfBirth: formData.get("dateOfBirth") === null ? undefined : formData.get("dateOfBirth"),
+            intakeId: formData.get("intakeId") === null ? undefined : formData.get("intakeId"),
         }
 
         // Partial schema for updates
@@ -66,18 +152,41 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
 
         const data = UpdateSchema.parse(rowData)
 
-        // ... existing R2 rename logic ...
-        // (Keeping R2 logic unchanged)
-
-        // ... (R2 rename implementation omitted for brevity in snippet, assumes it is preserved by tool or user context)
-        // RE-INSERTING R2 LOGIC TO BE SAFE IF REPLACING WHOLE BLOCK
-
-        // Check if name changed to trigger R2 folder rename
+        // Fetch current student to check existing data and for R2 logic later
         const currentStudent = await db.student.findUnique({
             where: { id },
-            include: { documents: true } // Fetch docs to find old folder path
+            include: { documents: true }
         });
 
+        let additionalData: any = {}
+        // Handle manual date updates (string -> Date)
+        if (data.certificateIssueDate) {
+            additionalData.certificateIssueDate = new Date(data.certificateIssueDate)
+        }
+        if (data.certificateExpiryDate) {
+            additionalData.certificateExpiryDate = new Date(data.certificateExpiryDate)
+        }
+
+        const COMPLETED_STATUSES = ["COURSE_COMPLETED", "CERTIFICATE_APPLIED", "CERTIFICATE_SHIPPED"];
+
+        if (data.status && COMPLETED_STATUSES.includes(data.status)) {
+            // If status is becoming 'completed' (or later stages)
+            // Check if dates are provided in this update OR already exist in DB
+            const hasManualDates = data.certificateIssueDate || data.certificateExpiryDate;
+            const hasExistingDates = currentStudent?.certificateIssueDate || currentStudent?.certificateExpiryDate;
+
+            if (!hasManualDates && !hasExistingDates) {
+                const now = new Date()
+                additionalData.certificateIssueDate = now
+                additionalData.certificateExpiryDate = addMonths(now, 13) // 1 year 1 month
+            }
+        }
+
+        if (currentStudent && data.fullName && currentStudent.fullName !== data.fullName) {
+            // ... folder rename logic ...
+        }
+
+        // RE-IMPORT folder rename logic or keep it if I can match range
         if (currentStudent && data.fullName && currentStudent.fullName !== data.fullName) {
             const newSafeName = slugify(data.fullName);
             const newFolder = `students/${newSafeName}`;
@@ -86,8 +195,6 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
             let oldFolder = `students/${slugify(currentStudent.fullName)}`; // Default fall back
             if (currentStudent.documents.length > 0) {
                 // Extract folder from first document URL
-                // Example: https://.../students/ya__z_ada_umur/file.pdf
-                // We want: students/ya__z_ada_umur
                 const firstDoc = currentStudent.documents[0];
                 const parts = firstDoc.fileUrl.split('/');
                 const studentIndex = parts.indexOf('students');
@@ -100,7 +207,6 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
                 await renameFolderInR2(oldFolder, newFolder);
 
                 // Update DB document URLs
-                // Refetch to be safe or use included docs
                 const docs = currentStudent.documents;
                 for (const doc of docs) {
                     if (doc.fileUrl.includes(oldFolder)) {
@@ -122,6 +228,10 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
                 ...(data.phone !== undefined && { phone: data.phone || null }),
                 ...(data.address !== undefined && { address: data.address || null }),
                 ...(data.status && { status: data.status }),
+                ...(data.nationality !== undefined && { nationality: data.nationality || null }),
+                ...(data.dateOfBirth !== undefined && { dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null }),
+                ...(data.intakeId !== undefined && { intakeId: data.intakeId || null }),
+                ...additionalData
             }
         })
 

@@ -52,7 +52,7 @@ export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { s
             const emailRes = await sendExamNotesEmail(studentId, course, uploadRes.url);
 
             if (emailRes.success) {
-                toast.success("Exam notes sent successfully!");
+                toast.success("Lecture notes sent successfully!");
                 setIsOpen(false);
                 setFile(null);
             } else {
@@ -71,12 +71,12 @@ export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { s
             <DialogTrigger asChild>
                 <Button variant="outline" size="sm">
                     <FileText className="w-4 h-4 mr-2" />
-                    Send Exam Notes
+                    Send Lecture Notes
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Send Exam Notes</DialogTitle>
+                    <DialogTitle>Send Lecture Notes</DialogTitle>
                     <DialogDescription>
                         Upload a file (PDF) to send to the student.
                     </DialogDescription>
@@ -102,7 +102,7 @@ export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { s
                         </Select>
                     </div>
                     <div className="space-y-2">
-                        <Label>Exam Note File</Label>
+                        <Label>Lecture Note File</Label>
                         <Input
                             type="file"
                             name="file"

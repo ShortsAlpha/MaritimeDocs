@@ -7,25 +7,48 @@ import { ListFilter } from "lucide-react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { Label } from "@/components/ui/label"
 import { Course } from "@prisma/client"
+import { Input } from "@/components/ui/input"
 
 type Props = {
     courses: Course[]
+    nationalities?: string[]
 }
 
-export function StudentFilter({ courses = [] }: Props) {
+export function StudentFilter({ courses = [], nationalities = [] }: Props) {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
-    const currentCourse = searchParams.get("course") || "all"
 
-    const handleValueChange = (value: string) => {
+    // Get current values
+    const currentCourse = searchParams.get("course") || "all"
+    const currentNationality = searchParams.get("nationality") || ""
+
+    // Update params helper
+    const updateParams = (key: string, value: string | null) => {
         const params = new URLSearchParams(searchParams.toString())
-        if (value && value !== "all") {
-            params.set("course", value)
+        if (value && value !== "all" && value !== "") {
+            params.set(key, value)
         } else {
-            params.delete("course")
+            params.delete(key)
         }
         router.push(`${pathname}?${params.toString()}`)
+    }
+
+    const handleCourseChange = (value: string) => {
+        updateParams("course", value)
+    }
+
+    const handleNationalityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        // Debounce could be good here, but for now direct update on blur or use keypress? 
+        // Typically inputs in popovers are tricky without explicit "Apply" or debounce.
+        // Let's rely on [Enter] or Blur, or just OnChange?
+        // Let's use OnChange with a small delay or just OnChange for simplicity first. 
+        // Actually, for filters, usually "on change" is okay if list is not massive.
+        updateParams("nationality", e.target.value)
+    }
+
+    const clearFilters = () => {
+        router.push(pathname)
     }
 
     return (
@@ -36,9 +59,12 @@ export function StudentFilter({ courses = [] }: Props) {
                     <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                         Filter
                     </span>
+                    {(currentCourse !== "all" || currentNationality) && (
+                        <div className="h-2 w-2 rounded-full bg-primary absolute top-1 right-1" />
+                    )}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto min-w-[300px] max-w-[90vw]" align="end">
+            <PopoverContent className="w-96 p-6" align="end">
                 <div className="grid gap-4">
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
@@ -46,30 +72,44 @@ export function StudentFilter({ courses = [] }: Props) {
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-8 px-3 text-muted-foreground hover:text-foreground"
-                                onClick={() => handleValueChange("all")}
+                                className="h-auto p-0 text-muted-foreground hover:text-foreground"
+                                onClick={clearFilters}
                             >
                                 Clear
                             </Button>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                            Filter students by course or status.
+                            Filter students by course or country.
                         </p>
                     </div>
-                    <div className="grid gap-2">
-                        <div className="grid w-full items-center gap-1.5">
+                    <div className="grid gap-4">
+                        <div className="space-y-2">
                             <Label htmlFor="course">Course</Label>
-                            <Select value={currentCourse} onValueChange={handleValueChange}>
+                            <Select value={currentCourse} onValueChange={handleCourseChange}>
                                 <SelectTrigger id="course" className="w-full">
-                                    <span className="truncate">
-                                        <SelectValue placeholder="Select course" />
-                                    </span>
+                                    <SelectValue placeholder="Select course" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Courses</SelectItem>
                                     {courses.map((course) => (
                                         <SelectItem key={course.id} value={course.title}>
                                             {course.title}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="nationality">Country</Label>
+                            <Select value={currentNationality} onValueChange={(val) => updateParams("nationality", val)}>
+                                <SelectTrigger id="nationality" className="w-full">
+                                    <SelectValue placeholder="Select country" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Countries</SelectItem>
+                                    {nationalities.map((nat) => (
+                                        <SelectItem key={nat} value={nat}>
+                                            {nat}
                                         </SelectItem>
                                     ))}
                                 </SelectContent>

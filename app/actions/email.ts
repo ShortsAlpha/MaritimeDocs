@@ -76,6 +76,16 @@ export async function sendStudentWelcomeEmail(studentId: string) {
         const student = await db.student.findUnique({ where: { id: studentId } });
         if (!student || !student.email) throw new Error("Student not found or no email");
 
+        // Fetch required documents dynamically
+        const requiredDocs = await db.documentType.findMany({
+            where: { isRequired: true },
+            select: { title: true }
+        });
+
+        const docListHtml = requiredDocs.length > 0
+            ? `<ul>${requiredDocs.map(doc => `<li>${doc.title}</li>`).join('')}</ul>`
+            : '';
+
         // Generate Token
         const token = uuidv4();
         const expiry = new Date();
@@ -109,7 +119,8 @@ export async function sendStudentWelcomeEmail(studentId: string) {
                 'Completing your Registration',
                 `<p>Dear ${student.fullName},</p>
                 <p>Welcome aboard! We are excited to have you join us at Xone Superyacht Academy.</p>
-                <p>To finalize your enrollment and ensure a smooth start, we require you to upload some essential documents.</p>
+                <p>To finalize your enrollment and ensure a smooth start, we require you to upload the following essential documents:</p>
+                ${docListHtml}
                 <p>Please click the button below to access your secure upload portal. This link is valid for <strong>7 days</strong>.</p>`,
                 baseUrl,
                 { text: 'Upload Documents Securely', url: uploadLink }
@@ -148,15 +159,15 @@ export async function sendExamNotesEmail(studentId: string, courseName: string, 
         await resend.emails.send({
             from: 'Xone Academy <academics@resend.dev>',
             to: student.email,
-            subject: `Exam Notes: ${courseName}`,
+            subject: `Lecture Notes: ${courseName}`,
             html: getEmailTemplate(
-                `Exam Notes: ${courseName}`,
+                `Lecture Notes: ${courseName}`,
                 `<p>Dear ${student.fullName},</p>
-                <p>We have prepared the study notes for your upcoming exam in <strong>${courseName}</strong>.</p>
+                <p>We have prepared the lecture notes for your upcoming exam in <strong>${courseName}</strong>.</p>
                 <p>You can download them directly using the link below. We recommend reviewing them thoroughly before your assessment.</p>
                 <p>Good luck with your studies!</p>`,
                 baseUrl,
-                { text: 'Download Exam Notes', url: notesUrl }
+                { text: 'Download Lecture Notes', url: notesUrl }
             ),
         });
         console.log("Email sent successfully via Resend");
@@ -173,11 +184,32 @@ export async function sendDocumentRejectionEmail(studentId: string, documentTitl
         const student = await db.student.findUnique({ where: { id: studentId } });
         if (!student || !student.email) throw new Error("Student not found or no email");
 
+        // Ensure valid upload token exists
+        let token = student.uploadToken;
+        // Simple expiry check: if no token or expired (we'll just issue a new one if it's been a long time or doesn't exist)
+        // For robustness, let's just ensure we have a token. If it's expired, the upload page logic should handle it or we should refresh it here.
+        // Let's refresh it to be safe for re-uploads.
+        if (!token) {
+            token = uuidv4();
+            const expiry = new Date();
+            expiry.setDate(expiry.getDate() + 7);
+
+            await db.student.update({
+                where: { id: studentId },
+                data: {
+                    uploadToken: token,
+                    uploadTokenExpiry: expiry
+                }
+            });
+        }
+
         // Resolve Base URL
         const headersList = await headers();
         const host = headersList.get('host') || 'localhost:3000';
         const protocol = headersList.get('x-forwarded-proto') || 'http';
         const baseUrl = `${protocol}://${host}`;
+
+        const uploadLink = `${baseUrl}/upload/${token}`;
 
         await resend.emails.send({
             from: 'Xone Academy <support@resend.dev>',
@@ -188,19 +220,65 @@ export async function sendDocumentRejectionEmail(studentId: string, documentTitl
                 `<p>Dear ${student.fullName},</p>
                 <p>We have reviewed your document "<strong>${documentTitle}</strong>" and unfortunately, it does not meet our validation criteria.</p>
                 <p style="background-color: #fee2e2; color: #991b1b; padding: 12px; border-radius: 6px; font-weight: 500;">Status: Rejected</p>
-                <p>Please review our document guidelines or contact our support team immediately to resolve this issue and prevent delays in your certification.</p>
+                <p>Please review our document guidelines and upload a corrected version using the link below.</p>
                 <ul>
-                    <li>Phone: +90 (555) 123 45 67</li>
-                    <li>Email: <a href="mailto:support@xone.com" class="link">support@xone.com</a></li>
+                    <li>Ensure the document is clear and readable</li>
+                    <li>Check that all corners are visible</li>
+                    <li>Verify the document is valid and not expired</li>
                 </ul>`,
                 baseUrl,
-                { text: 'Go to Student Portal', url: `${baseUrl}/admin/students/${studentId}` } // Redirect to portal
+                { text: 'Upload Revised Document', url: uploadLink }
             )
         });
 
         return { success: true };
     } catch (error) {
         console.error("Send Rejection Error:", error);
+        return { success: false, message: "Failed to send email" };
+    }
+}
+
+export async function sendFeedbackEmail(studentId: string) {
+    try {
+        const student = await db.student.findUnique({ where: { id: studentId } });
+        if (!student || !student.email) throw new Error("Student not found or no email");
+
+        // Ensure token exists
+        let token = student.feedbackToken;
+        if (!token) {
+            token = uuidv4();
+            await db.student.update({
+                where: { id: studentId },
+                data: { feedbackToken: token }
+            });
+        }
+
+        // Resolve Base URL
+        const headersList = await headers();
+        const host = headersList.get('host') || 'localhost:3000';
+        const protocol = headersList.get('x-forwarded-proto') || 'http';
+        const baseUrl = `${protocol}://${host}`;
+
+        const feedbackLink = `${baseUrl}/feedback/${token}`;
+
+        await resend.emails.send({
+            from: 'Xone Academy <feedback@resend.dev>',
+            to: student.email,
+            subject: 'We Value Your Feedback - Xone Superyacht Academy',
+            html: getEmailTemplate(
+                'Course Completion Feedback',
+                `<p>Dear ${student.fullName},</p>
+                <p>Congratulations on completing your course at Xone Superyacht Academy!</p>
+                <p>We constantly strive to improve our training and facilities. We would greatly appreciate it if you could take a moment to share your experience with us.</p>
+                <p>Please click the link below to answer a few brief questions.</p>`,
+                baseUrl,
+                { text: 'Provide Feedback', url: feedbackLink }
+            )
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error("Send Feedback Email Error:", error);
         return { success: false, message: "Failed to send email" };
     }
 }

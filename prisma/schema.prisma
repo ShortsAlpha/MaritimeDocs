@@ -30,15 +30,18 @@ model User {
 // Student Record (Data only, no login)
 enum StudentStatus {
   REGISTERED
-  ONGOING
-  EXAM_PHASE
-  DOCS_PENDING
-  GRADUATED
-  CANCELLED
+  DOCS_REQ_SENT
+  LECTURE_NOTES_SENT
+  PAYMENT_COMPLETED
+  COURSE_ONGOING
+  COURSE_COMPLETED
+  CERTIFICATE_APPLIED
+  CERTIFICATE_SHIPPED
 }
 
 model Student {
   id          String   @id @default(cuid())
+  studentNumber String? @unique // YYXXXX format
   
   // Personal Info
   fullName    String
@@ -46,6 +49,12 @@ model Student {
   phone       String?
   address     String?
   course      String?
+  nationality String?
+  dateOfBirth DateTime?
+  
+  // Certificate Info
+  certificateIssueDate   DateTime?
+  certificateExpiryDate  DateTime?
   
   status      StudentStatus @default(REGISTERED)
   
@@ -56,6 +65,9 @@ model Student {
   // Magic Link for Uploads
   uploadToken       String?   @unique
   uploadTokenExpiry DateTime?
+
+  // Feedback Token
+  feedbackToken     String?   @unique
   
   // Meta
   createdAt   DateTime @default(now())
@@ -64,6 +76,24 @@ model Student {
   // Relations
   documents   StudentDocument[]
   payments    Payment[]
+  feedbacks   Feedback[]
+  
+  intakeId    String?
+  intake      Intake?   @relation(fields: [intakeId], references: [id])
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  
+  courseRating     Int // 1-5
+  instructorRating Int // 1-5
+  recommend        Boolean
+  comment          String? @db.Text
+  
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
 }
 
 // ----------------------------------------------------------------------------
@@ -208,6 +238,18 @@ model StudentDocument {
 model Course {
   id        String   @id @default(cuid())
   title     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Intake {
+  id        String   @id @default(cuid())
+  name      String   // e.g. "March 2025"
+  startDate DateTime?
+  status    String   @default("ACTIVE") // ACTIVE, ARCHIVED
+  
+  students  Student[]
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

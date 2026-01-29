@@ -1,19 +1,19 @@
 'use client';
 
-import { sendStudentWelcomeEmail } from "@/app/actions/email";
+import { sendFeedbackEmail } from "@/app/actions/email";
 import { Button } from "@/components/ui/button";
-import { Mail, Send } from "lucide-react";
+import { MessageSquarePlus } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function SendWelcomeEmailButton({ studentId }: { studentId: string }) {
+export function SendFeedbackEmailButton({ studentId }: { studentId: string }) {
     const [isLoading, setIsLoading] = useState(false);
 
     async function handleSend() {
         setIsLoading(true);
-        const res = await sendStudentWelcomeEmail(studentId);
+        const res = await sendFeedbackEmail(studentId);
         if (res.success) {
-            toast.success("Welcome email sent!");
+            toast.success("Feedback request sent!");
         } else {
             toast.error(res.message);
         }
@@ -22,8 +22,8 @@ export function SendWelcomeEmailButton({ studentId }: { studentId: string }) {
 
     return (
         <Button variant="outline" size="sm" onClick={handleSend} disabled={isLoading}>
-            <Mail className="w-4 h-4 mr-2" />
-            {isLoading ? "Sending..." : "Send Document Request"}
+            <MessageSquarePlus className="w-4 h-4 mr-2" />
+            {isLoading ? "Sending..." : "Request Feedback"}
         </Button>
     );
 }

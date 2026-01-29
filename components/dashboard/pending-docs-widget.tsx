@@ -84,7 +84,7 @@ export function PendingDocsWidget({ documents }: { documents: PendingDocument[] 
 
     if (documents.length === 0) {
         return (
-            <Card className="h-full border-none shadow-sm bg-background/50 backdrop-blur-sm">
+            <Card className="h-full border-none shadow-sm bg-card">
                 <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                         Pending Documents
@@ -104,14 +104,6 @@ export function PendingDocsWidget({ documents }: { documents: PendingDocument[] 
     return (
         <>
             <Card className="h-full border-none shadow-sm flex flex-col">
-                <CardHeader className="flex flex-row items-center justify-between pb-4 border-b">
-                    <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                        Pending Documents
-                        <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-yellow-200 dark:border-yellow-500/20 dark:text-yellow-400">
-                            {documents.length}
-                        </Badge>
-                    </CardTitle>
-                </CardHeader>
                 <CardContent className="p-0 flex-1 overflow-y-auto max-h-[400px]">
                     <div className="divide-y">
                         {documents.map((doc) => (

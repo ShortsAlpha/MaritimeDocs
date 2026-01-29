@@ -110,7 +110,8 @@ export async function getStudentByToken(token: string) {
         where: { uploadToken: token },
         include: {
             documents: {
-                include: { documentType: true }
+                include: { documentType: true },
+                orderBy: { createdAt: 'desc' }
             }
         }
     });
@@ -234,11 +235,62 @@ export async function deleteStudentDocument(docId: string) {
             console.error("Failed to delete from R2, proceeding with DB delete:", r2Error);
         }
 
+        // ... (previous code)
+
         await db.studentDocument.delete({ where: { id: docId } });
         revalidatePath("/admin");
         return { success: true };
     } catch (error) {
         console.error("Delete Doc Error:", error);
         return { success: false, message: "Failed to delete" };
+    }
+}
+
+export async function uploadStudentDocumentByAdmin(formData: FormData) {
+    try {
+        const studentId = formData.get("studentId") as string;
+        const file = formData.get("file") as File;
+        const documentTypeId = formData.get("documentTypeId") as string;
+
+        if (!studentId || !file || !documentTypeId) throw new Error("Missing fields");
+
+        const student = await db.student.findUnique({
+            where: { id: studentId }
+        });
+
+        if (!student) throw new Error("Student not found");
+
+        // Upload to R2
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+        const key = `students/${student.id}/documents/admin-upload/${Date.now()}-${safeName}`;
+
+        await r2.send(new PutObjectCommand({
+            Bucket: process.env.R2_BUCKET_NAME,
+            Key: key,
+            Body: buffer,
+            ContentType: file.type,
+        }));
+
+        const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
+
+        // Create Document Record (Status: APPROVED because Admin uploaded it)
+        await db.studentDocument.create({
+            data: {
+                studentId: student.id,
+                documentTypeId,
+                fileUrl: publicUrl,
+                fileType: file.type.split('/')[1] || 'file',
+                title: file.name,
+                status: 'APPROVED'
+            }
+        });
+
+        revalidatePath(`/admin/students/${studentId}`);
+        return { success: true };
+
+    } catch (error) {
+        console.error("Admin Upload Doc Error:", error);
+        return { success: false, message: "Upload failed" };
     }
 }

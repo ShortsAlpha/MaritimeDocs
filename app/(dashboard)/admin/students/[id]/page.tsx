@@ -2,14 +2,15 @@ import { db } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Mail, Phone, MapPin, Wallet, User, Calendar, FileText, CreditCard, Hash, Clock } from "lucide-react";
+import { ArrowLeft, Mail, Phone, MapPin, Wallet, User, Calendar, FileText, CreditCard, Hash, Clock, ShieldCheck, Globe, CalendarDays } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { format } from "date-fns";
+import { format, differenceInYears } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { DeleteStudentButton } from "@/components/admin/delete-student-button";
 import { EditableField } from "@/components/admin/editable-field";
 import { StudentStatusSelect } from "@/components/admin/student-status-select";
+
 
 // Sub-components will be imported from separate files in next steps
 // Placeholder imports for now, we will create these files next
@@ -17,6 +18,7 @@ import { StudentDocsTab } from "@/components/admin/student-docs-tab";
 import { StudentAccountingTab } from "@/components/admin/student-accounting-tab";
 import { SendWelcomeEmailButton } from "@/components/admin/send-welcome-button";
 import { SendExamNotesDialog } from "@/components/admin/send-exam-notes-dialog";
+import { SendFeedbackEmailButton } from "@/components/admin/send-feedback-email-button";
 
 export default async function StudentDetailPage({
     params,
@@ -33,11 +35,15 @@ export default async function StudentDetailPage({
         where: { id },
         include: {
             documents: { include: { documentType: true } },
-            payments: { orderBy: { date: "desc" } }
+            payments: { orderBy: { date: "desc" } },
+            feedbacks: { orderBy: { createdAt: "desc" } },
+            intake: true
         }
     });
 
     if (!student) notFound();
+
+
 
     const studentData = {
         ...student,
@@ -67,14 +73,14 @@ export default async function StudentDetailPage({
                 </Link>
                 <div className="flex-1">
                     <h1 className="text-3xl font-bold tracking-tight">{student.fullName}</h1>
-                    <div className="flex items-center gap-4 text-muted-foreground mt-1">
-                        <div className="flex items-center gap-1">
-                            <Mail className="h-4 w-4" />
-                            <span>{student.email || "No email"}</span>
+                    <div className="flex flex-col gap-1 text-muted-foreground mt-1">
+                        <div className="flex items-center gap-2">
+                            <Mail className="h-3.5 w-3.5" />
+                            <span className="text-sm">{student.email || "No email"}</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                            <Phone className="h-4 w-4" />
-                            <span>{student.phone || "No phone"}</span>
+                        <div className="flex items-center gap-2">
+                            <Phone className="h-3.5 w-3.5" />
+                            <span className="text-sm">{student.phone || "No phone"}</span>
                         </div>
                     </div>
                 </div>
@@ -91,6 +97,7 @@ export default async function StudentDetailPage({
                         courseName={student.course || ""}
                         courses={courses}
                     />
+                    <SendFeedbackEmailButton studentId={student.id} />
 
                     <div className="h-8 w-px bg-border mx-2"></div>
                     <DeleteStudentButton studentId={student.id} />
@@ -124,6 +131,30 @@ export default async function StudentDetailPage({
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="grid gap-1">
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                            <Hash className="h-4 w-4 text-primary" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-xs text-muted-foreground">Student Number</span>
+                                                <span className="text-sm font-medium">{student.studentNumber || "Not Assigned"}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                            <Calendar className="h-4 w-4 text-primary" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-xs text-muted-foreground">Intake Period</span>
+                                                <span className="text-sm font-medium">{student.intake?.name || "No Intake Assigned"}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div className="flex items-center gap-3">
                                         <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                                             <User className="h-4 w-4 text-primary" />
@@ -180,6 +211,69 @@ export default async function StudentDetailPage({
                                             />
                                         </div>
                                     </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                            <ShieldCheck className="h-4 w-4 text-primary" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <EditableField
+                                                studentId={student.id}
+                                                label="Certificate Issue Date"
+                                                name="certificateIssueDate"
+                                                type="date"
+                                                value={student.certificateIssueDate ? format(student.certificateIssueDate, "yyyy-MM-dd") : ""}
+                                                displayValue={student.certificateIssueDate ? format(student.certificateIssueDate, "PPP") : null}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                            <ShieldCheck className="h-4 w-4 text-primary" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <EditableField
+                                                studentId={student.id}
+                                                label="Certificate Expiry Date"
+                                                name="certificateExpiryDate"
+                                                type="date"
+                                                value={student.certificateExpiryDate ? format(student.certificateExpiryDate, "yyyy-MM-dd") : ""}
+                                                displayValue={student.certificateExpiryDate ? format(student.certificateExpiryDate, "PPP") : null}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                            <Globe className="h-4 w-4 text-primary" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <EditableField
+                                                studentId={student.id}
+                                                label="Nationality"
+                                                name="nationality"
+                                                value={student.nationality}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                            <CalendarDays className="h-4 w-4 text-primary" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <EditableField
+                                                studentId={student.id}
+                                                label="Date of Birth"
+                                                name="dateOfBirth"
+                                                type="date"
+                                                value={student.dateOfBirth ? format(student.dateOfBirth, "yyyy-MM-dd") : ""}
+                                                displayValue={student.dateOfBirth ? `${differenceInYears(new Date(), student.dateOfBirth)} Years Old (${format(student.dateOfBirth, "PPP")})` : null}
+                                                noTruncate
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
@@ -211,6 +305,61 @@ export default async function StudentDetailPage({
                                             <span className="text-2xl font-bold text-red-700 dark:text-red-400">€{balance.toLocaleString()}</span>
                                         </div>
                                     </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Student Feedback */}
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2 text-base">
+                                        <FileText className="h-4 w-4 text-muted-foreground" />
+                                        Student Feedback
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    {student.feedbacks.length > 0 ? (
+                                        <div className="space-y-4">
+                                            {student.feedbacks.map((fb: any, i: any) => (
+                                                <div key={i} className="border rounded-lg p-3 space-y-2">
+                                                    <div className="flex items-center justify-between text-sm">
+                                                        <div className="flex items-center gap-2">
+                                                            <Badge variant={fb.recommend ? "default" : "destructive"}>
+                                                                {fb.recommend ? "Recommended" : "Not Recommended"}
+                                                            </Badge>
+                                                            <span className="text-xs text-muted-foreground">{format(fb.createdAt, "PPP")}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 gap-2 text-sm">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-xs text-muted-foreground">Course</span>
+                                                            <div className="flex text-yellow-500">
+                                                                {Array.from({ length: fb.courseRating }).map((_, i) => (
+                                                                    <span key={i}>★</span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <span className="text-xs text-muted-foreground">Instructor</span>
+                                                            <div className="flex text-indigo-500">
+                                                                {Array.from({ length: fb.instructorRating }).map((_, i) => (
+                                                                    <span key={i}>★</span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {fb.comment && (
+                                                        <div className="bg-muted/30 p-2 rounded text-sm italic">
+                                                            "{fb.comment}"
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-6 text-muted-foreground text-sm">
+                                            No feedback received yet.
+                                        </div>
+                                    )}
                                 </CardContent>
                             </Card>
 

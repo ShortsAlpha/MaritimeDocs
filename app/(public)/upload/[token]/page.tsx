@@ -48,8 +48,10 @@ export default async function UploadPage({ params }: { params: Promise<{ token: 
                     </CardHeader>
                     <CardContent className="space-y-6">
                         {docTypes.map((type) => {
-                            const isUploaded = existingDocs.some(d => d.documentTypeId === type.id);
                             const uploadedDoc = existingDocs.find(d => d.documentTypeId === type.id);
+                            // Consider it "complete" only if it's PENDING or APPROVED.
+                            // If REJECTED, we want to show the form again.
+                            const isComplete = uploadedDoc?.status === 'PENDING' || uploadedDoc?.status === 'APPROVED';
 
                             return (
                                 <div key={type.id} className="p-4 rounded-lg border border-neutral-800 bg-neutral-950/50">
@@ -61,13 +63,27 @@ export default async function UploadPage({ params }: { params: Promise<{ token: 
                                             </h3>
                                             {type.description && <p className="text-sm text-neutral-500 mt-1">{type.description}</p>}
                                         </div>
-                                        {isUploaded ? (
-                                            <div className="flex items-center gap-1.5 text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full text-sm font-medium">
-                                                <CheckCircle2 className="w-4 h-4" />
-                                                <span>
-                                                    {uploadedDoc?.status === 'APPROVED' ? 'Received' : 'Pending Review'}
-                                                </span>
-                                            </div>
+                                        {uploadedDoc ? (
+                                            <>
+                                                {uploadedDoc.status === 'APPROVED' && (
+                                                    <div className="flex items-center gap-1.5 text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full text-sm font-medium">
+                                                        <CheckCircle2 className="w-4 h-4" />
+                                                        <span>Received</span>
+                                                    </div>
+                                                )}
+                                                {uploadedDoc.status === 'PENDING' && (
+                                                    <div className="flex items-center gap-1.5 text-yellow-500 bg-yellow-500/10 px-3 py-1 rounded-full text-sm font-medium">
+                                                        <UploadCloud className="w-4 h-4" />
+                                                        <span>In Review</span>
+                                                    </div>
+                                                )}
+                                                {uploadedDoc.status === 'REJECTED' && (
+                                                    <div className="flex items-center gap-1.5 text-red-500 bg-red-500/10 px-3 py-1 rounded-full text-sm font-medium">
+                                                        <XCircle className="w-4 h-4" />
+                                                        <span>Rejected</span>
+                                                    </div>
+                                                )}
+                                            </>
                                         ) : (
                                             <div className="flex items-center gap-1.5 text-neutral-500 bg-neutral-800 px-3 py-1 rounded-full text-sm font-medium">
                                                 <div className="w-2 h-2 rounded-full bg-neutral-500" />
@@ -76,11 +92,20 @@ export default async function UploadPage({ params }: { params: Promise<{ token: 
                                         )}
                                     </div>
 
-                                    {!isUploaded && (
-                                        <UploadForm
-                                            token={token}
-                                            documentTypeId={type.id}
-                                        />
+                                    {/* Show form if no doc uploaded OR if it was rejected */}
+                                    {!isComplete && (
+                                        <div className={uploadedDoc?.status === 'REJECTED' ? "pt-2 border-t border-neutral-800 mt-2" : ""}>
+                                            {uploadedDoc?.status === 'REJECTED' && (
+                                                <p className="text-sm text-red-400 mb-4 flex items-center gap-2">
+                                                    <XCircle className="w-4 h-4" />
+                                                    Please upload a new version of this document.
+                                                </p>
+                                            )}
+                                            <UploadForm
+                                                token={token}
+                                                documentTypeId={type.id}
+                                            />
+                                        </div>
                                     )}
                                 </div>
                             )

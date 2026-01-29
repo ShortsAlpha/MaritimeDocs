@@ -21,7 +21,10 @@ import { format } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { deleteStudentDocument, getDocumentPreviewUrl } from "@/app/actions/documents";
+import { deleteStudentDocument, getDocumentPreviewUrl, uploadStudentDocumentByAdmin } from "@/app/actions/documents";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
 
 interface DocumentType {
     id: string;
@@ -55,6 +58,7 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [selectedDoc, setSelectedDoc] = useState<StudentDocument | null>(null);
     const [loadingPreview, setLoadingPreview] = useState(false);
+    const [uploadDocTypeId, setUploadDocTypeId] = useState<string | null>(null);
 
     const categories = ["OFFICE", "STUDENT", "MEDICAL", "CERTIFICATE"];
 
@@ -182,7 +186,12 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
                                                                 </Button>
                                                             </>
                                                         ) : (
-                                                            <Button variant="outline" size="sm" className="h-8 gap-2">
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="h-8 gap-2"
+                                                                onClick={() => setUploadDocTypeId(type.id)}
+                                                            >
                                                                 <CloudUpload className="h-3 w-3" />
                                                                 Upload
                                                             </Button>
@@ -239,9 +248,94 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
                 </DialogContent>
             </Dialog>
 
+            <AdminUploadDialog
+                open={!!uploadDocTypeId}
+                onOpenChange={(open) => !open && setUploadDocTypeId(null)}
+                studentId={student.id}
+                documentTypeId={uploadDocTypeId || ""}
+                onSuccess={() => {
+                    setUploadDocTypeId(null);
+                    router.refresh();
+                }}
+            />
+
+
             {student.documents.length === 0 && docTypes.length === 0 && (
                 <div className="text-center py-12 text-zinc-500">No documents or document types found.</div>
             )}
         </div>
+    );
+}
+
+function AdminUploadDialog({
+    open,
+    onOpenChange,
+    studentId,
+    documentTypeId,
+    onSuccess
+}: {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    studentId: string;
+    documentTypeId: string;
+    onSuccess: () => void;
+}) {
+    const [file, setFile] = useState<File | null>(null);
+    const [uploading, setUploading] = useState(false);
+
+    async function handleUpload() {
+        if (!file) return;
+        setUploading(true);
+
+        const formData = new FormData();
+        formData.append("studentId", studentId);
+        formData.append("documentTypeId", documentTypeId);
+        formData.append("file", file);
+
+        const res = await uploadStudentDocumentByAdmin(formData);
+
+        if (res.success) {
+            toast.success("Document uploaded successfully");
+            onSuccess();
+            onOpenChange(false);
+            setFile(null); // Reset file
+        } else {
+            toast.error(res.message || "Upload failed");
+        }
+        setUploading(false);
+    }
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Upload Document</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                        <Label>Select File</Label>
+                        <Input
+                            type="file"
+                            onChange={(e) => setFile(e.target.files?.[0] || null)}
+                            disabled={uploading}
+                        />
+                    </div>
+                    <Button
+                        onClick={handleUpload}
+                        disabled={!file || uploading}
+                        className="w-full"
+                    >
+                        {uploading ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Uploading...
+                            </>
+                        ) : (
+                            "Upload"
+                        )}
+                    </Button>
+                </div>
+            </DialogContent>
+        </Dialog>
     );
 }
