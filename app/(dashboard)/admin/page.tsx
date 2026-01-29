@@ -39,7 +39,7 @@ export default async function AdminPage() {
     const outstandingBalance = totalExpectedRevenue - totalRevenue;
 
     // Completions (Graduated Students)
-    const completionsCount = students.filter(s => s.status === 'GRADUATED').length;
+    const completionsCount = students.filter(s => s.status === 'COURSE_COMPLETED').length;
 
     // 3. Prepare "Quick Stats" (StatsCardsWithLinks)
     const quickStats = [

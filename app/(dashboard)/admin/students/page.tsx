@@ -149,7 +149,7 @@ export default async function AdminStudentsPage(props: Props) {
                                     ONGOING: { label: "Ongoing", color: "bg-green-500" },
                                     EXAM_PHASE: { label: "In Exam", color: "bg-amber-500" },
                                     DOCS_PENDING: { label: "Docs Pending", color: "bg-red-500" },
-                                    GRADUATED: { label: "Graduated", color: "bg-purple-500" },
+
                                     CANCELLED: { label: "Cancelled", color: "bg-gray-500" }
                                 };
                                 const statusInfo = statusMap[student.status] || { label: student.status, color: "bg-gray-400" };
