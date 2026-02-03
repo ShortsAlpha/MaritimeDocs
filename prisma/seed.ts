@@ -1,4 +1,8 @@
-import { PrismaClient, StudentStatus, PaymentMethod } from '@prisma/client'
+import { PrismaClient, StudentStatus, PaymentMethod, RecommendStatus } from '@prisma/client'
+
+// ... (keep existing code)
+
+
 
 const prisma = new PrismaClient()
 
@@ -193,10 +197,16 @@ async function main() {
             await prisma.feedback.create({
                 data: {
                     studentId: student.id,
-                    courseRating: randomInt(3, 5),
-                    instructorRating: randomInt(3, 5),
-                    recommend: Math.random() > 0.2,
-                    comment: randomElement(FEEDBACK_COMMENTS)
+                    recommend: Math.random() > 0.2 ? RecommendStatus.YES : RecommendStatus.NO,
+                    comment: randomElement(FEEDBACK_COMMENTS),
+                    registrationProcess: randomInt(3, 5),
+                    practicalStandards: randomInt(3, 5),
+                    courseMaterials: randomInt(3, 5),
+                    courseContent: randomInt(3, 5),
+                    instructorEffectiveness: randomInt(3, 5),
+                    overallImpression: randomInt(3, 5),
+                    staffFriendliness: randomInt(3, 5),
+                    learningEffectiveness: randomInt(3, 5),
                 }
             });
         }
