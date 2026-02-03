@@ -11,7 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format } from "date-fns"
 import { CalendarIcon, Download, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { generateStudentReport, ReportFilters } from "@/app/actions/reports"
+import { generateStudentReport, type ReportFilters } from "@/app/actions/reports"
 
 import { saveAs } from 'file-saver'
 import { toast } from "sonner"
