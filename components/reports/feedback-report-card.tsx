@@ -5,8 +5,7 @@ import { Download, FileSpreadsheet, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import * as XLSX from 'xlsx';
-import { exportFeedbackReport } from "@/app/actions/reports";
+import { exportFeedbackReportExcel } from "@/app/actions/reports";
 
 export function FeedbackReportCard() {
     const [isLoading, setIsLoading] = useState(false);
@@ -14,36 +13,33 @@ export function FeedbackReportCard() {
     async function handleExport() {
         setIsLoading(true);
         try {
-            const data = await exportFeedbackReport();
+            const base64Coords = await exportFeedbackReportExcel();
 
-            if (!data || data.length === 0) {
-                toast.warning("No feedback data found to export.");
+            if (!base64Coords) {
+                toast.warning("No data or failed to generate report.");
                 setIsLoading(false);
                 return;
             }
 
-            // Create Worksheet
-            const ws = XLSX.utils.json_to_sheet(data);
-
-            // Adjust column widths roughly
-            const wscols = [
-                { wch: 25 }, // Name
-                { wch: 20 }, // Course
-                { wch: 15 }, // Course Rating
-                { wch: 15 }, // Instructor Rating
-                { wch: 12 }, // Recommend
-                { wch: 50 }, // Comment
-                { wch: 15 }, // Date
-            ];
-            ws['!cols'] = wscols;
-
-            // Create Workbook
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Feedbacks");
+            // Convert Base64 to Blob
+            const binaryString = window.atob(base64Coords);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            const blob = new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
 
             // Download
-            XLSX.writeFile(wb, `Feedback_Report_${new Date().toISOString().split('T')[0]}.xlsx`);
-            toast.success("Feedback report downloaded!");
+            const dateStr = new Date().toISOString().split('T')[0];
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = `Feedback_Report_${dateStr}.xlsx`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            toast.success("Feedback report downloaded successfully!");
 
         } catch (error) {
             console.error(error);

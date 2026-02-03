@@ -101,7 +101,9 @@ export async function generateStudentReport(filters: ReportFilters) {
     }
 }
 
-export async function exportFeedbackReport() {
+import ExcelJS from 'exceljs';
+
+export async function exportFeedbackReportExcel() {
     try {
         const feedbacks = await db.feedback.findMany({
             include: {
@@ -115,27 +117,77 @@ export async function exportFeedbackReport() {
             orderBy: { createdAt: 'desc' }
         });
 
-        return feedbacks.map(f => ({
-            "Date": f.createdAt.toISOString().split('T')[0],
-            "Student Name": f.student.fullName,
-            "Course Attended": f.courseAttended || f.student.course || "N/A",
-            "Discovery Source": f.source || "N/A",
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Student Feedback');
 
-            "Registration Process (1-5)": f.registrationProcess,
-            "Practical/Simulator (1-5)": f.practicalStandards,
-            "Course Materials (1-5)": f.courseMaterials,
-            "Course Content (1-5)": f.courseContent,
-            "Instructor Effectiveness (1-5)": f.instructorEffectiveness,
-            "Overall Impression (1-5)": f.overallImpression,
-            "Staff Friendliness (1-5)": f.staffFriendliness,
-            "Learning Effectiveness (1-5)": f.learningEffectiveness,
+        // Define Columns
+        worksheet.columns = [
+            { header: 'Date', key: 'date', width: 15 },
+            { header: 'Student Name', key: 'studentName', width: 25 },
+            { header: 'Course Attended', key: 'course', width: 30 },
+            { header: 'Source', key: 'source', width: 15 },
+            { header: 'Registration (1-5)', key: 'reg', width: 18 },
+            { header: 'Practical (1-5)', key: 'prac', width: 18 },
+            { header: 'Materials (1-5)', key: 'mat', width: 18 },
+            { header: 'Content (1-5)', key: 'cont', width: 18 },
+            { header: 'Instructor (1-5)', key: 'inst', width: 18 },
+            { header: 'Overall (1-5)', key: 'over', width: 18 },
+            { header: 'Recommend?', key: 'rec', width: 15 },
+            { header: 'Comment', key: 'comment', width: 50 },
+        ];
 
-            "Recommend?": f.recommend,
-            "Comment": f.comment || "",
-        }));
+        // Style Header Row
+        const headerRow = worksheet.getRow(1);
+        headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 12 };
+        headerRow.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FF1F4E78' } // Dark Blue
+        };
+        headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+        headerRow.height = 30;
+
+        // Add Data
+        feedbacks.forEach(f => {
+            const row = worksheet.addRow({
+                date: f.createdAt.toISOString().split('T')[0],
+                studentName: f.student.fullName,
+                course: f.courseAttended || f.student.course || "N/A",
+                source: f.source || "N/A",
+                reg: f.registrationProcess,
+                prac: f.practicalStandards,
+                mat: f.courseMaterials,
+                cont: f.courseContent,
+                inst: f.instructorEffectiveness,
+                over: f.overallImpression,
+                rec: f.recommend, // Enum: YES, NO, MAYBE
+                comment: f.comment || ""
+            });
+
+            // Center align rating numbers
+            ['reg', 'prac', 'mat', 'cont', 'inst', 'over'].forEach(key => {
+                // @ts-ignore
+                row.getCell(key).alignment = { horizontal: 'center' };
+            });
+
+            // Color code "Recommend" cell
+            const recCell = row.getCell('rec');
+            recCell.alignment = { horizontal: 'center' };
+            if (f.recommend === 'YES') {
+                recCell.font = { color: { argb: 'FF006100' }, bold: true }; // Dark Green
+                recCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC6EFCE' } }; // Light Green
+            } else if (f.recommend === 'NO') {
+                recCell.font = { color: { argb: 'FF9C0006' }, bold: true }; // Dark Red
+                recCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFC7CE' } }; // Light Red
+            }
+        });
+
+        // Generate Buffer
+        const buffer = await workbook.xlsx.writeBuffer();
+        return buffer.toString('base64');
 
     } catch (error) {
         console.error("Feedback Report Error:", error);
-        throw new Error("Failed to export feedback");
+        throw new Error("Failed to export feedback: " + (error as Error).message);
     }
 }
