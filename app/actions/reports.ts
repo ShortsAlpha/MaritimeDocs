@@ -184,7 +184,7 @@ export async function exportFeedbackReportExcel() {
 
         // Generate Buffer
         const buffer = await workbook.xlsx.writeBuffer();
-        return buffer.toString('base64');
+        return Buffer.from(buffer).toString('base64');
 
     } catch (error) {
         console.error("Feedback Report Error:", error);
