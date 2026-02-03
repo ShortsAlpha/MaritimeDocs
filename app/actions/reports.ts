@@ -167,12 +167,22 @@ export async function exportFeedbackReportExcel() {
             // Center align rating numbers
             ['reg', 'prac', 'mat', 'cont', 'inst', 'over'].forEach(key => {
                 // @ts-ignore
-                row.getCell(key).alignment = { horizontal: 'center' };
+                row.getCell(key).alignment = { vertical: 'middle', horizontal: 'center' };
+            });
+
+            // Wrap text for comments
+            const commentCell = row.getCell('comment');
+            commentCell.alignment = { vertical: 'top', wrapText: true };
+
+            // Align other text columns to top for better look with multiline comments
+            ['studentName', 'course', 'source'].forEach(key => {
+                // @ts-ignore
+                row.getCell(key).alignment = { vertical: 'top', horizontal: 'left' };
             });
 
             // Color code "Recommend" cell
             const recCell = row.getCell('rec');
-            recCell.alignment = { horizontal: 'center' };
+            recCell.alignment = { vertical: 'top', horizontal: 'center' };
             if (f.recommend === 'YES') {
                 recCell.font = { color: { argb: 'FF006100' }, bold: true }; // Dark Green
                 recCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC6EFCE' } }; // Light Green
