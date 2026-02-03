@@ -4,6 +4,8 @@ import { useState } from "react"
 import { format } from "date-fns"
 import { CalendarTwin } from "@/components/ui/calendar-twin"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Plus } from "lucide-react"
 
 import { CreateEventDialog } from "@/components/admin/create-event-dialog"
 import { EventDetailsDialog } from "@/components/admin/event-details-dialog"
@@ -56,6 +58,13 @@ export function CalendarPageContent({ events, instructors, courses, intakes }: P
 
     return (
         <div className="flex flex-col gap-6 mt-6 items-center w-full">
+            <div className="w-full flex justify-end px-4">
+                <Button onClick={() => setCreateOpen(true)} className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    Add Event
+                </Button>
+            </div>
+
             <CalendarTwin
                 value={date}
                 onChange={handleDateChange}

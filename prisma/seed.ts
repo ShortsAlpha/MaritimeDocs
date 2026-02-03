@@ -55,9 +55,7 @@ const COURSE_NAMES = [
     "MASTER ON YACHTS LESS THAN 200 GT (MALTA FLAG STATE)"
 ];
 
-const INTAKE_NAMES = [
-    "January 2025", "February 2025", "March 2025", "April 2025", "May 2025", "June 2025"
-];
+
 
 // --- Helpers ---
 
@@ -95,13 +93,27 @@ async function main() {
     ));
 
     console.log('Creating Intakes...');
-    // Create one intake per month for first half of 2025
+    // Create one intake per month for first half of 2025 and 2026
     const intakes = [];
-    for (let i = 0; i < INTAKE_NAMES.length; i++) {
+    const months = ["January", "February", "March", "April", "May", "June"];
+
+    // 2025 Intakes
+    for (let i = 0; i < months.length; i++) {
         intakes.push(await prisma.intake.create({
             data: {
-                name: INTAKE_NAMES[i],
-                startDate: new Date(2025, i, 1), // Jan 1, Feb 1, etc.
+                name: `${months[i]} 2025`,
+                startDate: new Date(2025, i, 1),
+                status: 'ARCHIVED'
+            }
+        }));
+    }
+
+    // 2026 Intakes
+    for (let i = 0; i < months.length; i++) {
+        intakes.push(await prisma.intake.create({
+            data: {
+                name: `${months[i]} 2026`,
+                startDate: new Date(2026, i, 1),
                 status: 'ACTIVE'
             }
         }));

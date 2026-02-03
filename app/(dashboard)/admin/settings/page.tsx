@@ -12,6 +12,7 @@ import { CourseSettings } from "@/components/admin/course-settings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreateIntakeForm } from "@/components/admin/create-intake-form";
 import { DeleteIntakeButton } from "@/components/admin/delete-intake-button";
+import { format } from "date-fns";
 
 function DocTypeTable({ types }: { types: any[] }) {
     return (
@@ -90,9 +91,16 @@ export default async function AdminSettingsPage() {
                             </CardHeader>
                             <CardContent>
                                 <Table>
+                                    import {format} from "date-fns";
+
+                                    // ... existing imports
+
+                                    // ... existing code
+
                                     <TableHeader>
                                         <TableRow>
                                             <TableHead>Name</TableHead>
+                                            <TableHead>Start Date</TableHead>
                                             <TableHead className="text-right">Action</TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -100,6 +108,9 @@ export default async function AdminSettingsPage() {
                                         {intakes.map((intake) => (
                                             <TableRow key={intake.id}>
                                                 <TableCell className="font-medium">{intake.name}</TableCell>
+                                                <TableCell>
+                                                    {intake.startDate ? format(intake.startDate, "d MMMM yyyy") : "-"}
+                                                </TableCell>
                                                 <TableCell className="text-right">
                                                     <DeleteIntakeButton id={intake.id} />
                                                 </TableCell>
@@ -107,7 +118,7 @@ export default async function AdminSettingsPage() {
                                         ))}
                                         {intakes.length === 0 && (
                                             <TableRow>
-                                                <TableCell colSpan={2} className="text-center text-muted-foreground">
+                                                <TableCell colSpan={3} className="text-center text-muted-foreground">
                                                     No intakes defined.
                                                 </TableCell>
                                             </TableRow>
