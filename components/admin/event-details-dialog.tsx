@@ -96,12 +96,23 @@ function EventCard({ event }: { event: any }) {
     const handleToggle = async (itemId: string, checked: boolean) => {
         // Optimistic update
         setChecklistItems((prev: any[]) => prev.map((item) =>
-            item.id === itemId ? { ...item, isCompleted: checked } : item
+            item.id === itemId ? {
+                ...item,
+                isCompleted: checked,
+                // Temporary simplified optimistic update until server responds
+                completedAt: checked ? new Date().toISOString() : null,
+                completedBy: checked ? "You" : null
+            } : item
         ))
 
-        await toggleEventChecklistItem(itemId, checked)
-        // No need to revert if it fails usually, but strictly we should. 
-        // For this app, strict optimistic rollback is probably overkill.
+        const result = await toggleEventChecklistItem(itemId, checked)
+
+        if (result.success && (result as any).item) {
+            const updatedItem = (result as any).item
+            setChecklistItems((prev: any[]) => prev.map((item) =>
+                item.id === itemId ? updatedItem : item
+            ))
+        }
     }
 
     const handleDeleteEvent = async () => {
@@ -168,31 +179,46 @@ function EventCard({ event }: { event: any }) {
                     <div className="mt-4 pt-4 border-t">
                         <h5 className="text-sm font-semibold mb-2">Checklist</h5>
                         <div className="space-y-4">
-                            {checklistItems.map((item: any) => (
-                                <div key={item.id} className="relative flex items-center space-x-2 group">
-                                    <Checkbox
-                                        id={item.id}
-                                        checked={item.isCompleted}
-                                        onCheckedChange={(checked) => handleToggle(item.id, checked as boolean)}
-                                        className="transition-colors duration-300 z-10"
-                                    />
-                                    <div className="relative inline-block">
-                                        <label
-                                            htmlFor={item.id}
-                                            className={`text-sm font-medium leading-none cursor-pointer transition-colors ${item.isCompleted ? "line-through text-muted-foreground" : ""
-                                                }`}
-                                        >
-                                            {item.label}
-                                        </label>
-                                    </div>
-                                    <button
-                                        onClick={() => handleDelete(item.id)}
-                                        className="opacity-0 group-hover:opacity-100 text-destructive transition-opacity z-10 ml-auto"
-                                    >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                    </button>
-                                </div>
-                            ))}
+                            {checklistItems
+                                .sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
+                                .map((item: any, index: number) => {
+                                    const isPreviousCompleted = index === 0 || checklistItems[index - 1].isCompleted
+                                    const isDisabled = !isPreviousCompleted && !item.isCompleted
+
+                                    return (
+                                        <div key={item.id} className="flex flex-col gap-1">
+                                            <div className="relative flex items-center space-x-2 group">
+                                                <Checkbox
+                                                    id={item.id}
+                                                    checked={item.isCompleted}
+                                                    onCheckedChange={(checked) => handleToggle(item.id, checked as boolean)}
+                                                    disabled={isDisabled}
+                                                    className="transition-colors duration-300 z-10"
+                                                />
+                                                <div className="relative inline-block">
+                                                    <label
+                                                        htmlFor={item.id}
+                                                        className={`text-sm font-medium leading-none cursor-pointer transition-colors ${item.isCompleted ? "line-through text-muted-foreground" : ""
+                                                            } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                                                    >
+                                                        {item.label}
+                                                    </label>
+                                                </div>
+                                                <button
+                                                    onClick={() => handleDelete(item.id)}
+                                                    className="opacity-0 group-hover:opacity-100 text-destructive transition-opacity z-10 ml-auto"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
+                                            {item.isCompleted && item.completedBy && (
+                                                <div className="text-xs text-muted-foreground ml-6">
+                                                    Completed by {item.completedBy} at {item.completedAt ? format(new Date(item.completedAt), "HH:mm, dd MMM") : ""}
+                                                </div>
+                                            )}
+                                        </div>
+                                    )
+                                })}
                         </div>
                         <div className="mt-4 flex gap-2">
                             <Input

@@ -18,6 +18,16 @@ export default async function AdminCalendarPage() {
         select: { id: true, fullName: true }
     });
 
+    const courses = await db.course.findMany({
+        select: { id: true, title: true },
+        orderBy: { title: 'asc' }
+    });
+
+    const intakes = await db.intake.findMany({
+        select: { id: true, name: true },
+        orderBy: { startDate: 'desc' }
+    });
+
     // Transform for big-calendar
     const calendarEvents = events.map(evt => ({
         id: evt.id,
@@ -38,7 +48,12 @@ export default async function AdminCalendarPage() {
                 </div>
             </div>
 
-            <CalendarPageContent events={calendarEvents} instructors={instructors} />
+            <CalendarPageContent
+                events={calendarEvents}
+                instructors={instructors}
+                courses={courses}
+                intakes={intakes}
+            />
         </div>
     );
 }

@@ -3,8 +3,13 @@
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 
+import { currentUser } from "@clerk/nextjs/server"
+
 export async function createIntake(name: string, startDate?: string) {
     try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
         await db.intake.create({
             data: {
                 name,
@@ -22,6 +27,9 @@ export async function createIntake(name: string, startDate?: string) {
 
 export async function deleteIntake(id: string) {
     try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
         await db.intake.delete({
             where: { id }
         });

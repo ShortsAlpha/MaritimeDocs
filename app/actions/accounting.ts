@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { PaymentMethod } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { logActivity } from "@/lib/logger";
 
 export async function addPayment(studentId: string, amount: number, method: PaymentMethod, note?: string) {
     try {
@@ -16,6 +17,15 @@ export async function addPayment(studentId: string, amount: number, method: Paym
         });
 
         revalidatePath(`/admin/students/${studentId}`);
+
+        await logActivity({
+            action: 'PAYMENT',
+            title: `Payment Received: €${amount}`,
+            description: `Method: ${method} - Note: ${note || 'None'}`,
+            userId: studentId,
+            metadata: { amount, method, note }
+        });
+
         return { success: true };
     } catch (error) {
         return { success: false, message: "Failed to add payment" };
@@ -50,6 +60,15 @@ export async function updatePaymentAmount(paymentId: string, amount: number) {
         console.log("Payment updated:", updated);
 
         revalidatePath(`/admin/students/${payment.studentId}`);
+
+        await logActivity({
+            action: 'PAYMENT',
+            title: `Payment Updated: €${amount}`,
+            description: `Payment ID: ${paymentId} updated`,
+            userId: payment.studentId,
+            metadata: { paymentId, newAmount: amount }
+        });
+
         return { success: true };
     } catch (error) {
         console.error("Error updating payment:", error);

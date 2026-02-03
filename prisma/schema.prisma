@@ -34,6 +34,7 @@ enum StudentStatus {
   LECTURE_NOTES_SENT
   PAYMENT_COMPLETED
   COURSE_ONGOING
+  EXAM_PHASE
   COURSE_COMPLETED
   CERTIFICATE_APPLIED
   CERTIFICATE_SHIPPED
@@ -82,12 +83,40 @@ model Student {
   intake      Intake?   @relation(fields: [intakeId], references: [id])
 }
 
+enum FeedbackSource {
+  LINKEDIN
+  WORD_OF_MOUTH
+  ADVERTISEMENT
+  SOCIAL_MEDIA
+  RECOMMENDATION
+  OTHER
+}
+
+enum RecommendStatus {
+  YES
+  NO
+  MAYBE
+}
+
 model Feedback {
   id        String   @id @default(cuid())
+
+  // 1. General Info
+  source    FeedbackSource?
+
+  // 2. Ratings (1-5)
+  registrationProcess   Int
+  practicalStandards    Int   
+  courseMaterials       Int
+  courseContent         Int
+  instructorEffectiveness Int
+  overallImpression     Int
+  staffFriendliness     Int
+  learningEffectiveness Int
   
-  courseRating     Int // 1-5
-  instructorRating Int // 1-5
-  recommend        Boolean
+  // 3. Conclusion
+  recommend        RecommendStatus
+  courseAttended   String? // Snapshot of course name
   comment          String? @db.Text
   
   studentId String
@@ -150,6 +179,12 @@ model CourseEvent {
   instructorId String?
   instructor   Instructor? @relation(fields: [instructorId], references: [id])
   
+  courseId     String?
+  course       Course?     @relation(fields: [courseId], references: [id])
+
+  intakeId     String?
+  intake       Intake?     @relation(fields: [intakeId], references: [id])
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -163,6 +198,10 @@ model EventChecklistItem {
   
   courseEventId String
   courseEvent   CourseEvent @relation(fields: [courseEventId], references: [id], onDelete: Cascade)
+
+  completedAt   DateTime?
+  completedBy   String? // Store user name
+  order         Int       @default(0)
 }
 
 // ----------------------------------------------------------------------------
@@ -240,6 +279,8 @@ model Course {
   title     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  events    CourseEvent[]
 }
 
 model Intake {
@@ -249,8 +290,27 @@ model Intake {
   status    String   @default("ACTIVE") // ACTIVE, ARCHIVED
   
   students  Student[]
+  events    CourseEvent[]
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  
+  action    String   // LOGIN, UPLOAD, VIEW, DELETE, CREATE
+  title     String   // "Uploaded document.pdf" or "Viewed Dashboard"
+  description String? @db.Text // Optional details
+  
+  userId    String?  // If authenticated user
+  userEmail String?  // Store email for easy reading
+  
+  ipAddress String?
+  userAgent String?
+  
+  metadata  Json?    // Flexible storage for extra data (fileId, studentId etc)
+  
+  createdAt DateTime @default(now())
 }
 

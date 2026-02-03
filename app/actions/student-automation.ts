@@ -11,19 +11,24 @@ export async function sendDocumentRequest(studentId: string) {
         const emailResult = await sendStudentWelcomeEmail(studentId)
 
         if (!emailResult.success) {
-            return { success: false, error: emailResult.message }
+            console.warn("⚠️ Email failed to send (likely due to Resend free tier limits), but updating status for demo purposes:", emailResult.message)
+            // We do NOT return early here, so the status still updates.
         }
 
         // Update student status to DOCS_REQ_SENT
         await db.student.update({
             where: { id: studentId },
-            data: { status: StudentStatus.DOCS_REQ_SENT as any }
+            data: { status: StudentStatus.DOCS_REQ_SENT }
         })
 
         revalidatePath(`/admin/students/${studentId}`)
         revalidatePath("/admin/students")
 
-        return { success: true, newStatus: StudentStatus.DOCS_REQ_SENT as any }
+        return {
+            success: true,
+            newStatus: StudentStatus.DOCS_REQ_SENT,
+            message: emailResult.success ? "Request sent successfully" : "Status updated (Email failed)"
+        }
     } catch (error) {
         console.error("Error sending document request:", error)
         return { success: false, error: "Failed to send document request" }

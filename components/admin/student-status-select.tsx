@@ -9,9 +9,10 @@ import { Badge } from "@/components/ui/badge"
 type Props = {
     studentId: string
     currentStatus: string
+    balance: number
 }
 
-export function StudentStatusSelect({ studentId, currentStatus }: Props) {
+export function StudentStatusSelect({ studentId, currentStatus, balance }: Props) {
     const [status, setStatus] = useState(currentStatus)
 
     // Update local state when prop changes (e.g., after external update)
@@ -20,6 +21,15 @@ export function StudentStatusSelect({ studentId, currentStatus }: Props) {
     }, [currentStatus])
 
     const handleStatusChange = async (value: string) => {
+        // Warning for Exam Check
+        if (value === "EXAM_PHASE" && balance > 0) {
+            toast.warning(`Warning: Student has €${balance} unpaid balance!`, {
+                description: "Proceeding, but payment should be collected before exam.",
+                duration: 5000,
+            })
+            // We do not return here, we allow the update to proceed as requested.
+        }
+
         // Optimistic update
         setStatus(value)
 
@@ -43,6 +53,7 @@ export function StudentStatusSelect({ studentId, currentStatus }: Props) {
         LECTURE_NOTES_SENT: { label: "Notes Sent", color: "bg-indigo-500" },
         PAYMENT_COMPLETED: { label: "Payment Done", color: "bg-green-600" },
         COURSE_ONGOING: { label: "Course Ongoing", color: "bg-sky-500" },
+        EXAM_PHASE: { label: "In Exam", color: "bg-purple-600" },
         COURSE_COMPLETED: { label: "Course Completed", color: "bg-purple-500" },
         CERTIFICATE_APPLIED: { label: "Certificate Applied", color: "bg-orange-500" },
         CERTIFICATE_SHIPPED: { label: "Certificate Shipped", color: "bg-emerald-500" }

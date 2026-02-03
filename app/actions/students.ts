@@ -10,6 +10,8 @@ import { addMonths } from "date-fns"
 // ... existing code ...
 import { StudentStatus } from "@prisma/client"
 
+import { currentUser } from "@clerk/nextjs/server"
+
 // Helper to generate student number
 async function generateStudentNumber(date = new Date()): Promise<string> {
     const year = date.getFullYear().toString().slice(-2);
@@ -64,6 +66,9 @@ const StudentSchema = z.object({
 
 export async function createStudent(prevState: any, formData: FormData) {
     try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
         const rowData = {
             fullName: formData.get("fullName"),
             email: formData.get("email"),
@@ -105,6 +110,9 @@ export async function createStudent(prevState: any, formData: FormData) {
 // Temporary Action to Backfill Numbers
 export async function backfillStudentNumbers() {
     try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
         // Fetch all students without a number, sorted by creation date
         const studentsWithoutNumber = await db.student.findMany({
             where: { studentNumber: null },
@@ -131,6 +139,9 @@ export async function backfillStudentNumbers() {
 
 export async function updateStudent(id: string, prevState: any, formData: FormData) {
     try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
         const rowData = {
             fullName: formData.get("fullName") === null ? undefined : formData.get("fullName"),
             email: formData.get("email") === null ? undefined : formData.get("email"),
@@ -242,11 +253,12 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
         return { success: false, message: "Failed to update profile: " + (error.message || String(error)) }
     }
 }
-// ... existing deleteStudent ...
-// ... existing code ...
 
 export async function deleteStudent(id: string) {
     try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
         // 1. Fetch all documents for this student to clean up R2
         const docs = await db.studentDocument.findMany({
             where: { studentId: id }

@@ -17,6 +17,13 @@ export function UploadForm({ token, documentTypeId }: { token: string, documentT
         const file = event.target.files?.[0];
         if (!file) return;
 
+        // 10MB Limit
+        if (file.size > 10 * 1024 * 1024) {
+            toast.error("File is too large (Max 10MB). Please contact support if you have issues.");
+            event.target.value = ""; // Clear input
+            return;
+        }
+
         setIsUploading(true);
         const formData = new FormData();
         formData.append("file", file);

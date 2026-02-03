@@ -9,7 +9,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { StudentFilter } from "@/components/admin/student-filter";
 import { SortableHeader } from "@/components/admin/sortable-header";
-import { Prisma } from "@prisma/client";
+import { StudentSearch } from "@/components/admin/student-search";
+import { Prisma, StudentStatus } from "@prisma/client";
 
 type Props = {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -19,6 +20,10 @@ export default async function AdminStudentsPage(props: Props) {
     const searchParams = await props.searchParams;
     const courseFilter = typeof searchParams.course === 'string' ? searchParams.course : undefined;
     const nationalityFilter = typeof searchParams.nationality === 'string' ? searchParams.nationality : undefined; // Handle nationality filter if it's there
+
+    const query = typeof searchParams.query === 'string' ? searchParams.query : undefined;
+    const statusFilter = typeof searchParams.status === 'string' ? searchParams.status : undefined;
+    const intakeFilter = typeof searchParams.intake === 'string' ? searchParams.intake : undefined;
 
     const sort = typeof searchParams.sort === 'string' ? searchParams.sort : undefined;
     const order = typeof searchParams.order === 'string' && searchParams.order === 'desc' ? 'desc' : 'asc';
@@ -40,11 +45,26 @@ export default async function AdminStudentsPage(props: Props) {
 
     // Build where
     const where: Prisma.StudentWhereInput = {};
+
+    // Search Query
+    if (query) {
+        where.OR = [
+            { fullName: { contains: query, mode: 'insensitive' } },
+            { studentNumber: { contains: query, mode: 'insensitive' } },
+        ];
+    }
+
     if (courseFilter && courseFilter !== 'all') {
         where.course = courseFilter;
     }
     if (nationalityFilter && nationalityFilter !== 'all') {
         where.nationality = nationalityFilter;
+    }
+    if (statusFilter && statusFilter !== 'all') {
+        where.status = statusFilter as StudentStatus;
+    }
+    if (intakeFilter && intakeFilter !== 'all') {
+        where.intakeId = intakeFilter;
     }
 
     // Fetch students with their payments to calculate balance
@@ -83,7 +103,8 @@ export default async function AdminStudentsPage(props: Props) {
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold">Student Management</h1>
                 <div className="flex items-center gap-2">
-                    <StudentFilter courses={courses} nationalities={nationalities} />
+                    <StudentSearch />
+                    <StudentFilter courses={courses} nationalities={nationalities} intakes={intakes} />
                     <CreateStudentDialog courses={courses} intakes={intakes} />
                 </div>
             </div>
@@ -97,7 +118,7 @@ export default async function AdminStudentsPage(props: Props) {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Name</TableHead>
-                                <TableHead>Contact</TableHead>
+
                                 <TableHead>
                                     <SortableHeader
                                         column="country"
@@ -125,7 +146,7 @@ export default async function AdminStudentsPage(props: Props) {
                                         searchParams={searchParams}
                                     />
                                 </TableHead>
-                                <TableHead>Course Fee</TableHead>
+
                                 <TableHead>Balance</TableHead>
                                 <TableHead className="text-right">Action</TableHead>
                             </TableRow>
@@ -162,12 +183,7 @@ export default async function AdminStudentsPage(props: Props) {
                                                 <span className="text-xs text-muted-foreground">Joined {format(student.createdAt, 'MMM d, yyyy')}</span>
                                             </div>
                                         </TableCell>
-                                        <TableCell>
-                                            <div className="flex flex-col text-sm">
-                                                <span>{student.email || '-'}</span>
-                                                <span className="text-muted-foreground">{student.phone || '-'}</span>
-                                            </div>
-                                        </TableCell>
+
                                         <TableCell>
                                             {student.nationality || '-'}
                                         </TableCell>
@@ -180,7 +196,7 @@ export default async function AdminStudentsPage(props: Props) {
                                                 <span className="text-sm">{statusInfo.label}</span>
                                             </div>
                                         </TableCell>
-                                        <TableCell>€{totalFee.toLocaleString()}</TableCell>
+
                                         <TableCell>
                                             <Badge variant={balance > 0 ? "destructive" : "secondary"}>
                                                 €{balance.toLocaleString()}
@@ -198,7 +214,7 @@ export default async function AdminStudentsPage(props: Props) {
                             })}
                             {students.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                                         No students found.
                                     </TableCell>
                                 </TableRow>

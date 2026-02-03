@@ -1,21 +1,24 @@
 'use client';
 
-import { sendStudentWelcomeEmail } from "@/app/actions/email";
+import { sendDocumentRequest } from "@/app/actions/student-automation";
 import { Button } from "@/components/ui/button";
 import { Mail, Send } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export function SendWelcomeEmailButton({ studentId }: { studentId: string }) {
+    const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
 
     async function handleSend() {
         setIsLoading(true);
-        const res = await sendStudentWelcomeEmail(studentId);
+        const res = await sendDocumentRequest(studentId);
         if (res.success) {
-            toast.success("Welcome email sent!");
+            toast.success(res.message || "Document request sent and status updated!");
+            router.refresh();
         } else {
-            toast.error(res.message);
+            toast.error(res.error || "Failed to send request");
         }
         setIsLoading(false);
     }

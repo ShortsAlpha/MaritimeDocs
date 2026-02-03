@@ -11,9 +11,11 @@ import { EventDetailsDialog } from "@/components/admin/event-details-dialog"
 type Props = {
     events: any[]
     instructors: { id: string, fullName: string }[]
+    courses: { id: string, title: string }[]
+    intakes: { id: string, name: string }[]
 }
 
-export function CalendarPageContent({ events, instructors }: Props) {
+export function CalendarPageContent({ events, instructors, courses, intakes }: Props) {
     const [date, setDate] = useState<Date>(new Date())
     const [createOpen, setCreateOpen] = useState(false)
     const [detailsOpen, setDetailsOpen] = useState(false)
@@ -65,6 +67,8 @@ export function CalendarPageContent({ events, instructors }: Props) {
                 open={createOpen}
                 onOpenChange={setCreateOpen}
                 instructors={instructors}
+                courses={courses}
+                intakes={intakes}
                 defaultDate={selectedDate}
             />
 

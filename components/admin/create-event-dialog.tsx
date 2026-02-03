@@ -27,12 +27,14 @@ const initialState = {
 
 type Props = {
     instructors: { id: string, fullName: string }[]
+    courses?: { id: string, title: string }[]
+    intakes?: { id: string, name: string }[]
     open: boolean
     onOpenChange: (open: boolean) => void
     defaultDate?: Date
 }
 
-export function CreateEventDialog({ instructors, open, onOpenChange, defaultDate }: Props) {
+export function CreateEventDialog({ instructors, courses = [], intakes = [], open, onOpenChange, defaultDate }: Props) {
     const [state, formAction, isPending] = useActionState(createCourseEvent, initialState)
     const [startDate, setStartDate] = useState<Date | undefined>(defaultDate || new Date())
     const [endDate, setEndDate] = useState<Date | undefined>(defaultDate || new Date())
@@ -123,6 +125,45 @@ export function CreateEventDialog({ instructors, open, onOpenChange, defaultDate
                                 className="col-span-3"
                             />
                         </div>
+
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="course" className="text-right">
+                                Course
+                            </Label>
+                            <Select name="courseId">
+                                <SelectTrigger className="col-span-3">
+                                    <SelectValue placeholder="Select course (Optional)" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">No Course</SelectItem>
+                                    {courses.map((c) => (
+                                        <SelectItem key={c.id} value={c.id}>
+                                            {c.title}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="intake" className="text-right">
+                                Intake
+                            </Label>
+                            <Select name="intakeId">
+                                <SelectTrigger className="col-span-3">
+                                    <SelectValue placeholder="Select intake (Optional)" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">No Intake</SelectItem>
+                                    {intakes.map((i) => (
+                                        <SelectItem key={i.id} value={i.id}>
+                                            {i.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="instructor" className="text-right">
                                 Instructor

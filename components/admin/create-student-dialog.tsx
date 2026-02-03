@@ -61,11 +61,25 @@ export function CreateStudentDialog({ courses = [], intakes = [] }: Props) {
                         <Input id="fullName" name="fullName" required placeholder="John Doe" />
                     </div>
 
+                    <div className="space-y-2">
+                        <Label htmlFor="course">Course</Label>
+                        <Select name="course">
+                            <SelectTrigger className="w-full h-auto min-h-10 py-2 whitespace-normal [&>span]:line-clamp-none text-left">
+                                <SelectValue placeholder="Select a course" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {courses.map((c) => (
+                                    <SelectItem key={c.id} value={c.title}>{c.title}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="intakeId">Intake (Optional)</Label>
                             <Select name="intakeId">
-                                <SelectTrigger>
+                                <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Select intake" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -76,17 +90,8 @@ export function CreateStudentDialog({ courses = [], intakes = [] }: Props) {
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="course">Course</Label>
-                            <Select name="course">
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a course" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {courses.map((c) => (
-                                        <SelectItem key={c.id} value={c.title}>{c.title}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <Label htmlFor="nationality">Nationality</Label>
+                            <Input id="nationality" name="nationality" placeholder="e.g. Turkish" />
                         </div>
                     </div>
 
@@ -99,10 +104,9 @@ export function CreateStudentDialog({ courses = [], intakes = [] }: Props) {
                             <Label htmlFor="phone">Phone</Label>
                             <Input id="phone" name="phone" placeholder="+1 234..." />
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="nationality">Nationality</Label>
-                            <Input id="nationality" name="nationality" placeholder="e.g. Turkish" />
-                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2 flex flex-col">
                             <Label htmlFor="dateOfBirth">Date of Birth</Label>
                             <div className="flex gap-2">
@@ -163,11 +167,10 @@ export function CreateStudentDialog({ courses = [], intakes = [] }: Props) {
                             </div>
                             <input type="hidden" name="dateOfBirth" value={dob ? format(dob, "yyyy-MM-dd") : ""} />
                         </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="totalFee">Total Course Fee (€)</Label>
-                        <Input id="totalFee" name="totalFee" type="number" defaultValue="0" required min="0" />
+                        <div className="space-y-2">
+                            <Label htmlFor="totalFee">Total Course Fee (€)</Label>
+                            <Input id="totalFee" name="totalFee" type="number" defaultValue="0" required min="0" />
+                        </div>
                     </div>
                     <div className="flex justify-end">
                         <SubmitButton />

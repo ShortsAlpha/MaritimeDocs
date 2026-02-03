@@ -10,9 +10,18 @@ import { revalidatePath } from "next/cache";
 
 // ... existing code
 
+import { currentUser } from "@clerk/nextjs/server"
+import { logActivity } from "@/lib/logger";
+
+// ... existing imports ...
+
 export async function getDocumentPreviewUrl(docId: string) {
     try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
         const doc = await db.studentDocument.findUnique({ where: { id: docId } });
+        // ...
         if (!doc) return { success: false, message: "Document not found" };
 
         let key = "";
@@ -21,13 +30,6 @@ export async function getDocumentPreviewUrl(docId: string) {
         if (doc.fileUrl.startsWith(publicUrl)) {
             key = doc.fileUrl.replace(publicUrl + "/", "");
         } else {
-            // Fallback if URL stored differently (e.g. full path without matching public URL root)
-            // Typically R2 keys in your app were `students/${studentId}/...`
-            // If we can't parse it, we might fail or try to use the raw value if it looked like a key.
-            // But let's assume standard flow.
-
-            // Attempt to extract from last known logic or just split by "/"
-            // A simplistic fallback: everything after "students/"
             if (doc.fileUrl.includes("students/")) {
                 key = doc.fileUrl.substring(doc.fileUrl.indexOf("students/"));
             }
@@ -53,6 +55,7 @@ export async function getDocumentPreviewUrl(docId: string) {
 import { sendDocumentRejectionEmail } from "./email";
 
 export async function uploadPendingDocument(formData: FormData) {
+    // ... Public Token Based ... 
     try {
         const token = formData.get("token") as string;
         const file = formData.get("file") as File;
@@ -86,6 +89,7 @@ export async function uploadPendingDocument(formData: FormData) {
         const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
 
         // 3. Create Document Record (Status: PENDING)
+        // 3. Create Document Record (Status: PENDING)
         await db.studentDocument.create({
             data: {
                 studentId: student.id,
@@ -95,6 +99,15 @@ export async function uploadPendingDocument(formData: FormData) {
                 title: file.name,
                 status: 'PENDING'
             }
+        });
+
+        // Activity Log
+        await logActivity({
+            action: 'UPLOAD',
+            title: `Student uploaded: ${file.name}`,
+            userId: student.id,
+            userEmail: student.email || "Unknown",
+            metadata: { fileUrl: publicUrl, size: file.size }
         });
 
         return { success: true };
@@ -130,6 +143,9 @@ export async function getPublicDocumentTypes() {
 
 export async function approveDocument(docId: string) {
     try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
         await db.studentDocument.update({
             where: { id: docId },
             data: { status: 'APPROVED' }
@@ -143,6 +159,9 @@ export async function approveDocument(docId: string) {
 
 export async function rejectDocument(docId: string) {
     try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
         const doc = await db.studentDocument.findUnique({ where: { id: docId } });
         if (!doc) throw new Error("Doc not found");
 
@@ -165,6 +184,9 @@ export async function rejectDocument(docId: string) {
 export async function uploadExamNoteFile(formData: FormData) {
     console.log("Starting uploadExamNoteFile...");
     try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
         const file = formData.get("file") as File;
         const studentId = formData.get("studentId") as string;
 
@@ -214,6 +236,9 @@ export async function uploadExamNoteFile(formData: FormData) {
 
 export async function deleteStudentDocument(docId: string) {
     try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
         const doc = await db.studentDocument.findUnique({ where: { id: docId } });
         if (!doc) throw new Error("Document not found");
 
@@ -248,6 +273,9 @@ export async function deleteStudentDocument(docId: string) {
 
 export async function uploadStudentDocumentByAdmin(formData: FormData) {
     try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
         const studentId = formData.get("studentId") as string;
         const file = formData.get("file") as File;
         const documentTypeId = formData.get("documentTypeId") as string;
@@ -287,6 +315,17 @@ export async function uploadStudentDocumentByAdmin(formData: FormData) {
         });
 
         revalidatePath(`/admin/students/${studentId}`);
+
+        // Activity Log
+        await logActivity({
+            action: 'UPLOAD',
+            title: `Admin uploaded: ${file.name}`,
+            description: `Uploaded for student ${student.fullName}`,
+            userId: user.id,
+            userEmail: user.emailAddresses[0]?.emailAddress || "Admin",
+            metadata: { fileUrl: publicUrl, size: file.size, studentId: student.id }
+        });
+
         return { success: true };
 
     } catch (error) {

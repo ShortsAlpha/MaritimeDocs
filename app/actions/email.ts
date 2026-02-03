@@ -4,7 +4,8 @@ import { db } from "@/lib/db";
 import { Resend } from 'resend';
 import { v4 as uuidv4 } from 'uuid';
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers"; // Dynamically get host from request
+import { headers } from "next/headers";
+import { logActivity } from "@/lib/logger";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -133,6 +134,16 @@ export async function sendStudentWelcomeEmail(studentId: string) {
         }
 
         console.log("Welcome email sent successfully:", data);
+
+        await logActivity({
+            action: 'EMAIL',
+            title: `Sent Welcome Email`,
+            description: `Sent to ${student.email}`,
+            userId: student.id,
+            userEmail: student.email,
+            metadata: { type: 'WELCOME', token }
+        });
+
         return { success: true };
     } catch (error) {
         console.error("Send Welcome Email Error:", error);
@@ -171,6 +182,15 @@ export async function sendExamNotesEmail(studentId: string, courseName: string, 
             ),
         });
         console.log("Email sent successfully via Resend");
+
+        await logActivity({
+            action: 'EMAIL',
+            title: `Sent Exam Notes: ${courseName}`,
+            description: `Sent to ${student.email}`,
+            userId: student.id,
+            userEmail: student.email,
+            metadata: { type: 'EXAM_NOTES', course: courseName }
+        });
 
         return { success: true };
     } catch (error: any) {

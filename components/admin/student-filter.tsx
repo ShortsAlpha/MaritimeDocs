@@ -6,22 +6,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ListFilter } from "lucide-react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { Label } from "@/components/ui/label"
-import { Course } from "@prisma/client"
+import { Course, Intake } from "@prisma/client"
 import { Input } from "@/components/ui/input"
 
 type Props = {
     courses: Course[]
+    intakes?: Intake[]
     nationalities?: string[]
 }
 
-export function StudentFilter({ courses = [], nationalities = [] }: Props) {
+export function StudentFilter({ courses = [], nationalities = [], intakes = [] }: Props) {
     const router = useRouter()
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
     // Get current values
     const currentCourse = searchParams.get("course") || "all"
-    const currentNationality = searchParams.get("nationality") || ""
+    const currentNationality = searchParams.get("nationality") || "all"
+    const currentStatus = searchParams.get("status") || "all"
+    const currentIntake = searchParams.get("intake") || "all"
 
     // Update params helper
     const updateParams = (key: string, value: string | null) => {
@@ -59,7 +62,7 @@ export function StudentFilter({ courses = [], nationalities = [] }: Props) {
                     <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                         Filter
                     </span>
-                    {(currentCourse !== "all" || currentNationality) && (
+                    {(currentCourse !== "all" || currentNationality !== "all" || currentStatus !== "all" || currentIntake !== "all") && (
                         <div className="h-2 w-2 rounded-full bg-primary absolute top-1 right-1" />
                     )}
                 </Button>
@@ -83,37 +86,76 @@ export function StudentFilter({ courses = [], nationalities = [] }: Props) {
                         </p>
                     </div>
                     <div className="grid gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="course">Course</Label>
-                            <Select value={currentCourse} onValueChange={handleCourseChange}>
-                                <SelectTrigger id="course" className="w-full">
-                                    <SelectValue placeholder="Select course" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Courses</SelectItem>
-                                    {courses.map((course) => (
-                                        <SelectItem key={course.id} value={course.title}>
-                                            {course.title}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="nationality">Country</Label>
-                            <Select value={currentNationality} onValueChange={(val) => updateParams("nationality", val)}>
-                                <SelectTrigger id="nationality" className="w-full">
-                                    <SelectValue placeholder="Select country" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Countries</SelectItem>
-                                    {nationalities.map((nat) => (
-                                        <SelectItem key={nat} value={nat}>
-                                            {nat}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                        <div className="grid gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="status">Status</Label>
+                                <Select value={currentStatus} onValueChange={(val) => updateParams("status", val)}>
+                                    <SelectTrigger id="status" className="w-full">
+                                        <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Statuses</SelectItem>
+                                        <SelectItem value="REGISTERED">Registered</SelectItem>
+                                        <SelectItem value="DOCS_REQ_SENT">Docs Request Sent</SelectItem>
+                                        <SelectItem value="DOCS_PENDING">Docs Pending</SelectItem>
+                                        <SelectItem value="LECTURE_NOTES_SENT">Lecture Notes Sent</SelectItem>
+                                        <SelectItem value="PAYMENT_COMPLETED">Payment Completed</SelectItem>
+                                        <SelectItem value="COURSE_ONGOING">Course Ongoing</SelectItem>
+                                        <SelectItem value="COURSE_COMPLETED">Course Completed</SelectItem>
+                                        <SelectItem value="CERTIFICATE_APPLIED">Certificate Applied</SelectItem>
+                                        <SelectItem value="CERTIFICATE_SHIPPED">Certificate Shipped</SelectItem>
+                                        <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="intake">Intake Period</Label>
+                                <Select value={currentIntake} onValueChange={(val) => updateParams("intake", val)}>
+                                    <SelectTrigger id="intake" className="w-full">
+                                        <SelectValue placeholder="Select intake" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Intakes</SelectItem>
+                                        {intakes.map((intake) => (
+                                            <SelectItem key={intake.id} value={intake.id}>
+                                                {intake.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="course">Course</Label>
+                                <Select value={currentCourse} onValueChange={handleCourseChange}>
+                                    <SelectTrigger id="course" className="w-full">
+                                        <SelectValue placeholder="Select course" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Courses</SelectItem>
+                                        {courses.map((course) => (
+                                            <SelectItem key={course.id} value={course.title}>
+                                                {course.title}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="nationality">Country</Label>
+                                <Select value={currentNationality} onValueChange={(val) => updateParams("nationality", val)}>
+                                    <SelectTrigger id="nationality" className="w-full">
+                                        <SelectValue placeholder="Select country" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Countries</SelectItem>
+                                        {nationalities.map((nat) => (
+                                            <SelectItem key={nat} value={nat}>
+                                                {nat}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -18,7 +18,7 @@ export default async function FeedbackPage({ params }: { params: Promise<{ token
     const hasSubmitted = student.feedbacks.length > 0;
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 flex items-center justify-center p-4">
             <Card className="max-w-xl w-full">
                 <CardHeader className="text-center">
                     <CardTitle className="text-2xl">Course Feedback</CardTitle>

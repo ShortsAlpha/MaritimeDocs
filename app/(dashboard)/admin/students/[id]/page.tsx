@@ -87,7 +87,11 @@ export default async function StudentDetailPage({
                 <div className="flex items-center gap-4">
                     <div className="flex flex-col items-end gap-1">
                         <span className="text-xs text-muted-foreground">Status</span>
-                        <StudentStatusSelect studentId={student.id} currentStatus={student.status} />
+                        <StudentStatusSelect
+                            studentId={student.id}
+                            currentStatus={student.status}
+                            balance={balance}
+                        />
                     </div>
                     <div className="h-8 w-px bg-border mx-2"></div>
 
@@ -320,44 +324,59 @@ export default async function StudentDetailPage({
                                     {student.feedbacks.length > 0 ? (
                                         <div className="space-y-4">
                                             {student.feedbacks.map((fb: any, i: any) => (
-                                                <div key={i} className="border rounded-lg p-3 space-y-2">
-                                                    <div className="flex items-center justify-between text-sm">
+                                                <div key={i} className="border rounded-lg p-4 space-y-3 bg-card">
+                                                    <div className="flex items-center justify-between">
                                                         <div className="flex items-center gap-2">
-                                                            <Badge variant={fb.recommend ? "default" : "destructive"}>
-                                                                {fb.recommend ? "Recommended" : "Not Recommended"}
-                                                            </Badge>
+                                                            <div className={`px-2 py-0.5 rounded text-xs font-semibold uppercase ${fb.recommend === 'YES' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                                                fb.recommend === 'NO' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                                                                    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                                                }`}>
+                                                                {fb.recommend === 'YES' ? 'Recommended' : fb.recommend === 'NO' ? 'Not Recommended' : 'Maybe'}
+                                                            </div>
                                                             <span className="text-xs text-muted-foreground">{format(fb.createdAt, "PPP")}</span>
                                                         </div>
+                                                        {fb.source && <span className="text-xs border px-1.5 py-0.5 rounded text-muted-foreground">
+                                                            {fb.source.replace(/_/g, " ").split(' ').map((w: string) => w.charAt(0) + w.slice(1).toLowerCase()).join(' ')}
+                                                        </span>}
                                                     </div>
-                                                    <div className="grid grid-cols-2 gap-2 text-sm">
-                                                        <div className="flex flex-col">
-                                                            <span className="text-xs text-muted-foreground">Course</span>
-                                                            <div className="flex text-yellow-500">
-                                                                {Array.from({ length: fb.courseRating }).map((_, i) => (
-                                                                    <span key={i}>★</span>
-                                                                ))}
+
+                                                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                                                        {[
+                                                            { label: "Registration", val: fb.registrationProcess },
+                                                            { label: "Practical/Sim", val: fb.practicalStandards },
+                                                            { label: "Materials", val: fb.courseMaterials },
+                                                            { label: "Course Content", val: fb.courseContent },
+                                                            { label: "Instructor", val: fb.instructorEffectiveness },
+                                                            { label: "Staff", val: fb.staffFriendliness },
+                                                            { label: "Learning", val: fb.learningEffectiveness },
+                                                            { label: "Overall", val: fb.overallImpression }
+                                                        ].map((item, idx) => (
+                                                            <div key={idx} className="flex justify-between items-center text-xs">
+                                                                <span className="text-muted-foreground">{item.label}</span>
+                                                                <div className="flex gap-0.5">
+                                                                    {Array.from({ length: 5 }).map((_, s) => (
+                                                                        <div key={s} className={`h-1.5 w-1.5 rounded-full ${s < (item.val || 0) ? 'bg-primary' : 'bg-muted'}`} />
+                                                                    ))}
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div className="flex flex-col">
-                                                            <span className="text-xs text-muted-foreground">Instructor</span>
-                                                            <div className="flex text-indigo-500">
-                                                                {Array.from({ length: fb.instructorRating }).map((_, i) => (
-                                                                    <span key={i}>★</span>
-                                                                ))}
-                                                            </div>
-                                                        </div>
+                                                        ))}
                                                     </div>
+
                                                     {fb.comment && (
-                                                        <div className="bg-muted/30 p-2 rounded text-sm italic">
-                                                            "{fb.comment}"
+                                                        <div className="bg-muted/30 p-3 rounded-md text-sm italic text-muted-foreground relative">
+                                                            <span className="absolute top-1 left-2 text-2xl opacity-20">"</span>
+                                                            <p className="px-2">{fb.comment}</p>
                                                         </div>
                                                     )}
                                                 </div>
                                             ))}
                                         </div>
                                     ) : (
-                                        <div className="text-center py-6 text-muted-foreground text-sm">
-                                            No feedback received yet.
+                                        <div className="text-center py-8 flex flex-col items-center gap-2 text-muted-foreground">
+                                            <div className="bg-muted rounded-full p-3">
+                                                <FileText className="h-6 w-6 opacity-50" />
+                                            </div>
+                                            <span className="text-sm">No feedback received yet.</span>
                                         </div>
                                     )}
                                 </CardContent>

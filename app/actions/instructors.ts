@@ -6,6 +6,8 @@ import { z } from "zod"
 import { deleteFileFromR2 } from "@/lib/r2"
 import { InstructorEmploymentType } from "@prisma/client"
 
+import { currentUser } from "@clerk/nextjs/server"
+
 const InstructorSchema = z.object({
     fullName: z.string().min(2, "Name is too short"),
     email: z.string().email().optional().or(z.literal("")),
@@ -17,6 +19,9 @@ const InstructorSchema = z.object({
 
 export async function createInstructor(prevState: any, formData: FormData) {
     try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
         const rowData = {
             fullName: formData.get("fullName"),
             email: formData.get("email"),
@@ -49,6 +54,9 @@ export async function createInstructor(prevState: any, formData: FormData) {
 
 export async function updateInstructor(id: string, prevState: any, formData: FormData) {
     try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
         const rowData = {
             fullName: formData.get("fullName"),
             email: formData.get("email"),
@@ -82,6 +90,9 @@ export async function updateInstructor(id: string, prevState: any, formData: For
 
 export async function deleteInstructor(id: string) {
     try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
         // 1. Fetch all documents for this instructor to clean up R2
         const docs = await db.instructorDocument.findMany({
             where: { instructorId: id }

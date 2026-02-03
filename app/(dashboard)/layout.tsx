@@ -6,6 +6,8 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/s
 import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
+import { PageViewLogger } from "@/components/admin/page-view-logger";
+
 export default async function DashboardLayout({
     children,
 }: {
@@ -22,6 +24,7 @@ export default async function DashboardLayout({
 
     return (
         <SidebarProvider>
+            <PageViewLogger />
             <AppSidebar role={role} />
             <SidebarInset>
                 <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
