@@ -201,3 +201,111 @@ export async function exportFeedbackReportExcel() {
         throw new Error("Failed to export feedback: " + (error as Error).message);
     }
 }
+
+export async function exportPaymentReportExcel(dateRange?: { from?: Date; to?: Date }) {
+    try {
+        const where: Prisma.PaymentWhereInput = {};
+
+        if (dateRange?.from) {
+            where.date = {
+                gte: dateRange.from,
+                lte: dateRange.to ? new Date(dateRange.to.setHours(23, 59, 59, 999)) : new Date()
+            };
+        }
+
+        const payments = await db.payment.findMany({
+            where,
+            include: {
+                student: {
+                    select: {
+                        fullName: true,
+                        course: true,
+                        studentNumber: true
+                    }
+                }
+            },
+            orderBy: { date: 'desc' }
+        });
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Payment Ledger');
+
+        // Define Columns
+        worksheet.columns = [
+            { header: 'Date', key: 'date', width: 15 },
+            { header: 'Student', key: 'student', width: 25 },
+            { header: 'Student #', key: 'studentNo', width: 15 },
+            { header: 'Course', key: 'course', width: 30 },
+            { header: 'Amount', key: 'amount', width: 15 },
+            { header: 'Method', key: 'method', width: 15 },
+            { header: 'Note', key: 'note', width: 30 },
+        ];
+
+        // Style Header
+        const headerRow = worksheet.getRow(1);
+        headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 12 };
+        headerRow.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FF0F766E' } // Teal/Emerald
+        };
+        headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+        headerRow.height = 30;
+
+        let totalAmount = 0;
+
+        // Add Rows
+        payments.forEach(p => {
+            const amt = Number(p.amount);
+            totalAmount += amt;
+
+            worksheet.addRow({
+                date: p.date.toISOString().split('T')[0],
+                student: p.student.fullName,
+                studentNo: p.student.studentNumber || '-',
+                course: p.student.course || '-',
+                amount: amt,
+                method: p.method,
+                note: p.note || ''
+            });
+        });
+
+        // Add Total Row
+        const totalRow = worksheet.addRow({
+            date: 'TOTAL',
+            amount: totalAmount
+        });
+        totalRow.font = { bold: true };
+        totalRow.getCell('amount').font = { bold: true, color: { argb: 'FF000000' } };
+        totalRow.getCell('amount').numFmt = '#,##0.00';
+
+        // Apply Borders & Styling
+        worksheet.eachRow((row, rowNumber) => {
+            if (rowNumber > 1) {
+                row.eachCell((cell) => {
+                    cell.border = {
+                        top: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                        left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                        bottom: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+                        right: { style: 'thin', color: { argb: 'FFCBD5E1' } }
+                    };
+                });
+
+                // Format Amount Column
+                const amtCell = row.getCell('amount');
+                amtCell.numFmt = '#,##0.00';
+                const validAmount = typeof amtCell.value === 'number';
+                if (validAmount) {
+                    amtCell.alignment = { horizontal: 'right' };
+                }
+            }
+        });
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        return Buffer.from(buffer).toString('base64');
+
+    } catch (error) {
+        console.error("Payment Report Error:", error);
+        throw new Error("Failed to export payments");
+    }
+}

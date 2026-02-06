@@ -3,7 +3,9 @@
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
-import { deleteFileFromR2, renameFolderInR2 } from "@/lib/r2"
+import { r2, deleteFileFromR2, renameFolderInR2 } from "@/lib/r2"
+import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3"
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { slugify } from "@/lib/utils"
 import { addMonths } from "date-fns"
 
@@ -330,5 +332,77 @@ export async function fixStudentFolder(id: string) {
     } catch (error: any) {
         console.error("Fix Folder Error:", error)
         return { success: false, message: error.message }
+    }
+}
+
+
+export async function getSignedProfilePhotoUrl(storedUrl: string | null) {
+    if (!storedUrl) return null;
+    try {
+        const publicUrl = process.env.R2_PUBLIC_URL || "";
+        const bucket = process.env.R2_BUCKET_NAME;
+
+        let key = "";
+        if (storedUrl.startsWith(publicUrl)) {
+            key = storedUrl.replace(publicUrl + "/", "");
+        } else if (storedUrl.includes("/students/")) {
+            key = storedUrl.substring(storedUrl.indexOf("students/"));
+        }
+
+        if (!key || !bucket) return storedUrl;
+
+        const command = new GetObjectCommand({
+            Bucket: bucket,
+            Key: key,
+        });
+
+        return await getSignedUrl(r2, command, { expiresIn: 86400 });
+    } catch (e) {
+        console.error("Sign URL error", e);
+        return storedUrl;
+    }
+}
+
+export async function uploadProfilePhoto(formData: FormData) {
+    try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
+        const studentId = formData.get("studentId") as string;
+        const file = formData.get("file") as File;
+
+        if (!studentId || !file) throw new Error("Missing fields");
+
+        const student = await db.student.findUnique({ where: { id: studentId } });
+        if (!student) throw new Error("Student not found");
+
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+        const key = `students/${slugify(student.fullName)}/profile-${Date.now()}-${safeName}`;
+
+        await r2.send(new PutObjectCommand({
+            Bucket: process.env.R2_BUCKET_NAME,
+            Key: key,
+            Body: buffer,
+            ContentType: file.type,
+        }));
+
+        const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
+
+        await db.student.update({
+            where: { id: studentId },
+            data: { photoUrl: publicUrl }
+        });
+
+        revalidatePath(`/admin/students/${studentId}`);
+
+        // Return Signed URL for immediate display
+        const signedUrl = await getSignedProfilePhotoUrl(publicUrl);
+
+        return { success: true, url: signedUrl };
+
+    } catch (error: any) {
+        console.error("Profile Photo Upload Error:", error);
+        return { success: false, message: error.message };
     }
 }

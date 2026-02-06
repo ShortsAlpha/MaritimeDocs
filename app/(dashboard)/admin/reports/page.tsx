@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { ReportFilters } from "@/components/reports/report-filters";
 import { FeedbackReportCard } from "@/components/reports/feedback-report-card";
+import { PaymentReportCard } from "@/components/reports/payment-report-card";
 
 export default async function ReportsPage() {
     // Fetch filter options
@@ -29,6 +30,7 @@ export default async function ReportsPage() {
 
             <div className="grid gap-6 md:grid-cols-2">
                 <FeedbackReportCard />
+                <PaymentReportCard />
             </div>
         </div>
     );

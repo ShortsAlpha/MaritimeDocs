@@ -18,12 +18,14 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { format } from "date-fns"
-import { Calendar, Clock, MapPin, Plus, Trash2, User } from "lucide-react"
-import { toggleEventChecklistItem, addChecklistItem, deleteEventChecklistItem, deleteCourseEvent } from "@/app/actions/calendar"
+import { Calendar, Clock, MapPin, Plus, Trash2, User, FileSpreadsheet } from "lucide-react"
+import { toggleEventChecklistItem, addChecklistItem, deleteEventChecklistItem, deleteCourseEvent, updateChecklistNote } from "@/app/actions/calendar"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
+import { toast } from "sonner"
+import { Loader2 } from "lucide-react"
 
 type Props = {
     open: boolean
@@ -35,7 +37,7 @@ type Props = {
 export function EventDetailsDialog({ open, onOpenChange, date, events }: Props) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[900px] max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Schedule for {date.toDateString()}</DialogTitle>
                     <DialogDescription>
@@ -58,11 +60,6 @@ export function EventDetailsDialog({ open, onOpenChange, date, events }: Props) 
     )
 }
 
-
-
-import { toast } from "sonner"
-import { Loader2 } from "lucide-react"
-
 function EventCard({ event }: { event: any }) {
     const [newItem, setNewItem] = useState("")
     const [isPending, setIsPending] = useState(false)
@@ -70,7 +67,6 @@ function EventCard({ event }: { event: any }) {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [checklistItems, setChecklistItems] = useState(event.resource?.checklist || [])
 
-    // Sync state with props when event updates (e.g. after a revalidation)
     useEffect(() => {
         setChecklistItems(event.resource?.checklist || [])
     }, [event.resource?.checklist])
@@ -94,12 +90,10 @@ function EventCard({ event }: { event: any }) {
     }
 
     const handleToggle = async (itemId: string, checked: boolean) => {
-        // Optimistic update
         setChecklistItems((prev: any[]) => prev.map((item) =>
             item.id === itemId ? {
                 ...item,
                 isCompleted: checked,
-                // Temporary simplified optimistic update until server responds
                 completedAt: checked ? new Date().toISOString() : null,
                 completedBy: checked ? "You" : null
             } : item
@@ -115,6 +109,14 @@ function EventCard({ event }: { event: any }) {
         }
     }
 
+    const handleNoteUpdate = async (itemId: string, note: string) => {
+        setChecklistItems((prev: any[]) => prev.map((item) =>
+            item.id === itemId ? { ...item, note } : item
+        ))
+
+        await updateChecklistNote(itemId, note)
+    }
+
     const handleDeleteEvent = async () => {
         setIsDeleting(true)
         const res = await deleteCourseEvent(event.id)
@@ -128,20 +130,150 @@ function EventCard({ event }: { event: any }) {
     }
 
     const handleDelete = async (itemId: string) => {
-        // Optimistic update
         setChecklistItems((prev: any[]) => prev.filter((item) => item.id !== itemId))
         await deleteEventChecklistItem(itemId)
     }
 
+    const handleExportExcel = async () => {
+        try {
+            const ExcelJS = (await import('exceljs')).default
+
+            // 1. Fetch the template
+            const templateName = "MALTA - Course Flow - MOY Limited (1).xlsx"
+            const response = await fetch(`/templates/${encodeURIComponent(templateName)}`)
+            if (!response.ok) throw new Error("Template not found")
+            const buffer = await response.arrayBuffer()
+
+            // 2. Load into Workbook
+            const workbook = new ExcelJS.Workbook()
+            await workbook.xlsx.load(buffer)
+            const ws = workbook.getWorksheet(1) || workbook.worksheets[0]
+
+            // 3. Fill Header Info
+            const startDateStr = event.start ? format(new Date(event.start), "dd.MM.yyyy") : ""
+            const locStr = event.resource?.location || ""
+            ws.getCell("D2").value = `${startDateStr}${locStr ? "-" + locStr : ""}`
+            ws.getCell("D2").alignment = { vertical: 'middle', horizontal: 'center', wrapText: true }
+
+            const instrName = event.resource?.instructor?.fullName || ""
+            ws.getCell("D3").value = instrName
+
+            // Header E5: Note
+            ws.getCell("E5").value = "Note"
+            ws.getCell("E5").style = { ...ws.getCell("F5").style }
+
+            // Header G5: Checked By
+            ws.getCell("G5").value = "Checked By"
+            ws.getCell("G5").style = { ...ws.getCell("F5").style }
+
+                // Clean up green fills in specific cells E22, E23, E24
+                ;["E22", "E23", "E24"].forEach(cell => {
+                    ws.getCell(cell).fill = { type: 'pattern', pattern: 'none' }
+                })
+
+                // Remove red text from specific C cells (Set to Black)
+                ;["C22", "C23", "C24", "C31", "C32", "C33", "C34", "C35"].forEach(cellAddress => {
+                    const cell = ws.getCell(cellAddress)
+                    if (cell.font) {
+                        cell.font = { ...cell.font, color: { argb: 'FF000000' } }
+                    }
+                })
+
+            // Widen Column G
+            ws.getColumn(7).width = 25
+
+            // 4. Fill Data
+            const centerStyle: any = { vertical: 'middle', horizontal: 'center', wrapText: true }
+
+            ws.eachRow((row, rowNumber) => {
+                if (rowNumber < 6) return
+
+                // Special fix for Row 28 (B28 Orange)
+                if (rowNumber === 28) {
+                    row.getCell(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFC000' } } as any
+                }
+
+                // Special styling for Row 29 (Force B, D-G Gray)
+                if (rowNumber === 29) {
+                    const grayFill: any = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9D9D9' } }
+                    row.getCell(2).fill = grayFill
+                        ;[4, 5, 6, 7].forEach(col => row.getCell(col).fill = grayFill)
+                }
+
+                const cellC = row.getCell(3)
+                let labelInExcel = ""
+                const val = cellC.value
+                if (val && typeof val === 'object' && 'richText' in val) {
+                    labelInExcel = (val as any).richText.map((t: any) => t.text).join('')
+                } else if (val) {
+                    labelInExcel = val.toString()
+                }
+                labelInExcel = labelInExcel.trim()
+
+                if (!labelInExcel) {
+                    const grayFill: any = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9D9D9' } }
+                        ;[4, 5, 6, 7].forEach(col => row.getCell(col).fill = grayFill)
+                    return
+                }
+
+                // Adjust layout
+                row.height = 55
+                row.getCell(3).alignment = { vertical: 'middle', horizontal: 'left', wrapText: true }
+
+                // Theme extension: Apply F style to G
+                const cellG = row.getCell(7)
+                cellG.style = { ...row.getCell(6).style }
+
+                const matchedItem = checklistItems.find((item: any) => item.label.trim() === labelInExcel)
+
+                if (matchedItem) {
+                    // Column E: Note (Always write note if exists)
+                    const cellE = row.getCell(5)
+                    cellE.value = matchedItem.note || ""
+                    cellE.alignment = centerStyle
+                    cellE.fill = { type: 'pattern', pattern: 'none' }
+
+                    if (matchedItem.isCompleted) {
+                        // Column D: Date
+                        const cellD = row.getCell(4)
+                        if (matchedItem.completedAt) {
+                            const dateObj = new Date(matchedItem.completedAt)
+                            cellD.value = `${format(dateObj, "dd/MM/yyyy")}\n${format(dateObj, "HH:mm")}`
+                        }
+                        cellD.alignment = centerStyle
+
+                        // Column G: Checked By
+                        const name = matchedItem.completedBy || ""
+                        cellG.value = name
+                        cellG.alignment = centerStyle
+                    }
+                }
+
+                // Ensure E is clean (no green) for all valid rows regardless of match
+                row.getCell(5).fill = { type: 'pattern', pattern: 'none' }
+            })
+
+            // 6. Generate & Download
+            const outBuffer = await workbook.xlsx.writeBuffer()
+            const blob = new Blob([outBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" })
+            const url = window.URL.createObjectURL(blob)
+            const a = document.createElement("a")
+            a.href = url
+            a.download = `${event.title}_Checklist.xlsx`
+            a.click()
+            window.URL.revokeObjectURL(url)
+
+        } catch (error) {
+            console.error("Export failed", error)
+            toast.error("Failed to export excel. Template might be missing.")
+        }
+    }
+
     return (
         <>
-            <div className="flex flex-col gap-2 p-4 rounded-lg border bg-card text-card-foreground shadow-sm relative overflow-hidden group/card">
-                <div
-                    className="absolute left-0 top-0 bottom-0 w-1"
-                    style={{ backgroundColor: event.color || '#3b82f6' }}
-                />
-                {/* Delete Button */}
-                <div className="absolute top-2 right-2 opacity-0 group-hover/card:opacity-100 transition-opacity">
+            <div className="flex flex-col gap-2 py-1 group/card relative">
+
+                <div className="absolute top-0 right-0 z-10">
                     <Button
                         variant="ghost"
                         size="icon"
@@ -153,7 +285,7 @@ function EventCard({ event }: { event: any }) {
                     </Button>
                 </div>
 
-                <div className="pl-2 pr-6">
+                <div className="pr-8">
                     <h4 className="font-semibold text-lg leading-none mb-2">{event.title}</h4>
                     <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
@@ -178,16 +310,24 @@ function EventCard({ event }: { event: any }) {
 
                     <div className="mt-4 pt-4 border-t">
                         <h5 className="text-sm font-semibold mb-2">Checklist</h5>
-                        <div className="space-y-4">
+                        <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
                             {checklistItems
                                 .sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
-                                .map((item: any, index: number) => {
-                                    const isPreviousCompleted = index === 0 || checklistItems[index - 1].isCompleted
+                                .map((item: any, index: number, array: any[]) => {
+                                    const isPreviousCompleted = index === 0 || array[index - 1].isCompleted
                                     const isDisabled = !isPreviousCompleted && !item.isCompleted
+                                    const showPhaseHeader = index === 0 || item.phase !== array[index - 1].phase
 
                                     return (
                                         <div key={item.id} className="flex flex-col gap-1">
-                                            <div className="relative flex items-center space-x-2 group">
+                                            {showPhaseHeader && (
+                                                <div className="mt-2 mb-1 sticky top-0 bg-card z-20 pb-1 pt-1 shadow-sm">
+                                                    <span className="text-xs font-bold text-primary uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded">
+                                                        {item.phase || "General"}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            <div className="relative flex items-center space-x-2 group pl-2 border-l-2 border-muted hover:border-primary/50 transition-colors">
                                                 <Checkbox
                                                     id={item.id}
                                                     checked={item.isCompleted}
@@ -195,15 +335,31 @@ function EventCard({ event }: { event: any }) {
                                                     disabled={isDisabled}
                                                     className="transition-colors duration-300 z-10"
                                                 />
-                                                <div className="relative inline-block">
+                                                <div className="relative inline-block flex-1 min-w-0">
                                                     <label
                                                         htmlFor={item.id}
-                                                        className={`text-sm font-medium leading-none cursor-pointer transition-colors ${item.isCompleted ? "line-through text-muted-foreground" : ""
+                                                        className={`text-sm font-medium leading-snug cursor-pointer transition-colors block whitespace-normal break-words ${item.isCompleted ? "line-through text-muted-foreground" : ""
                                                             } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                                                        title={item.label}
                                                     >
                                                         {item.label}
                                                     </label>
                                                 </div>
+
+                                                <div className="w-[150px] shrink-0">
+                                                    <Input
+                                                        placeholder="Note..."
+                                                        defaultValue={item.note || ""}
+                                                        className="h-6 text-xs px-2 bg-transparent border-transparent hover:border-input focus:border-primary transition-all"
+                                                        onBlur={(e) => handleNoteUpdate(item.id, e.target.value)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === "Enter") {
+                                                                e.currentTarget.blur()
+                                                            }
+                                                        }}
+                                                    />
+                                                </div>
+
                                                 <button
                                                     onClick={() => handleDelete(item.id)}
                                                     className="opacity-0 group-hover:opacity-100 text-destructive transition-opacity z-10 ml-auto"
@@ -212,7 +368,7 @@ function EventCard({ event }: { event: any }) {
                                                 </button>
                                             </div>
                                             {item.isCompleted && item.completedBy && (
-                                                <div className="text-xs text-muted-foreground ml-6">
+                                                <div className="text-xs text-muted-foreground ml-8">
                                                     Completed by {item.completedBy} at {item.completedAt ? format(new Date(item.completedAt), "HH:mm, dd MMM") : ""}
                                                 </div>
                                             )}
@@ -238,6 +394,15 @@ function EventCard({ event }: { event: any }) {
                                 disabled={isPending}
                             >
                                 <Plus className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-8 w-8 p-0 text-green-600 hover:text-green-700"
+                                onClick={handleExportExcel}
+                                title="Export to Excel"
+                            >
+                                <FileSpreadsheet className="h-4 w-4" />
                             </Button>
                         </div>
                     </div>

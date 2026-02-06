@@ -61,6 +61,7 @@ model Student {
   
   // Financials
   totalFee    Decimal  @default(0) // Total course fee in EUR
+  photoUrl    String?  // Profile Photo URL
   currency    String   @default("EUR")
   
   // Magic Link for Uploads
@@ -194,6 +195,7 @@ model CourseEvent {
 model EventChecklistItem {
   id            String      @id @default(cuid())
   label         String
+  phase         String      @default("General")
   isCompleted   Boolean     @default(false)
   
   courseEventId String
@@ -201,6 +203,7 @@ model EventChecklistItem {
 
   completedAt   DateTime?
   completedBy   String? // Store user name
+  note          String?
   order         Int       @default(0)
 }
 
@@ -279,6 +282,8 @@ model Course {
   title     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  checklistTemplate Json? // Array of { phase: string, items: string[] }
   
   events    CourseEvent[]
 }

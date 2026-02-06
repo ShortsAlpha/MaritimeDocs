@@ -30,24 +30,63 @@ export async function createCourseEvent(prevState: any, formData: FormData) {
         if (!user) return { success: false, message: "Unauthorized" }
 
         const rowData = {
-            title: formData.get("title"),
-            startDate: formData.get("startDate"),
-            endDate: formData.get("endDate"),
-            location: formData.get("location"),
-            instructorId: formData.get("instructorId") === "none" ? undefined : formData.get("instructorId"),
-            courseId: formData.get("courseId") === "none" ? undefined : formData.get("courseId"),
-            intakeId: formData.get("intakeId") === "none" ? undefined : formData.get("intakeId"),
-            color: formData.get("color"),
-            checklist: formData.get("checklist"),
+            title: formData.get("title") || "",
+            startDate: formData.get("startDate") || "",
+            endDate: formData.get("endDate") || "",
+            location: formData.get("location") || undefined,
+            instructorId: (formData.get("instructorId") === "none" ? undefined : formData.get("instructorId")) || undefined,
+            courseId: (formData.get("courseId") === "none" ? undefined : formData.get("courseId")) || undefined,
+            intakeId: (formData.get("intakeId") === "none" ? undefined : formData.get("intakeId")) || undefined,
+            color: formData.get("color") || undefined,
+            checklist: formData.get("checklist") || undefined,
         }
 
-        const data = EventSchema.parse(rowData)
+        const validResult = EventSchema.safeParse(rowData)
+
+        if (!validResult.success) {
+            console.error("Validation Error:", validResult.error)
+            const firstError = validResult.error instanceof z.ZodError
+                ? validResult.error.errors?.[0]?.message || validResult.error.issues?.[0]?.message
+                : "Validation failed"
+            return { success: false, message: firstError || "Invalid inputs" }
+        }
+
+        const data = validResult.data
 
         // Parse checklist JSON if present
-        let checklistItems: string[] = []
+        let checklistItemsToCreate: { label: string, phase: string, order: number }[] = []
+
         if (data.checklist) {
             try {
-                checklistItems = JSON.parse(data.checklist)
+                const parsed = JSON.parse(data.checklist)
+                let globalOrder = 0
+
+                if (Array.isArray(parsed)) {
+                    // Check if it's the new phase structure (object with title and items)
+                    if (parsed.length > 0 && typeof parsed[0] === 'object' && 'items' in parsed[0]) {
+                        // It is ChecklistPhase[]
+                        for (const phase of parsed) {
+                            if (Array.isArray(phase.items)) {
+                                for (const item of phase.items) {
+                                    checklistItemsToCreate.push({
+                                        label: typeof item === 'string' ? item : String(item),
+                                        phase: phase.title || "General",
+                                        order: globalOrder++
+                                    })
+                                }
+                            }
+                        }
+                    } else {
+                        // It is likely string[] (Old simple checklist)
+                        for (const item of parsed) {
+                            checklistItemsToCreate.push({
+                                label: String(item),
+                                phase: "General",
+                                order: globalOrder++
+                            })
+                        }
+                    }
+                }
             } catch (e) {
                 console.error("Failed to parse checklist JSON", e)
             }
@@ -64,9 +103,10 @@ export async function createCourseEvent(prevState: any, formData: FormData) {
                 intakeId: data.intakeId,
                 color: data.color,
                 checklist: {
-                    create: checklistItems.map((item, index) => ({
-                        label: item,
-                        order: index
+                    create: checklistItemsToCreate.map((item) => ({
+                        label: item.label,
+                        phase: item.phase,
+                        order: item.order
                     }))
                 }
             }
@@ -74,9 +114,9 @@ export async function createCourseEvent(prevState: any, formData: FormData) {
 
         revalidatePath("/admin/calendar")
         return { success: true, message: "Event created successfully" }
-    } catch (error) {
-        console.error(error)
-        return { success: false, message: "Failed to create event" }
+    } catch (error: any) {
+        console.error("Create Event Error:", error)
+        return { success: false, message: error.message || "Failed to create event" }
     }
 }
 
@@ -184,5 +224,22 @@ export async function deleteEventChecklistItem(itemId: string) {
     } catch (error) {
         console.error("Delete Checklist Item Error:", error)
         return { success: false }
+    }
+}
+
+export async function updateChecklistNote(itemId: string, note: string) {
+    try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
+        await db.eventChecklistItem.update({
+            where: { id: itemId },
+            data: { note }
+        })
+        revalidatePath("/admin/calendar")
+        return { success: true }
+    } catch (error) {
+        console.error("Update Note Error:", error)
+        return { success: false, message: "Failed to update note" }
     }
 }

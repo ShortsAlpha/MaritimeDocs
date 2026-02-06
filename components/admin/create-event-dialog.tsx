@@ -1,6 +1,4 @@
-'use client'
-
-import { createCourseEvent } from "@/app/actions/calendar"
+import { useState, useActionState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -13,124 +11,92 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, X } from "lucide-react"
-import { useActionState, useState, useEffect } from "react"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { createCourseEvent } from "@/app/actions/calendar"
+import { getCourseChecklistTemplate } from "@/app/actions/courses"
+import { format } from "date-fns"
+import { Course, Instructor, Intake } from "@prisma/client"
+import { DateTimePicker } from "@/components/ui/date-time-picker"
 import { toast } from "sonner"
 
-import { DateTimePicker } from "@/components/ui/date-time-picker"
-
-const initialState = {
-    message: "",
-    success: false
+type ChecklistPhase = {
+    id: string
+    title: string
+    items: string[]
 }
 
 type Props = {
-    instructors: { id: string, fullName: string }[]
-    courses?: { id: string, title: string }[]
-    intakes?: { id: string, name: string }[]
+    instructors: Instructor[]
+    courses: Course[]
+    intakes?: Intake[]
     open: boolean
     onOpenChange: (open: boolean) => void
     defaultDate?: Date
+}
+
+const initialState = {
+    success: false,
+    message: ""
 }
 
 export function CreateEventDialog({ instructors, courses = [], intakes = [], open, onOpenChange, defaultDate }: Props) {
     const [state, formAction, isPending] = useActionState(createCourseEvent, initialState)
     const [startDate, setStartDate] = useState<Date | undefined>(defaultDate || new Date())
     const [endDate, setEndDate] = useState<Date | undefined>(defaultDate || new Date())
-    const [checklist, setChecklist] = useState<string[]>([""])
+    const [checklistTemplate, setChecklistTemplate] = useState<ChecklistPhase[]>([])
+    const [selectedColor, setSelectedColor] = useState("#3b82f6")
 
     useEffect(() => {
-        if (open) {
-            setChecklist([""])
-        }
-        if (defaultDate) {
-            const start = new Date(defaultDate)
-            start.setHours(9, 0, 0, 0)
-            const end = new Date(defaultDate)
-            end.setHours(23, 30, 0, 0)
-            setStartDate(start)
-            setEndDate(end)
-        }
-    }, [defaultDate, open])
-
-    useEffect(() => {
-        if (state.success) {
-            toast.success(state.message)
-            onOpenChange(false)
-        } else if (state.message) {
-            toast.error(state.message)
+        if (state.message) {
+            if (state.success) {
+                toast.success(state.message)
+                onOpenChange(false)
+            } else {
+                toast.error(state.message)
+            }
         }
     }, [state, onOpenChange])
 
+    useEffect(() => {
+        if (defaultDate) {
+            setStartDate(defaultDate)
+            setEndDate(defaultDate)
+        }
+    }, [defaultDate])
+
+    const handleCourseChange = async (courseId: string) => {
+        if (courseId && courseId !== "none") {
+            const template = await getCourseChecklistTemplate(courseId)
+            if (template) {
+                // @ts-ignore
+                setChecklistTemplate(template)
+            } else {
+                setChecklistTemplate([])
+            }
+        } else {
+            setChecklistTemplate([])
+        }
+    }
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[600px]">
                 <DialogHeader>
-                    <DialogTitle>Schedule Course</DialogTitle>
-                    <DialogDescription>
-                        Add a new course or event to the calendar.
-                    </DialogDescription>
+                    <DialogTitle>Add Course to Calendar</DialogTitle>
                 </DialogHeader>
                 <form action={formAction}>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="title" className="text-right">
-                                Title
-                            </Label>
-                            <Input
-                                id="title"
-                                name="title"
-                                placeholder="STCW Basic Training"
-                                className="col-span-3"
-                                required
-                            />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="startDate" className="text-right">
-                                Start
-                            </Label>
-                            <div className="col-span-3">
-                                <DateTimePicker date={startDate} setDate={(date) => {
-                                    setStartDate(date);
-                                    // Auto-update end date if it's before start date or to keep a default 1-day duration if needed
-                                    // For now, let's just ensure end date is at least start date if not set
-                                    if (date && (!endDate || endDate < date)) {
-                                        const end = new Date(date);
-                                        end.setHours(23, 30, 0, 0); // Default to end of day
-                                        setEndDate(end);
-                                    }
-                                }} />
-                                <input type="hidden" name="startDate" value={startDate ? startDate.toISOString() : ''} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="endDate" className="text-right">
-                                End
-                            </Label>
-                            <div className="col-span-3">
-                                <DateTimePicker date={endDate} setDate={setEndDate} />
-                                <input type="hidden" name="endDate" value={endDate ? endDate.toISOString() : ''} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="location" className="text-right">
-                                Location
-                            </Label>
-                            <Input
-                                id="location"
-                                name="location"
-                                placeholder="Classroom A"
-                                className="col-span-3"
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="course" className="text-right">
                                 Course
                             </Label>
-                            <Select name="courseId">
+                            <Select name="courseId" onValueChange={handleCourseChange}>
                                 <SelectTrigger className="col-span-3">
                                     <SelectValue placeholder="Select course (Optional)" />
                                 </SelectTrigger>
@@ -146,22 +112,57 @@ export function CreateEventDialog({ instructors, courses = [], intakes = [], ope
                         </div>
 
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="intake" className="text-right">
-                                Intake
+                            <Label htmlFor="title" className="text-right">
+                                Title
                             </Label>
-                            <Select name="intakeId">
-                                <SelectTrigger className="col-span-3">
-                                    <SelectValue placeholder="Select intake (Optional)" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="none">No Intake</SelectItem>
-                                    {intakes.map((i) => (
-                                        <SelectItem key={i.id} value={i.id}>
-                                            {i.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <Input
+                                id="title"
+                                name="title"
+                                className="col-span-3"
+                                placeholder="Event title"
+                                required
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label className="text-right">Color</Label>
+                            <div className="col-span-3 flex gap-2">
+                                {[
+                                    { value: "#3b82f6", label: "Blue" },
+                                    { value: "#22c55e", label: "Green" },
+                                    { value: "#ef4444", label: "Red" },
+                                    { value: "#eab308", label: "Yellow" },
+                                    { value: "#a855f7", label: "Purple" },
+                                    { value: "#ec4899", label: "Pink" },
+                                    { value: "#6b7280", label: "Gray" },
+                                ].map((c) => (
+                                    <button
+                                        key={c.value}
+                                        type="button"
+                                        className={`w-6 h-6 rounded-full transition-all ${selectedColor === c.value ? "ring-2 ring-offset-2 ring-foreground scale-110" : "hover:scale-110"}`}
+                                        style={{ backgroundColor: c.value }}
+                                        onClick={() => setSelectedColor(c.value)}
+                                        title={c.label}
+                                    />
+                                ))}
+                                <input type="hidden" name="color" value={selectedColor} />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label className="text-right">Start Date</Label>
+                            <div className="col-span-3">
+                                <DateTimePicker date={startDate} setDate={setStartDate} />
+                                <input type="hidden" name="startDate" value={startDate ? startDate.toISOString() : ""} />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label className="text-right">End Date</Label>
+                            <div className="col-span-3">
+                                <DateTimePicker date={endDate} setDate={setEndDate} />
+                                <input type="hidden" name="endDate" value={endDate ? endDate.toISOString() : ""} />
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-4 items-center gap-4">
@@ -173,29 +174,11 @@ export function CreateEventDialog({ instructors, courses = [], intakes = [], ope
                                     <SelectValue placeholder="Select instructor" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="none">No Instructor</SelectItem>
-                                    {instructors.map((inst) => (
-                                        <SelectItem key={inst.id} value={inst.id}>
-                                            {inst.fullName}
+                                    {instructors.map((i) => (
+                                        <SelectItem key={i.id} value={i.id}>
+                                            {i.fullName}
                                         </SelectItem>
                                     ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="color" className="text-right">
-                                Color
-                            </Label>
-                            <Select name="color" defaultValue="#3b82f6">
-                                <SelectTrigger className="col-span-3">
-                                    <SelectValue placeholder="Select color" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="#3b82f6"><span className="flex items-center gap-2"><div className="w-4 h-4 rounded bg-blue-500"></div> Blue</span></SelectItem>
-                                    <SelectItem value="#10b981"><span className="flex items-center gap-2"><div className="w-4 h-4 rounded bg-green-500"></div> Green</span></SelectItem>
-                                    <SelectItem value="#ef4444"><span className="flex items-center gap-2"><div className="w-4 h-4 rounded bg-red-500"></div> Red</span></SelectItem>
-                                    <SelectItem value="#f59e0b"><span className="flex items-center gap-2"><div className="w-4 h-4 rounded bg-amber-500"></div> Orange</span></SelectItem>
-                                    <SelectItem value="#8b5cf6"><span className="flex items-center gap-2"><div className="w-4 h-4 rounded bg-violet-500"></div> Purple</span></SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -205,39 +188,24 @@ export function CreateEventDialog({ instructors, courses = [], intakes = [], ope
                                 Checklist
                             </Label>
                             <div className="col-span-3 space-y-2">
-                                {checklist.map((item: string, index: number) => (
-                                    <div key={index} className="flex gap-2">
-                                        <Input
-                                            value={item}
-                                            onChange={(e) => {
-                                                const newChecklist = [...checklist];
-                                                newChecklist[index] = e.target.value;
-                                                setChecklist(newChecklist);
-                                            }}
-                                            placeholder="Item name..."
-                                        />
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => {
-                                                const newChecklist = checklist.filter((_: string, i: number) => i !== index);
-                                                setChecklist(newChecklist);
-                                            }}
-                                        >
-                                            <X className="h-4 w-4" />
-                                        </Button>
+                                {checklistTemplate.length > 0 ? (
+                                    <div className="border rounded-md p-3 bg-muted/50 text-sm space-y-3 max-h-[200px] overflow-y-auto">
+                                        <p className="font-semibold text-muted-foreground">Auto-loaded Checklist:</p>
+                                        {checklistTemplate.map((phase) => (
+                                            <div key={phase.id} className="space-y-1">
+                                                <p className="font-medium text-xs uppercase tracking-wider text-primary">{phase.title}</p>
+                                                <ul className="list-disc list-inside pl-1 text-muted-foreground">
+                                                    {phase.items.map((item, i) => (
+                                                        <li key={i}>{item}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setChecklist([...checklist, ""])}
-                                >
-                                    <Plus className="mr-2 h-4 w-4" /> Add Item
-                                </Button>
-                                <input type="hidden" name="checklist" value={JSON.stringify(checklist)} />
+                                ) : (
+                                    <p className="text-sm text-muted-foreground italic py-2">Select a course to load its checklist.</p>
+                                )}
+                                <input type="hidden" name="checklist" value={JSON.stringify(checklistTemplate)} />
                             </div>
                         </div>
                     </div>

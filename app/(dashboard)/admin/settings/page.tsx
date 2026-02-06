@@ -91,11 +91,6 @@ export default async function AdminSettingsPage() {
                             </CardHeader>
                             <CardContent>
                                 <Table>
-                                    import {format} from "date-fns";
-
-                                    // ... existing imports
-
-                                    // ... existing code
 
                                     <TableHeader>
                                         <TableRow>

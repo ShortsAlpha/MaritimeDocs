@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createCourse, deleteCourse, updateCourse } from "@/app/actions/courses"
-import { Pencil, Trash, Loader2, Save } from "lucide-react"
+import { Pencil, Trash, Loader2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { ChecklistTemplateDialog } from "@/components/admin/checklist-template-dialog"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -118,6 +119,7 @@ export function CourseSettings({ courses }: { courses: Course[] }) {
                                 <TableRow key={course.id}>
                                     <TableCell className="font-medium">{course.title}</TableCell>
                                     <TableCell className="text-right flex items-center justify-end gap-2">
+                                        <ChecklistTemplateDialog course={course} />
                                         <EditCourseDialog course={course} />
                                         <Button
                                             variant="ghost"

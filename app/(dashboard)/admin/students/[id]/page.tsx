@@ -19,6 +19,8 @@ import { StudentAccountingTab } from "@/components/admin/student-accounting-tab"
 import { SendWelcomeEmailButton } from "@/components/admin/send-welcome-button";
 import { SendExamNotesDialog } from "@/components/admin/send-exam-notes-dialog";
 import { SendFeedbackEmailButton } from "@/components/admin/send-feedback-email-button";
+import { StudentPhotoUpload } from "@/components/admin/student-photo-upload";
+import { getSignedProfilePhotoUrl } from "@/app/actions/students";
 
 export default async function StudentDetailPage({
     params,
@@ -43,7 +45,8 @@ export default async function StudentDetailPage({
 
     if (!student) notFound();
 
-
+    // Generate Signed URL
+    const signedPhotoUrl = await getSignedProfilePhotoUrl(student.photoUrl);
 
     const studentData = {
         ...student,
@@ -71,6 +74,14 @@ export default async function StudentDetailPage({
                         <ArrowLeft className="h-4 w-4" />
                     </Button>
                 </Link>
+
+                <StudentPhotoUpload
+                    studentId={student.id}
+                    photoUrl={signedPhotoUrl}
+                    fullName={student.fullName}
+                    className="h-32 w-32"
+                />
+
                 <div className="flex-1">
                     <h1 className="text-3xl font-bold tracking-tight">{student.fullName}</h1>
                     <div className="flex flex-col gap-1 text-muted-foreground mt-1">

@@ -53,3 +53,29 @@ export async function updateCourse(id: string, formData: FormData) {
         return { success: false, message: "Failed to update course" }
     }
 }
+export async function updateCourseChecklistTemplate(id: string, template: any) {
+    try {
+        await db.course.update({
+            where: { id },
+            data: { checklistTemplate: template }
+        })
+        revalidatePath("/admin/settings")
+        return { success: true, message: "Checklist template updated" }
+    } catch (error) {
+        console.error("Template Update Error:", error)
+        return { success: false, message: "Failed to update template" }
+    }
+}
+
+export async function getCourseChecklistTemplate(courseId: string) {
+    try {
+        const course = await db.course.findUnique({
+            where: { id: courseId },
+            select: { checklistTemplate: true }
+        })
+        return course?.checklistTemplate || []
+    } catch (error) {
+        console.error("Get Template Error:", error)
+        return []
+    }
+}
