@@ -45,10 +45,8 @@ export async function createCourseEvent(prevState: any, formData: FormData) {
 
         if (!validResult.success) {
             console.error("Validation Error:", validResult.error)
-            const firstError = validResult.error instanceof z.ZodError
-                ? validResult.error.errors?.[0]?.message || validResult.error.issues?.[0]?.message
-                : "Validation failed"
-            return { success: false, message: firstError || "Invalid inputs" }
+            const firstError = validResult.error.issues[0]?.message || "Validation failed"
+            return { success: false, message: firstError }
         }
 
         const data = validResult.data
