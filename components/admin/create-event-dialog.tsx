@@ -32,9 +32,9 @@ type ChecklistPhase = {
 }
 
 type Props = {
-    instructors: Instructor[]
-    courses: Course[]
-    intakes?: Intake[]
+    instructors: { id: string; fullName: string }[]
+    courses: { id: string; title: string }[]
+    intakes?: { id: string; name: string }[]
     open: boolean
     onOpenChange: (open: boolean) => void
     defaultDate?: Date
