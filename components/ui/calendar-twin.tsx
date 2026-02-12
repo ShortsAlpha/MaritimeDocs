@@ -80,9 +80,10 @@ export function CalendarTwin({
                                 onClick={() => handleSelect(day)}
                                 className={cn(
                                     "w-full aspect-square flex flex-col items-center justify-center rounded-lg text-lg font-medium transition-all hover:scale-105 relative",
-                                    isSelected
-                                        ? "bg-primary text-primary-foreground shadow-md scale-105"
-                                        : "hover:bg-accent hover:text-foreground bg-secondary/10"
+                                    "bg-card text-foreground shadow-sm",
+                                    "border border-border/60 dark:border-transparent dark:bg-transparent dark:shadow-none",
+                                    "hover:border-primary/50 hover:shadow-md dark:hover:bg-accent/10",
+                                    isSelected && "ring-1 ring-primary/20 z-10" // Very subtle indicator just in case
                                 )}
                             >
                                 <span>{day.getDate()}</span>

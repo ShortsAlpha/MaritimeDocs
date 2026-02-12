@@ -19,14 +19,19 @@ import { logActivity } from "@/lib/logger";
 import { currentUser } from "@clerk/nextjs/server";
 
 export async function logPageView(path: string) {
-    const user = await currentUser();
-    if (!user) return;
+    try {
+        const user = await currentUser();
+        if (!user) return;
 
-    await logActivity({
-        action: 'VIEW',
-        title: `Viewed Page: ${path}`,
-        userId: user.id,
-        userEmail: user.emailAddresses[0]?.emailAddress,
-        metadata: { path }
-    });
+        await logActivity({
+            action: 'VIEW',
+            title: `Viewed Page: ${path}`,
+            userId: user.id,
+            userEmail: user.emailAddresses[0]?.emailAddress,
+            metadata: { path }
+        });
+    } catch (error) {
+        // Silently fail or log to server console only, to prevent client crashes
+        console.error("Error logging page view:", error);
+    }
 }

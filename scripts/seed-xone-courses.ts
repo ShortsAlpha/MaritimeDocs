@@ -1,0 +1,70 @@
+import { PrismaClient } from "@prisma/client"
+
+const prisma = new PrismaClient()
+
+const courses = [
+    "STCW BASIC SAFETY TRAINING CERTIFICATE",
+    "SUPERYACHT DECK CREW",
+    "SMALL POWERBOAT & RIB MASTER MCA RECOGNISED",
+    "PROFESSIONAL SUPERYACHT HOSPITALITY",
+    "MARINE COMMUNICATIONS (VHF-SRC)",
+    "ACCREDITED ENGINE-RATING COURSE (AEC)",
+    "PROFESSIONAL SUPERYACHT CHEF",
+    "MASTER OF YACHTS 200 GT COASTAL / MATE",
+    "MASTER OF YACHTS 200 GT LIMITED",
+    "MASTER ON YACHTS LESS THAN 200 GT (MALTA FLAG STATE)",
+    "MASTER OF YACHTS 200 GT UNLIMITED",
+    "OOW ON YACHTS LESS THAN 3000GT",
+    "MASTER OF YACHTS 500 GT / CHIEF MATE 3000 GT",
+    "PROFICIENCY IN ADVANCED FIRE FIGHTING",
+    "MEDICAL FIRST AID",
+    "PROFICIENCY IN MEDICAL CARE",
+    "PROFICIENCY IN SURVIVAL CRAFT AND RESCUE BOATS",
+    "LEADERSHIP AND TEAMWORK (HELM Operational Level)",
+    "LEADERSHIP AND MANAGERIAL SKILLS (MANAGEMENT LEVEL)",
+    "ECDIS - ELECTRONIC CHART DISPLAY AND INFORMATION SYSTEM",
+    "RADAR / ARPA (OPERATIONAL LEVEL)",
+    "RADAR / ARPA (MANAGEMENT LEVEL)",
+    "GMDSS GENERAL OPERATORS CERTIFICATE (GOC) CoC",
+    "EFFICIENT DECK HAND COURSE",
+    "IYT INSTRUCTOR TRAINING PROGRAMME",
+    "PERSONAL WATERCRAFT OPERATOR ( PWC )",
+    "INTERNATIONAL BAREBOAT SKIPPER POWER / SAIL",
+    "INTERNATIONAL BAREBOAT SKIPPER SAIL / CATAMARAN",
+    "INTERNATIONAL CERTIFICATE OF COMPETENCY COURSE",
+    "INTERNATIONAL FLOTILLA SKIPPER",
+    "INTERNATIONAL FLOTILLA SKIPPER SAIL / CATAMARAN",
+    "YACHT MASTER COASTAL POWER / SAIL",
+    "YACHT MASTER COASTAL SAIL / CATAMARAN",
+    "YACHT MASTER OCEAN",
+    "YACHT MASTER OFFSHORE POWER / SAIL",
+    "YACHT MASTER OFFSHORE SAIL / CATAMARAN",
+    "PROFICIENCY IN MARITIME SECURITY AWARENESS"
+]
+
+async function main() {
+    console.log(`Start seeding ${courses.length} courses...`)
+
+    for (const title of courses) {
+        try {
+            await prisma.course.upsert({
+                where: { title },
+                update: {},
+                create: { title },
+            })
+            process.stdout.write(".")
+        } catch (e) {
+            console.error(`Error seeding ${title}:`, e)
+        }
+    }
+    console.log("\nSeeding finished.")
+}
+
+main()
+    .catch((e) => {
+        console.error(e)
+        process.exit(1)
+    })
+    .finally(async () => {
+        await prisma.$disconnect()
+    })

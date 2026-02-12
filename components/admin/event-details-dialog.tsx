@@ -37,7 +37,7 @@ type Props = {
 export function EventDetailsDialog({ open, onOpenChange, date, events }: Props) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[900px] max-h-[85vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Schedule for {date.toDateString()}</DialogTitle>
                     <DialogDescription>
@@ -60,6 +60,18 @@ export function EventDetailsDialog({ open, onOpenChange, date, events }: Props) 
     )
 }
 
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { EventStudentSelector } from "./event-student-selector"
+import { getEventStudents, removeStudentFromEvent } from "@/app/actions/event-students"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { AlertCircle, CheckCircle2, Download } from "lucide-react"
+import { EventStudentManager } from "./event-student-manager"
+
+// ... existing imports
+
 function EventCard({ event }: { event: any }) {
     const [newItem, setNewItem] = useState("")
     const [isPending, setIsPending] = useState(false)
@@ -70,6 +82,7 @@ function EventCard({ event }: { event: any }) {
     useEffect(() => {
         setChecklistItems(event.resource?.checklist || [])
     }, [event.resource?.checklist])
+
 
     const handleAddItem = async () => {
         if (!newItem.trim() || isPending) return
@@ -308,107 +321,126 @@ function EventCard({ event }: { event: any }) {
                         )}
                     </div>
 
-                    <div className="mt-4 pt-4 border-t">
-                        <h5 className="text-sm font-semibold mb-2">Checklist</h5>
-                        <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
-                            {checklistItems
-                                .sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
-                                .map((item: any, index: number, array: any[]) => {
-                                    const isPreviousCompleted = index === 0 || array[index - 1].isCompleted
-                                    const isDisabled = !isPreviousCompleted && !item.isCompleted
-                                    const showPhaseHeader = index === 0 || item.phase !== array[index - 1].phase
 
-                                    return (
-                                        <div key={item.id} className="flex flex-col gap-1">
-                                            {showPhaseHeader && (
-                                                <div className="mt-2 mb-1 sticky top-0 bg-card z-20 pb-1 pt-1 shadow-sm">
-                                                    <span className="text-xs font-bold text-primary uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded">
-                                                        {item.phase || "General"}
-                                                    </span>
-                                                </div>
-                                            )}
-                                            <div className="relative flex items-center space-x-2 group pl-2 border-l-2 border-muted hover:border-primary/50 transition-colors">
-                                                <Checkbox
-                                                    id={item.id}
-                                                    checked={item.isCompleted}
-                                                    onCheckedChange={(checked) => handleToggle(item.id, checked as boolean)}
-                                                    disabled={isDisabled}
-                                                    className="transition-colors duration-300 z-10"
-                                                />
-                                                <div className="relative inline-block flex-1 min-w-0">
-                                                    <label
-                                                        htmlFor={item.id}
-                                                        className={`text-sm font-medium leading-snug cursor-pointer transition-colors block whitespace-normal break-words ${item.isCompleted ? "line-through text-muted-foreground" : ""
-                                                            } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
-                                                        title={item.label}
-                                                    >
-                                                        {item.label}
-                                                    </label>
-                                                </div>
 
-                                                <div className="w-[150px] shrink-0">
-                                                    <Input
-                                                        placeholder="Note..."
-                                                        defaultValue={item.note || ""}
-                                                        className="h-6 text-xs px-2 bg-transparent border-transparent hover:border-input focus:border-primary transition-all"
-                                                        onBlur={(e) => handleNoteUpdate(item.id, e.target.value)}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === "Enter") {
-                                                                e.currentTarget.blur()
-                                                            }
-                                                        }}
+                    <Tabs defaultValue="overview" className="mt-4">
+                        <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="overview">Checklist</TabsTrigger>
+                            <TabsTrigger value="students">Students</TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="overview" className="space-y-4 pt-4">
+                            <h5 className="text-sm font-semibold mb-2">Checklist Items</h5>
+                            <div className="space-y-2 max-h-[350px] overflow-y-auto pr-2">
+                                {checklistItems
+                                    .sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
+                                    .map((item: any, index: number, array: any[]) => {
+                                        const isPreviousCompleted = index === 0 || array[index - 1].isCompleted
+                                        const isDisabled = !isPreviousCompleted && !item.isCompleted
+                                        const showPhaseHeader = index === 0 || item.phase !== array[index - 1].phase
+
+                                        return (
+                                            <div key={item.id} className="flex flex-col gap-1">
+                                                {showPhaseHeader && (
+                                                    <div className="mt-2 mb-1 sticky top-0 bg-card z-20 pb-1 pt-1 shadow-sm">
+                                                        <span className="text-xs font-bold text-primary uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded">
+                                                            {item.phase || "General"}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                <div className="relative flex items-center space-x-2 group pl-2 border-l-2 border-muted hover:border-primary/50 transition-colors">
+                                                    <Checkbox
+                                                        id={item.id}
+                                                        checked={item.isCompleted}
+                                                        onCheckedChange={(checked) => handleToggle(item.id, checked as boolean)}
+                                                        disabled={isDisabled}
+                                                        className="transition-colors duration-300 z-10"
                                                     />
-                                                </div>
+                                                    <div className="relative inline-block flex-1 min-w-0">
+                                                        <label
+                                                            htmlFor={item.id}
+                                                            className={`text-sm font-medium leading-snug cursor-pointer transition-colors block whitespace-normal break-words ${item.isCompleted ? "line-through text-muted-foreground" : ""
+                                                                } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                                                            title={item.label}
+                                                        >
+                                                            {item.label}
+                                                        </label>
+                                                    </div>
 
-                                                <button
-                                                    onClick={() => handleDelete(item.id)}
-                                                    className="opacity-0 group-hover:opacity-100 text-destructive transition-opacity z-10 ml-auto"
-                                                >
-                                                    <Trash2 className="w-3.5 h-3.5" />
-                                                </button>
-                                            </div>
-                                            {item.isCompleted && item.completedBy && (
-                                                <div className="text-xs text-muted-foreground ml-8">
-                                                    Completed by {item.completedBy} at {item.completedAt ? format(new Date(item.completedAt), "HH:mm, dd MMM") : ""}
+                                                    <div className="w-[150px] shrink-0">
+                                                        <Input
+                                                            placeholder="Note..."
+                                                            defaultValue={item.note || ""}
+                                                            className="h-6 text-xs px-2 bg-transparent border-transparent hover:border-input focus:border-primary transition-all"
+                                                            onBlur={(e) => handleNoteUpdate(item.id, e.target.value)}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") {
+                                                                    e.currentTarget.blur()
+                                                                }
+                                                            }}
+                                                        />
+                                                    </div>
+
+                                                    <button
+                                                        onClick={() => handleDelete(item.id)}
+                                                        className="opacity-0 group-hover:opacity-100 text-destructive transition-opacity z-10 ml-auto"
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                    </button>
                                                 </div>
-                                            )}
-                                        </div>
-                                    )
-                                })}
-                        </div>
-                        <div className="mt-4 flex gap-2">
-                            <Input
-                                value={newItem}
-                                onChange={(e) => setNewItem(e.target.value)}
-                                placeholder="Add item..."
-                                className="h-8 text-sm"
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") handleAddItem()
-                                }}
+                                                {item.isCompleted && item.completedBy && (
+                                                    <div className="text-xs text-muted-foreground ml-8">
+                                                        Completed by {item.completedBy} at {item.completedAt ? format(new Date(item.completedAt), "HH:mm, dd MMM") : ""}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )
+                                    })}
+                            </div>
+                            <div className="mt-4 flex gap-2">
+                                <Input
+                                    value={newItem}
+                                    onChange={(e) => setNewItem(e.target.value)}
+                                    placeholder="Add item..."
+                                    className="h-8 text-sm"
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") handleAddItem()
+                                    }}
+                                />
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-8 w-8 p-0"
+                                    onClick={handleAddItem}
+                                    disabled={isPending}
+                                >
+                                    <Plus className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="h-8 w-8 p-0 text-green-600 hover:text-green-700"
+                                    onClick={handleExportExcel}
+                                    title="Export Checklist"
+                                >
+                                    <FileSpreadsheet className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </TabsContent>
+
+                        <TabsContent value="students" className="space-y-4 pt-4">
+                            <EventStudentManager
+                                eventId={event.id}
+                                eventTitle={event.title}
+                                eventStart={event.start}
+                                eventResource={event.resource}
                             />
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-8 w-8 p-0"
-                                onClick={handleAddItem}
-                                disabled={isPending}
-                            >
-                                <Plus className="h-4 w-4" />
-                            </Button>
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                className="h-8 w-8 p-0 text-green-600 hover:text-green-700"
-                                onClick={handleExportExcel}
-                                title="Export to Excel"
-                            >
-                                <FileSpreadsheet className="h-4 w-4" />
-                            </Button>
-                        </div>
-                    </div>
+                        </TabsContent>
+                    </Tabs>
                 </div>
             </div>
 
+            {/* Delete Confirmation Alert (same as before) */}
             <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
@@ -429,3 +461,4 @@ function EventCard({ event }: { event: any }) {
         </>
     )
 }
+

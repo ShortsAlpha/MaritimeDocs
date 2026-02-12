@@ -77,11 +77,29 @@ model Student {
 
   // Relations
   documents   StudentDocument[]
+  documentNotes StudentDocumentNote[]
   payments    Payment[]
   feedbacks   Feedback[]
+  events      CourseEvent[]
   
   intakeId    String?
   intake      Intake?   @relation(fields: [intakeId], references: [id])
+}
+
+model StudentDocumentNote {
+  id             String       @id @default(cuid())
+  note           String       @db.Text
+  
+  studentId      String
+  student        Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  documentTypeId String
+  documentType   DocumentType @relation(fields: [documentTypeId], references: [id], onDelete: Cascade)
+  
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  
+  @@unique([studentId, documentTypeId])
 }
 
 enum FeedbackSource {
@@ -190,6 +208,7 @@ model CourseEvent {
   updatedAt DateTime @updatedAt
 
   checklist EventChecklistItem[]
+  students  Student[]
 }
 
 model EventChecklistItem {
@@ -256,6 +275,8 @@ model DocumentType {
   
   documents   StudentDocument[]
   instructorDocuments InstructorDocument[]
+  courseRequirements CourseDocument[]
+  studentNotes StudentDocumentNote[]
 }
 
 model StudentDocument {
@@ -286,6 +307,23 @@ model Course {
   checklistTemplate Json? // Array of { phase: string, items: string[] }
   
   events    CourseEvent[]
+  requiredDocuments CourseDocument[]
+}
+
+model CourseDocument {
+  id             String       @id @default(cuid())
+  
+  courseId       String
+  course         Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  documentTypeId String
+  documentType   DocumentType @relation(fields: [documentTypeId], references: [id], onDelete: Cascade)
+  
+  isRequired     Boolean      @default(true)
+  
+  createdAt      DateTime     @default(now())
+  
+  @@unique([courseId, documentTypeId])
 }
 
 model Intake {

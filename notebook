@@ -126,3 +126,13 @@ mail gönderme tuşlarına öğrencinin belgeleri tam değil lecture note gönde
 * checklist örneği iletelim demisim atıyorum onu da
 
 /students içinde filtre çok detaylı olsun
+
+
+
+
+
+calendar üzerinde günlere tıklayınca açılan ekrana evente eklenen öğrencileri gördüğümüz bir ekran gerekli
+
+öğrencileri gördüğümüz ekranda öğrencilerin belgeleri tam mı değil mi onu görebilelim. eksikse üzerine tıklayınca eksik belgeleri görelim. 
+excel versin ve o da dinamik olarak güncellensin. /students içindeki öğrenci profiline belge yüklenince calendar içindeki öğrenci listesinde de güncellensin. 
+
