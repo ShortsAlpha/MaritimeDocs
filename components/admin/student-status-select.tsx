@@ -61,7 +61,7 @@ export function StudentStatusSelect({ studentId, currentStatus, balance }: Props
 
     return (
         <Select value={status} onValueChange={handleStatusChange}>
-            <SelectTrigger className="w-[200px] h-8 text-xs">
+            <SelectTrigger className="w-full min-w-[140px] h-8 text-xs">
                 <SelectValue placeholder="Select status" />
             </SelectTrigger>
             <SelectContent position="popper" className="max-h-[500px]">

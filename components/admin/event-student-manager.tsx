@@ -185,8 +185,8 @@ export function EventStudentManager({ eventId, eventTitle, eventStart, eventReso
                     <Table className="w-full min-w-[1000px] border-separate border-spacing-0">
                         <TableHeader>
                             <TableRow className="bg-muted/50 hover:bg-muted/50">
-                                <TableHead className="w-[50px] border-b border-r text-center sticky left-0 z-20 bg-muted/90 h-10 shadow-[1px_0_0_0_rgba(0,0,0,0.1)]">#</TableHead>
-                                <TableHead className="w-[200px] border-b border-r sticky left-[50px] z-20 bg-muted/90 h-10 font-bold text-primary shadow-[1px_0_0_0_rgba(0,0,0,0.1)]">Student Name</TableHead>
+                                <TableHead className="w-[50px] min-w-[50px] max-w-[50px] border-b border-r text-center sticky left-0 z-20 bg-muted/90 h-10 shadow-[1px_0_0_0_rgba(0,0,0,0.1)]">#</TableHead>
+                                <TableHead className="w-[200px] min-w-[200px] border-b border-r sticky left-[50px] z-20 bg-muted/90 h-10 font-bold text-primary shadow-[1px_0_0_0_rgba(0,0,0,0.1)]">Student Name</TableHead>
                                 {docTypes.map(dt => (
                                     <TableHead key={dt.id} className="text-center min-w-[140px] border-b border-r h-10 text-xs font-bold px-1 whitespace-normal leading-tight bg-muted/50">
                                         {dt.title}
@@ -210,10 +210,10 @@ export function EventStudentManager({ eventId, eventTitle, eventStart, eventReso
                             ) : (
                                 students.map((student, idx) => (
                                     <TableRow key={student.id} className="hover:bg-transparent group">
-                                        <TableCell className="text-center text-muted-foreground border-b border-r sticky left-0 z-10 bg-background group-hover:bg-muted/5 shadow-[1px_0_0_0_rgba(0,0,0,0.05)]">{idx + 1}</TableCell>
-                                        <TableCell className="sticky left-[50px] bg-background z-10 border-b border-r group-hover:bg-muted/5 shadow-[1px_0_0_0_rgba(0,0,0,0.05)]">
+                                        <TableCell className="w-[50px] min-w-[50px] max-w-[50px] text-center text-muted-foreground border-b border-r sticky left-0 z-10 bg-background group-hover:bg-muted/5 shadow-[1px_0_0_0_rgba(0,0,0,0.05)]">{idx + 1}</TableCell>
+                                        <TableCell className="w-[200px] min-w-[200px] sticky left-[50px] bg-background z-10 border-b border-r group-hover:bg-muted/5 shadow-[1px_0_0_0_rgba(0,0,0,0.05)]">
                                             <div className="flex flex-col py-1">
-                                                <span className="font-semibold text-sm">{student.fullName}</span>
+                                                <span className="font-semibold text-sm truncate">{student.fullName}</span>
                                                 <span className="text-[10px] text-muted-foreground font-mono">{student.studentNumber}</span>
                                             </div>
                                         </TableCell>

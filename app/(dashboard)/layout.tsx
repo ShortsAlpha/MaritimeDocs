@@ -27,7 +27,7 @@ export default async function DashboardLayout({
             <PageViewLogger />
             <AppSidebar role={role} />
             <SidebarInset>
-                <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
+                <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4 md:pl-6 md:pr-10">
                     <SidebarTrigger className="-ml-1" />
                     <Separator orientation="vertical" className="mr-2 h-4" />
                     <div className="flex flex-1 items-center justify-between">
@@ -37,7 +37,7 @@ export default async function DashboardLayout({
                         <UserProfile />
                     </div>
                 </header>
-                <main className="flex-1 overflow-auto p-6">{children}</main>
+                <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:pl-6 md:pr-10">{children}</main>
             </SidebarInset>
         </SidebarProvider>
     );

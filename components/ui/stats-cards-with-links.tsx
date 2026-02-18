@@ -122,7 +122,7 @@ export default function StatsCardsWithLinks({ stats }: { stats: StatsCardProps[]
             <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 w-full">
                 {stats.map((item) => (
                     <Card key={item.name} className="p-0 gap-0">
-                        <CardContent className="p-6">
+                        <CardContent className="p-4 sm:p-6">
                             <dd className="flex items-start justify-between space-x-2">
                                 <span className="truncate text-sm text-muted-foreground">
                                     {item.name}
@@ -138,14 +138,14 @@ export default function StatsCardsWithLinks({ stats }: { stats: StatsCardProps[]
                                     {item.change}
                                 </span>
                             </dd>
-                            <dd className="mt-1 text-3xl font-semibold text-foreground">
+                            <dd className="mt-1 text-2xl sm:text-3xl font-semibold text-foreground">
                                 {item.value}
                             </dd>
                         </CardContent>
                         <CardFooter className="flex justify-end border-t border-border !p-0">
                             <Link
                                 href={item.href}
-                                className="px-6 py-3 text-sm font-medium text-primary hover:text-primary/90"
+                                className="px-4 py-2 sm:px-6 sm:py-3 text-sm font-medium text-primary hover:text-primary/90"
                             >
                                 View more →
                             </Link>

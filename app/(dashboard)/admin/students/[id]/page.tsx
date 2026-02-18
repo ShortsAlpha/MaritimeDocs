@@ -67,68 +67,77 @@ export default async function StudentDetailPage({
     const courses = await db.course.findMany({ orderBy: { title: 'asc' } });
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center gap-4">
-                <Link href="/admin/students">
-                    <Button variant="outline" size="icon">
-                        <ArrowLeft className="h-4 w-4" />
-                    </Button>
-                </Link>
+        <div className="space-y-4 md:space-y-6 w-full max-w-full overflow-hidden">
+            <div className="flex flex-col xl:flex-row gap-4 md:gap-6 max-w-full xl:items-start transition-all">
+                {/* Left Section: Back, Photo, Name */}
+                <div className="flex items-start gap-4 flex-1 w-full">
+                    <Link href="/admin/students">
+                        <Button variant="outline" size="icon" className="shrink-0 mt-2">
+                            <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                    </Link>
 
-                <StudentPhotoUpload
-                    studentId={student.id}
-                    photoUrl={signedPhotoUrl}
-                    fullName={student.fullName}
-                    className="h-32 w-32"
-                />
+                    <StudentPhotoUpload
+                        studentId={student.id}
+                        photoUrl={signedPhotoUrl}
+                        fullName={student.fullName}
+                        className="h-24 w-24 sm:h-32 sm:w-32 shrink-0 shadow-lg rounded-full"
+                    />
 
-                <div className="flex-1">
-                    <h1 className="text-3xl font-bold tracking-tight">{student.fullName}</h1>
-                    <div className="flex flex-col gap-1 text-muted-foreground mt-1">
-                        <div className="flex items-center gap-2">
-                            <Mail className="h-3.5 w-3.5" />
-                            <span className="text-sm">{student.email || "No email"}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Phone className="h-3.5 w-3.5" />
-                            <span className="text-sm">{student.phone || "No phone"}</span>
+                    <div className="min-w-0 flex-1 pt-1">
+                        <h1 className="text-xl sm:text-3xl font-bold tracking-tight truncate break-words mb-2">{student.fullName}</h1>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-muted-foreground">
+                            <div className="flex items-center gap-2 min-w-0">
+                                <Mail className="h-3.5 w-3.5 shrink-0" />
+                                <span className="text-sm truncate">{student.email || "No email"}</span>
+                            </div>
+                            <div className="flex items-center gap-2 min-w-0">
+                                <Phone className="h-3.5 w-3.5 shrink-0" />
+                                <span className="text-sm truncate">{student.phone || "No phone"}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-4">
-                    <div className="flex flex-col items-end gap-1">
-                        <span className="text-xs text-muted-foreground">Status</span>
-                        <StudentStatusSelect
-                            studentId={student.id}
-                            currentStatus={student.status}
-                            balance={balance}
-                        />
-                    </div>
-                    <div className="h-8 w-px bg-border mx-2"></div>
 
-                    <SendWelcomeEmailButton studentId={student.id} />
-                    <SendExamNotesDialog
-                        studentId={student.id}
-                        courseName={student.course || ""}
-                        courses={courses}
-                    />
-                    <SendFeedbackEmailButton studentId={student.id} />
-
-                    <div className="h-8 w-px bg-border mx-2"></div>
-                    <DeleteStudentButton studentId={student.id} />
-                    <div className="flex flex-col items-end">
-                        <span className="text-sm text-muted-foreground">Current Balance</span>
-                        <div className="flex items-center gap-2">
-                            <span className={`text-2xl font-bold ${balance > 0 ? "text-red-500" : "text-green-500"}`}>
+                {/* Right Section: Actions & Status */}
+                {/* Right Section: Actions & Status */}
+                <div className="flex flex-col gap-3 md:gap-4 w-full xl:w-auto">
+                    {/* Row 1: Status & Balance */}
+                    <div className="flex items-end justify-between gap-2 md:gap-4">
+                        <div className="flex flex-col gap-1.5 flex-1">
+                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold pl-1">
+                                Status
+                            </span>
+                            <StudentStatusSelect
+                                studentId={student.id}
+                                currentStatus={student.status}
+                                balance={balance}
+                            />
+                        </div>
+                        <div className="flex flex-col items-end gap-0.5 pb-0.5">
+                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Balance</span>
+                            <span className={`text-2xl font-bold tracking-tight ${balance > 0 ? "text-red-500" : "text-green-500"}`}>
                                 €{balance.toLocaleString()}
                             </span>
                         </div>
                     </div>
+
+                    {/* Row 2: Quick Actions (Responsive Grid) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+                        <SendWelcomeEmailButton studentId={student.id} />
+                        <SendExamNotesDialog
+                            studentId={student.id}
+                            courseName={student.course || ""}
+                            courses={courses}
+                        />
+                        <SendFeedbackEmailButton studentId={student.id} />
+                        <DeleteStudentButton studentId={student.id} />
+                    </div>
                 </div>
             </div>
 
-            <Tabs defaultValue="overview" className="space-y-4">
-                <TabsList>
+            <Tabs defaultValue="overview" className="space-y-4 w-full">
+                <TabsList className="flex w-full justify-start overflow-x-auto flex-nowrap">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="documents">Documents</TabsTrigger>
                     <TabsTrigger value="accounting">Accounting</TabsTrigger>

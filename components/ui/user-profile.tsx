@@ -33,8 +33,10 @@ function UserProfileContent() {
             <PopoverTrigger asChild>
                 <Button variant="ghost" className="h-10 w-10 rounded-full p-0">
                     <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.imageUrl} />
-                        <AvatarFallback>{user.firstName?.charAt(0)}{user.lastName?.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={user.imageUrl} alt={user.fullName || "User"} />
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                            {user.firstName?.charAt(0)}{user.lastName?.charAt(0)}
+                        </AvatarFallback>
                     </Avatar>
                 </Button>
             </PopoverTrigger>

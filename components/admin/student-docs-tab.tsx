@@ -97,11 +97,82 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
                 const categoryName = category.charAt(0) + category.slice(1).toLowerCase() + " Documents";
 
                 return (
-                    <div key={category} className="space-y-4">
+                    <div key={category} className="space-y-2 md:space-y-4 overflow-hidden w-full">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold tracking-tight">{categoryName}</h3>
+                            <h3 className="text-sm md:text-lg font-semibold tracking-tight">{categoryName}</h3>
                         </div>
-                        <div className="rounded-md border bg-card">
+
+                        {/* Mobile View */}
+                        <div className="md:hidden space-y-2">
+                            {categoryTypes.map((type) => {
+                                const uploadedDoc = student.documents.find(
+                                    (d) => d.documentTypeId === type.id
+                                );
+
+                                return (
+                                    <div key={type.id} className="flex items-center justify-between p-2 rounded-lg border bg-card">
+                                        <div className="flex items-center gap-2 overflow-hidden">
+                                            <div className="p-1.5 bg-muted rounded-md text-muted-foreground shrink-0">
+                                                <FileText className="h-3.5 w-3.5" />
+                                            </div>
+                                            <div className="flex flex-col min-w-0">
+                                                <span className="font-medium text-xs truncate flex items-center gap-1.5">
+                                                    {type.title}
+                                                    {type.isRequired && (
+                                                        <Badge variant="secondary" className="text-[9px] h-3.5 px-1 font-normal shrink-0">
+                                                            Req
+                                                        </Badge>
+                                                    )}
+                                                </span>
+                                                {uploadedDoc ? (
+                                                    <span className="text-[10px] text-muted-foreground truncate">
+                                                        {format(new Date(uploadedDoc.createdAt), "MMM d, yyyy")}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-[10px] text-muted-foreground italic">Not uploaded</span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="shrink-0 ml-2">
+                                            {uploadedDoc ? (
+                                                <div className="flex items-center">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-7 w-7"
+                                                        onClick={() => handlePreview(uploadedDoc)}
+                                                    >
+                                                        <Eye className="h-3.5 w-3.5" />
+                                                    </Button>
+
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-7 w-7 text-destructive"
+                                                        onClick={() => handleDelete(uploadedDoc.id)}
+                                                    >
+                                                        <Trash2 className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    className="h-7 w-7"
+                                                    onClick={() => setUploadDocTypeId(type.id)}
+                                                >
+                                                    <CloudUpload className="h-3.5 w-3.5" />
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Desktop View */}
+                        <div className="hidden md:block rounded-md border bg-card">
                             <Table>
                                 <TableHeader>
                                     <TableRow className="hover:bg-transparent">

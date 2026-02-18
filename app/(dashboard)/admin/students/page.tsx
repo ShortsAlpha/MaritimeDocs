@@ -11,6 +11,7 @@ import { StudentFilter } from "@/components/admin/student-filter";
 import { SortableHeader } from "@/components/admin/sortable-header";
 import { StudentSearch } from "@/components/admin/student-search";
 import { Prisma, StudentStatus } from "@prisma/client";
+import { Eye } from "lucide-react";
 
 type Props = {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -100,12 +101,14 @@ export default async function AdminStudentsPage(props: Props) {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <h1 className="text-2xl font-bold">Student Management</h1>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
                     <StudentSearch />
-                    <StudentFilter courses={courses} nationalities={nationalities} intakes={intakes} />
-                    <CreateStudentDialog courses={courses} intakes={intakes} />
+                    <div className="flex items-center gap-2">
+                        <StudentFilter courses={courses} nationalities={nationalities} intakes={intakes} />
+                        <CreateStudentDialog courses={courses} intakes={intakes} />
+                    </div>
                 </div>
             </div>
 
@@ -114,12 +117,75 @@ export default async function AdminStudentsPage(props: Props) {
                     <CardTitle>Student List</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Table>
+                    {/* Mobile View */}
+                    <div className="md:hidden space-y-3">
+                        {students.map((student) => {
+                            const totalFee = Number(student.totalFee)
+                            const totalPaid = student.payments.reduce((sum, p) => sum + Number(p.amount), 0)
+                            const balance = totalFee - totalPaid
+
+                            const statusMap: Record<string, { label: string, color: string }> = {
+                                REGISTERED: { label: "Registered", color: "bg-blue-500" },
+                                DOCS_REQ_SENT: { label: "Documents Request Sent", color: "bg-orange-500" },
+                                LECTURE_NOTES_SENT: { label: "Lecture Notes Sent", color: "bg-amber-500" },
+                                PAYMENT_COMPLETED: { label: "Payment Completed", color: "bg-green-600" },
+                                COURSE_ONGOING: { label: "Course Ongoing", color: "bg-green-500" },
+                                COURSE_COMPLETED: { label: "Course Completed", color: "bg-purple-500" },
+                                CERTIFICATE_APPLIED: { label: "Certificate Applied", color: "bg-indigo-500" },
+                                CERTIFICATE_SHIPPED: { label: "Certificate Shipped", color: "bg-pink-500" },
+                                ONGOING: { label: "Ongoing", color: "bg-green-500" },
+                                EXAM_PHASE: { label: "In Exam", color: "bg-amber-500" },
+                                DOCS_PENDING: { label: "Docs Pending", color: "bg-red-500" },
+                                CANCELLED: { label: "Cancelled", color: "bg-gray-500" }
+                            };
+                            const statusInfo = statusMap[student.status] || { label: student.status, color: "bg-gray-400" };
+
+                            return (
+                                <div key={student.id} className="flex flex-col gap-3 p-4 rounded-lg border bg-card text-card-foreground shadow-sm">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex flex-col gap-1">
+                                            <span className="font-semibold">{student.fullName}</span>
+                                            <span className="text-xs text-muted-foreground">{student.course || 'General'}</span>
+                                        </div>
+                                        <Badge variant={balance > 0 ? "destructive" : "secondary"} className="shrink-0">
+                                            €{balance.toLocaleString()}
+                                        </Badge>
+                                    </div>
+
+                                    <div className="flex items-center justify-between text-sm">
+                                        <div className="flex items-center gap-2">
+                                            <div className={`h-2 w-2 rounded-full ${statusInfo.color}`} />
+                                            <span className="text-muted-foreground">{statusInfo.label}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center justify-between pt-2 border-t mt-1">
+                                        <span className="text-xs text-muted-foreground">
+                                            Joined {format(student.createdAt, 'MMM d, yyyy')}
+                                        </span>
+                                        <Link href={`/admin/students/${student.id}`}>
+                                            <Button variant="outline" size="sm" className="h-8">
+                                                View Details
+                                            </Button>
+                                        </Link>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        {students.length === 0 && (
+                            <div className="text-center text-muted-foreground py-8">
+                                No students found.
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Desktop View */}
+                    <Table className="hidden md:table">
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Name</TableHead>
+                                <TableHead className="w-[180px] lg:w-[250px]">Name</TableHead>
 
-                                <TableHead>
+                                <TableHead className="hidden xl:table-cell">
                                     <SortableHeader
                                         column="country"
                                         currentSort={sort}
@@ -128,7 +194,7 @@ export default async function AdminStudentsPage(props: Props) {
                                         searchParams={searchParams}
                                     />
                                 </TableHead>
-                                <TableHead>
+                                <TableHead className="w-[200px] lg:w-auto">
                                     <SortableHeader
                                         column="course"
                                         currentSort={sort}
@@ -137,7 +203,7 @@ export default async function AdminStudentsPage(props: Props) {
                                         searchParams={searchParams}
                                     />
                                 </TableHead>
-                                <TableHead>
+                                <TableHead className="w-[150px] lg:w-auto">
                                     <SortableHeader
                                         column="status"
                                         currentSort={sort}
@@ -177,23 +243,27 @@ export default async function AdminStudentsPage(props: Props) {
 
                                 return (
                                     <TableRow key={student.id}>
-                                        <TableCell className="font-medium">
+                                        <TableCell className="font-medium py-3">
                                             <div className="flex flex-col">
-                                                <span>{student.fullName}</span>
+                                                <span className="truncate max-w-[140px] lg:max-w-[200px] xl:max-w-none" title={student.fullName}>{student.fullName}</span>
                                                 <span className="text-xs text-muted-foreground">Joined {format(student.createdAt, 'MMM d, yyyy')}</span>
                                             </div>
                                         </TableCell>
 
-                                        <TableCell>
+                                        <TableCell className="hidden xl:table-cell">
                                             {student.nationality || '-'}
                                         </TableCell>
                                         <TableCell>
-                                            <Badge variant="outline">{student.course || 'General'}</Badge>
+                                            <div className="max-w-[160px] lg:max-w-[280px] xl:max-w-[400px]" title={student.course || 'General'}>
+                                                <Badge variant="outline" className="font-normal max-w-full">
+                                                    <span className="truncate">{student.course || 'General'}</span>
+                                                </Badge>
+                                            </div>
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-2">
-                                                <div className={`h-2 w-2 rounded-full ${statusInfo.color}`} />
-                                                <span className="text-sm">{statusInfo.label}</span>
+                                                <div className={`h-2.5 w-2.5 rounded-full ${statusInfo.color} shrink-0`} />
+                                                <span className="text-sm truncate max-w-[130px] lg:max-w-none" title={statusInfo.label}>{statusInfo.label}</span>
                                             </div>
                                         </TableCell>
 
@@ -204,8 +274,8 @@ export default async function AdminStudentsPage(props: Props) {
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <Link href={`/admin/students/${student.id}`}>
-                                                <Button variant="ghost" size="sm">
-                                                    View
+                                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                    <Eye className="h-4 w-4" />
                                                 </Button>
                                             </Link>
                                         </TableCell>
