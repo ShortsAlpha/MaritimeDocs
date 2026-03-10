@@ -2,14 +2,18 @@ import { db } from "@/lib/db";
 import { ReportFilters } from "@/components/reports/report-filters";
 import { FeedbackReportCard } from "@/components/reports/feedback-report-card";
 import { PaymentReportCard } from "@/components/reports/payment-report-card";
+import { getCurrentUserBranch, shouldFilterByBranch } from "@/lib/branch";
 
 export default async function ReportsPage() {
+    const branch = await getCurrentUserBranch();
+    const branchFilter = shouldFilterByBranch(branch) ? { branchId: branch!.branchId } : {};
+
     // Fetch filter options
     const courses = await db.course.findMany({ select: { id: true, title: true }, orderBy: { title: 'asc' } });
-    const intakes = await db.intake.findMany({ select: { id: true, name: true }, orderBy: { startDate: 'desc' } });
+    const intakes = await db.intake.findMany({ where: branchFilter, select: { id: true, name: true }, orderBy: { startDate: 'desc' } });
     const nationalities = await db.student.groupBy({
         by: ['nationality'],
-        where: { nationality: { not: null } },
+        where: { nationality: { not: null }, ...branchFilter },
         orderBy: { nationality: 'asc' }
     }).then(groups => groups.map(g => g.nationality).filter(Boolean) as string[]);
 

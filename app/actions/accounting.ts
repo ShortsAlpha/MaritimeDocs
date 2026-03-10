@@ -4,26 +4,33 @@ import { db } from "@/lib/db";
 import { PaymentMethod } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { logActivity } from "@/lib/logger";
+import { getCurrentUserBranch } from "@/lib/branch";
 
 export async function addPayment(studentId: string, amount: number, method: PaymentMethod, note?: string) {
     try {
+        const branch = await getCurrentUserBranch();
+
         await db.payment.create({
             data: {
                 studentId,
                 amount,
                 method,
-                note
+                note,
+                currency: branch?.currency || 'EUR',
+                branchId: branch?.branchId || null,
             }
         });
 
         revalidatePath(`/admin/students/${studentId}`);
 
+        const symbol = branch?.currency === 'BGN' ? 'лв' : '€';
         await logActivity({
             action: 'PAYMENT',
-            title: `Payment Received: €${amount}`,
+            title: `Payment Received: ${symbol}${amount}`,
             description: `Method: ${method} - Note: ${note || 'None'}`,
             userId: studentId,
-            metadata: { amount, method, note }
+            branchId: branch?.branchId,
+            metadata: { amount, method, note, currency: branch?.currency }
         });
 
         return { success: true };

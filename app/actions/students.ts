@@ -8,6 +8,7 @@ import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { slugify } from "@/lib/utils"
 import { addMonths } from "date-fns"
+import { getCurrentUserBranch, getBranchStoragePrefix } from "@/lib/branch"
 
 // ... existing code ...
 import { StudentStatus } from "@prisma/client"
@@ -68,8 +69,8 @@ const StudentSchema = z.object({
 
 export async function createStudent(prevState: any, formData: FormData) {
     try {
-        const user = await currentUser()
-        if (!user) return { success: false, message: "Unauthorized" }
+        const branch = await getCurrentUserBranch()
+        if (!branch) return { success: false, message: "Unauthorized" }
 
         const rowData = {
             fullName: formData.get("fullName"),
@@ -98,6 +99,7 @@ export async function createStudent(prevState: any, formData: FormData) {
                 nationality: data.nationality || null,
                 dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
                 intakeId: data.intakeId || null,
+                branchId: branch.branchId,
             }
         })
 
@@ -201,11 +203,13 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
 
         // RE-IMPORT folder rename logic or keep it if I can match range
         if (currentStudent && data.fullName && currentStudent.fullName !== data.fullName) {
+            const branchCtx = await getCurrentUserBranch()
+            const prefix = branchCtx ? getBranchStoragePrefix(branchCtx.branchCode) : 'hq'
             const newSafeName = slugify(data.fullName);
-            const newFolder = `students/${newSafeName}`;
+            const newFolder = `${prefix}/students/${newSafeName}`;
 
             // Try to determine old folder from existing documents
-            let oldFolder = `students/${slugify(currentStudent.fullName)}`; // Default fall back
+            let oldFolder = `${prefix}/students/${slugify(currentStudent.fullName)}`; // Default fall back
             if (currentStudent.documents.length > 0) {
                 // Extract folder from first document URL
                 const firstDoc = currentStudent.documents[0];
@@ -365,8 +369,8 @@ export async function getSignedProfilePhotoUrl(storedUrl: string | null) {
 
 export async function uploadProfilePhoto(formData: FormData) {
     try {
-        const user = await currentUser()
-        if (!user) return { success: false, message: "Unauthorized" }
+        const branch = await getCurrentUserBranch()
+        if (!branch) return { success: false, message: "Unauthorized" }
 
         const studentId = formData.get("studentId") as string;
         const file = formData.get("file") as File;
@@ -376,9 +380,10 @@ export async function uploadProfilePhoto(formData: FormData) {
         const student = await db.student.findUnique({ where: { id: studentId } });
         if (!student) throw new Error("Student not found");
 
+        const prefix = getBranchStoragePrefix(branch.branchCode);
         const buffer = Buffer.from(await file.arrayBuffer());
         const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-        const key = `students/${slugify(student.fullName)}/profile-${Date.now()}-${safeName}`;
+        const key = `${prefix}/students/${slugify(student.fullName)}/profile-${Date.now()}-${safeName}`;
 
         await r2.send(new PutObjectCommand({
             Bucket: process.env.R2_BUCKET_NAME,

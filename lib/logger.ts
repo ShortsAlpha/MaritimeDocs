@@ -9,10 +9,11 @@ interface LogOptions {
     description?: string;
     userId?: string;
     userEmail?: string;
+    branchId?: string;
     metadata?: Record<string, any>;
 }
 
-export async function logActivity({ action, title, description, userId, userEmail, metadata }: LogOptions) {
+export async function logActivity({ action, title, description, userId, userEmail, branchId, metadata }: LogOptions) {
     try {
         const headersList = await headers();
         const ip = headersList.get("x-forwarded-for") || "unknown";
@@ -25,6 +26,7 @@ export async function logActivity({ action, title, description, userId, userEmai
                 description,
                 userId,
                 userEmail,
+                branchId,
                 ipAddress: ip,
                 userAgent: userAgent,
                 metadata: metadata ? JSON.stringify(metadata) : undefined

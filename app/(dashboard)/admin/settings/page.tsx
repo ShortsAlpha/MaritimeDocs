@@ -13,6 +13,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CreateIntakeForm } from "@/components/admin/create-intake-form";
 import { DeleteIntakeButton } from "@/components/admin/delete-intake-button";
 import { format } from "date-fns";
+import { getCurrentUserBranch, shouldFilterByBranch } from "@/lib/branch";
+import { UserManagement } from "@/components/admin/user-management";
 
 function DocTypeTable({ types }: { types: any[] }) {
     return (
@@ -64,6 +66,9 @@ function DocTypeTable({ types }: { types: any[] }) {
 }
 
 export default async function AdminSettingsPage() {
+    const branch = await getCurrentUserBranch();
+    const branchFilter = shouldFilterByBranch(branch) ? { branchId: branch!.branchId } : {};
+
     const docTypes = await db.documentType.findMany({
         orderBy: { title: 'asc' }
     });
@@ -73,11 +78,21 @@ export default async function AdminSettingsPage() {
     });
 
     const intakes = await db.intake.findMany({
-        orderBy: { startDate: 'desc' } // or createdAt desc
+        where: branchFilter,
+        orderBy: { startDate: 'desc' }
     });
 
     return (
         <div className="space-y-12 pb-12">
+
+            {/* USER MANAGEMENT — SUPER_ADMIN ONLY */}
+            {branch?.role === 'SUPER_ADMIN' && (
+                <section>
+                    <h2 className="text-2xl font-bold tracking-tight">User Management</h2>
+                    <p className="text-muted-foreground mb-6">Manage user roles and branch assignments.</p>
+                    <UserManagement />
+                </section>
+            )}
 
             {/* INTAKE MANAGEMENT SECTION */}
             <section>

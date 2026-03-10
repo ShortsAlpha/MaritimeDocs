@@ -12,6 +12,7 @@ import { SortableHeader } from "@/components/admin/sortable-header";
 import { StudentSearch } from "@/components/admin/student-search";
 import { Prisma, StudentStatus } from "@prisma/client";
 import { Eye } from "lucide-react";
+import { getCurrentUserBranch, shouldFilterByBranch } from "@/lib/branch";
 
 type Props = {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -46,6 +47,12 @@ export default async function AdminStudentsPage(props: Props) {
 
     // Build where
     const where: Prisma.StudentWhereInput = {};
+
+    // Branch Scope (Multi-tenant)
+    const branch = await getCurrentUserBranch();
+    if (shouldFilterByBranch(branch)) {
+        where.branchId = branch!.branchId;
+    }
 
     // Search Query
     if (query) {
@@ -88,6 +95,7 @@ export default async function AdminStudentsPage(props: Props) {
     });
 
     const intakes = await db.intake.findMany({
+        where: shouldFilterByBranch(branch) ? { branchId: branch!.branchId } : {},
         orderBy: { startDate: 'desc' }
     });
 

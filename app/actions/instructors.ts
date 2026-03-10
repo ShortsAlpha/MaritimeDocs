@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache"
 import { z } from "zod"
 import { deleteFileFromR2 } from "@/lib/r2"
 import { InstructorEmploymentType } from "@prisma/client"
+import { getCurrentUserBranch } from "@/lib/branch"
 
 import { currentUser } from "@clerk/nextjs/server"
 
@@ -19,8 +20,8 @@ const InstructorSchema = z.object({
 
 export async function createInstructor(prevState: any, formData: FormData) {
     try {
-        const user = await currentUser()
-        if (!user) return { success: false, message: "Unauthorized" }
+        const branch = await getCurrentUserBranch()
+        if (!branch) return { success: false, message: "Unauthorized" }
 
         const rowData = {
             fullName: formData.get("fullName"),
@@ -41,6 +42,7 @@ export async function createInstructor(prevState: any, formData: FormData) {
                 bio: data.bio || null,
                 specialties: data.specialties || null,
                 employmentType: data.employmentType,
+                branchId: branch.branchId,
             }
         })
 

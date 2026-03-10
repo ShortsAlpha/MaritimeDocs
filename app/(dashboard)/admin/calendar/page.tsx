@@ -1,11 +1,16 @@
 import { db } from "@/lib/db";
 
 import { CalendarPageContent } from "@/components/admin/calendar-page-content";
+import { getCurrentUserBranch, shouldFilterByBranch } from "@/lib/branch";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCalendarPage() {
+    const branch = await getCurrentUserBranch();
+    const branchFilter = shouldFilterByBranch(branch) ? { branchId: branch!.branchId } : {};
+
     const events = await db.courseEvent.findMany({
+        where: branchFilter,
         include: {
             instructor: true,
             checklist: {
@@ -15,6 +20,7 @@ export default async function AdminCalendarPage() {
     });
 
     const instructors = await db.instructor.findMany({
+        where: branchFilter,
         select: { id: true, fullName: true }
     });
 
@@ -24,6 +30,7 @@ export default async function AdminCalendarPage() {
     });
 
     const intakes = await db.intake.findMany({
+        where: branchFilter,
         select: { id: true, name: true },
         orderBy: { startDate: 'desc' }
     });

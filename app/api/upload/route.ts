@@ -4,6 +4,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getBranchStoragePrefix } from "@/lib/branch";
 
 export async function POST(req: Request) {
     try {
@@ -19,7 +20,14 @@ export async function POST(req: Request) {
         }
 
         const buffer = Buffer.from(await file.arrayBuffer());
-        const fileName = `${subFolder}/${Date.now()}-${file.name.replace(/\s/g, "-")}`;
+
+        // Get user's branch prefix
+        const user = await db.user.findUnique({
+            where: { id: userId },
+            include: { branch: true }
+        });
+        const prefix = user?.branch ? getBranchStoragePrefix(user.branch.code) : 'hq';
+        const fileName = `${prefix}/${subFolder}/${Date.now()}-${file.name.replace(/\s/g, "-")}`;
 
         const command = new PutObjectCommand({
             Bucket: process.env.R2_BUCKET_NAME,

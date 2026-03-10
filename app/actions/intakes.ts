@@ -2,19 +2,21 @@
 
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
+import { getCurrentUserBranch } from "@/lib/branch"
 
 import { currentUser } from "@clerk/nextjs/server"
 
 export async function createIntake(name: string, startDate?: string) {
     try {
-        const user = await currentUser()
-        if (!user) return { success: false, message: "Unauthorized" }
+        const branch = await getCurrentUserBranch()
+        if (!branch) return { success: false, message: "Unauthorized" }
 
         await db.intake.create({
             data: {
                 name,
                 startDate: startDate ? new Date(startDate) : undefined,
-                status: "ACTIVE"
+                status: "ACTIVE",
+                branchId: branch.branchId,
             }
         });
         revalidatePath("/admin/settings");

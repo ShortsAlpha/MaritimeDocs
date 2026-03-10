@@ -3,6 +3,7 @@
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
+import { getCurrentUserBranch } from "@/lib/branch"
 
 const EventSchema = z.object({
     title: z.string().min(1, "Title is required"),
@@ -26,8 +27,8 @@ import { currentUser } from "@clerk/nextjs/server"
 
 export async function createCourseEvent(prevState: any, formData: FormData) {
     try {
-        const user = await currentUser()
-        if (!user) return { success: false, message: "Unauthorized" }
+        const branch = await getCurrentUserBranch()
+        if (!branch) return { success: false, message: "Unauthorized" }
 
         const rowData = {
             title: formData.get("title") || "",
@@ -100,6 +101,7 @@ export async function createCourseEvent(prevState: any, formData: FormData) {
                 courseId: data.courseId,
                 intakeId: data.intakeId,
                 color: data.color,
+                branchId: branch.branchId,
                 checklist: {
                     create: checklistItemsToCreate.map((item) => ({
                         label: item.label,

@@ -7,9 +7,14 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CreateInstructorDialog } from "@/components/admin/create-instructor-dialog";
 import { User, Mail, Phone, Award } from "lucide-react";
+import { getCurrentUserBranch, shouldFilterByBranch } from "@/lib/branch";
 
 export default async function AdminInstructorsPage() {
+    const branch = await getCurrentUserBranch();
+    const branchFilter = shouldFilterByBranch(branch) ? { branchId: branch!.branchId } : {};
+
     const instructors = await db.instructor.findMany({
+        where: branchFilter,
         orderBy: { createdAt: "desc" },
     });
 

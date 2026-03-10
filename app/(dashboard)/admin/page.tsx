@@ -10,23 +10,28 @@ import { checkDocumentCompleteness } from "@/app/actions/student-automation";
 import { StudentStatus } from "@prisma/client";
 import { addDays } from "date-fns";
 import { ExpiringCertificatesWidget } from "@/components/dashboard/expiring-certificates-widget";
+import { getCurrentUserBranch, shouldFilterByBranch } from "@/lib/branch";
 
 
 
 export default async function AdminPage() {
+    const branch = await getCurrentUserBranch();
+    const branchFilter = shouldFilterByBranch(branch) ? { branchId: branch!.branchId } : {};
     // 1. Fetch Data
     const students = await db.student.findMany({
+        where: branchFilter,
         include: { payments: true }
     });
 
-    const payments = await db.payment.findMany();
+    const payments = await db.payment.findMany({ where: branchFilter });
 
     // Fetch Active Courses
     const activeCoursesCount = await db.courseEvent.count({
         where: {
             endDate: {
                 gte: new Date()
-            }
+            },
+            ...branchFilter
         }
     });
 
@@ -81,7 +86,10 @@ export default async function AdminPage() {
 
     // 5. Fetch Pending Documents
     const pendingDocs = await db.studentDocument.findMany({
-        where: { status: 'PENDING' },
+        where: {
+            status: 'PENDING',
+            ...(shouldFilterByBranch(branch) ? { student: { is: { branchId: branch!.branchId } } } : {})
+        },
         include: {
             student: { select: { id: true, fullName: true } },
             documentType: { select: { title: true } }
@@ -92,7 +100,7 @@ export default async function AdminPage() {
     // 6. Fetch Students for Automation Suggestions
     // Students who need document requests (REGISTERED status)
     const documentsNeeded = await db.student.findMany({
-        where: { status: 'REGISTERED' },
+        where: { status: 'REGISTERED', ...branchFilter },
         select: {
             id: true,
             fullName: true,
@@ -108,7 +116,8 @@ export default async function AdminPage() {
             OR: [
                 { status: 'DOCS_REQ_SENT' as any },
                 { status: 'PAYMENT_COMPLETED' as any }
-            ]
+            ],
+            ...branchFilter
         },
         select: {
             id: true,
@@ -165,7 +174,8 @@ export default async function AdminPage() {
             certificateExpiryDate: {
                 gte: new Date(),
                 lte: addDays(new Date(), 30)
-            }
+            },
+            ...branchFilter
         },
         select: {
             id: true,
@@ -195,7 +205,7 @@ export default async function AdminPage() {
                 {/* Upcoming Courses (Top Left) */}
                 <div className="space-y-4">
                     <h2 className="text-lg font-semibold">Upcoming Courses</h2>
-                    <UpcomingCourses />
+                    <UpcomingCourses branchFilter={branchFilter} />
                 </div>
 
                 {/* Pending Documents (Top Right) */}

@@ -7,10 +7,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ----------------------------------------------------------------------------
+// Multi-Tenant Branch System
+// ----------------------------------------------------------------------------
+
+model Branch {
+  id        String   @id @default(cuid())
+  code      String   @unique // "HQ", "BG", "GR"
+  name      String            // "Malta (HQ)", "Bulgaria", "Greece"
+  timezone  String            // "Europe/Malta", "Europe/Sofia", "Europe/Athens"
+  currency  String   @default("EUR") // "EUR", "BGN"
+
+  // Relations
+  users       User[]
+  students    Student[]
+  instructors Instructor[]
+  events      CourseEvent[]
+  payments    Payment[]
+  intakes     Intake[]
+  activityLogs ActivityLog[]
+
+  createdAt DateTime @default(now())
+}
+
 // Staff/Admin Users (Authentication)
 enum Role {
-  ADMIN
-  STAFF
+  SUPER_ADMIN   // Malta HQ — can access all branches
+  BRANCH_ADMIN  // Branch manager — manages own branch
+  STAFF         // Branch staff — sees own branch only
 }
 
 model User {
@@ -18,6 +42,10 @@ model User {
   email     String   @unique
   name      String?
   role      Role     @default(STAFF)
+
+  branchId  String?
+  branch    Branch?  @relation(fields: [branchId], references: [id])
+
   createdAt DateTime @default(now())
 }
 
@@ -70,6 +98,10 @@ model Student {
 
   // Feedback Token
   feedbackToken     String?   @unique
+  
+  // Branch (Multi-tenant)
+  branchId    String?
+  branch      Branch?  @relation(fields: [branchId], references: [id])
   
   // Meta
   createdAt   DateTime @default(now())
@@ -160,6 +192,10 @@ model Instructor {
   specialties String?  // Comma separated or simplified text
   employmentType InstructorEmploymentType @default(FULL_TIME)
 
+  // Branch (Multi-tenant)
+  branchId    String?
+  branch      Branch?  @relation(fields: [branchId], references: [id])
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -193,6 +229,10 @@ model CourseEvent {
   location  String?
   
   color     String?  // For UI coloring
+
+  // Branch (Multi-tenant)
+  branchId    String?
+  branch      Branch?  @relation(fields: [branchId], references: [id])
 
   // Relations
   instructorId String?
@@ -238,9 +278,14 @@ enum PaymentMethod {
 model Payment {
   id          String        @id @default(cuid())
   amount      Decimal
+  currency    String        @default("EUR") // EUR, BGN
   date        DateTime      @default(now())
   method      PaymentMethod @default(CASH)
   note        String?       // e.g. "Installment 1", "Registration Fee"
+  
+  // Branch (Multi-tenant)
+  branchId    String?
+  branch      Branch?       @relation(fields: [branchId], references: [id])
   
   // Relations
   studentId   String
@@ -332,6 +377,10 @@ model Intake {
   startDate DateTime?
   status    String   @default("ACTIVE") // ACTIVE, ARCHIVED
   
+  // Branch (Multi-tenant)
+  branchId    String?
+  branch      Branch?  @relation(fields: [branchId], references: [id])
+  
   students  Student[]
   events    CourseEvent[]
   
@@ -348,6 +397,10 @@ model ActivityLog {
   
   userId    String?  // If authenticated user
   userEmail String?  // Store email for easy reading
+  
+  // Branch (Multi-tenant)
+  branchId    String?
+  branch      Branch?  @relation(fields: [branchId], references: [id])
   
   ipAddress String?
   userAgent String?

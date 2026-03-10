@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import UserProfile from "@/components/ui/user-profile";
 import { db } from "@/lib/db";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 import { PageViewLogger } from "@/components/admin/page-view-logger";
+import { BranchSwitcher } from "@/components/admin/branch-switcher";
 
 export default async function DashboardLayout({
     children,
@@ -16,11 +17,28 @@ export default async function DashboardLayout({
     const { userId } = await auth();
     if (!userId) return null;
 
-    const user = await db.user.findUnique({
+    let user = await db.user.findUnique({
         where: { id: userId }
     });
 
-    const role = user?.role || "STUDENT";
+    // Auto-create DB record for existing Clerk users
+    if (!user) {
+        const clerkUser = await currentUser();
+        if (clerkUser) {
+            const hqBranch = await db.branch.findUnique({ where: { code: 'HQ' } });
+            user = await db.user.create({
+                data: {
+                    id: clerkUser.id,
+                    email: clerkUser.emailAddresses[0]?.emailAddress || '',
+                    name: `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim(),
+                    role: 'SUPER_ADMIN',
+                    branchId: hqBranch?.id || null,
+                }
+            });
+        }
+    }
+
+    const role = user?.role || "STAFF";
 
     return (
         <SidebarProvider className="h-svh overflow-hidden">
@@ -34,7 +52,10 @@ export default async function DashboardLayout({
                         <div className="flex items-center gap-2">
                             <ThemeToggle />
                         </div>
-                        <UserProfile />
+                        <div className="flex items-center gap-2">
+                            <BranchSwitcher />
+                            <UserProfile />
+                        </div>
                     </div>
                 </header>
                 <main className="flex-1 overflow-y-auto overflow-x-hidden p-2 md:p-3 lg:p-4">{children}</main>

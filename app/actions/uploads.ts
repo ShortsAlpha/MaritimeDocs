@@ -3,23 +3,21 @@
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { r2, deleteFileFromR2 } from "@/lib/r2";
-export { deleteFileFromR2 }; // Re-export for client usage if needed via server action wrapper, though typically direct import is better. 
-// However, since it's used in a client component, and it's a server action file... wait.
-// deleteFileFromR2 is likely a server-side only function (utilizing aws-sdk). 
-// If instructor-docs-tab is a client component, it CANNOT import deleteFileFromR2 directly if it has Node.js dependencies.
-// It seems deleteFileFromR2 IS a server utility.
-// instructor-docs-tab is importing it.
-// If I export it here, and this file is 'use server', next.js might handle it as a server action if it's async.
-// But deleteFileFromR2 in lib/r2 is just a function.
-// Let's check lib/r2 again.
+export { deleteFileFromR2 };
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuidv4 } from "uuid";
+import { getCurrentUserBranch, getBranchStoragePrefix } from "@/lib/branch";
 
 export async function getUploadUrl(filename: string, fileType: string, folder: string) {
     try {
+        // Auto-prefix folder with branch code
+        const branch = await getCurrentUserBranch();
+        const prefix = branch ? getBranchStoragePrefix(branch.branchCode) : 'hq';
+        const branchFolder = `${prefix}/${folder}`;
+
         const fileExtension = filename.split('.').pop();
-        const key = `${folder}/${uuidv4()}.${fileExtension}`;
+        const key = `${branchFolder}/${uuidv4()}.${fileExtension}`;
 
         const command = new PutObjectCommand({
             Bucket: process.env.R2_BUCKET_NAME,

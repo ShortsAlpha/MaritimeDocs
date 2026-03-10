@@ -51,17 +51,21 @@ export async function POST(req: Request) {
     if (eventType === 'user.created') {
         const { id, email_addresses, first_name, last_name, public_metadata } = evt.data
         const email = email_addresses[0]?.email_address
-        // @ts-ignore
-        const role = public_metadata?.role === 'ADMIN' ? 'ADMIN' : 'STAFF'
+        // @ts-ignore - Assign SUPER_ADMIN by default (change to STAFF once team is set up)
+        const role = 'SUPER_ADMIN' as const
 
         if (!email) return new Response('No email found', { status: 400 })
+
+        // Find HQ branch to assign as default
+        const hqBranch = await db.branch.findUnique({ where: { code: 'HQ' } })
 
         await db.user.create({
             data: {
                 id: id,
                 email: email,
                 name: `${first_name} ${last_name}`.trim(),
-                role: role
+                role: role,
+                branchId: hqBranch?.id || null,
             }
         })
     } else if (eventType === 'user.deleted') {

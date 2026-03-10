@@ -13,11 +13,17 @@ export type ReportFilters = {
         to?: Date;
     };
     paymentStatus?: 'PAID' | 'PARTIAL' | 'UNPAID';
+    branchId?: string;
 }
 
 export async function generateStudentReport(filters: ReportFilters) {
     try {
         const where: Prisma.StudentWhereInput = {};
+
+        // Branch Filter (Multi-tenant)
+        if (filters.branchId) {
+            where.branchId = filters.branchId;
+        }
 
         // 1. Course Filter
         if (filters.course && filters.course.length > 0) {
@@ -211,6 +217,12 @@ export async function exportPaymentReportExcel(dateRange?: { from?: Date; to?: D
                 gte: dateRange.from,
                 lte: dateRange.to ? new Date(dateRange.to.setHours(23, 59, 59, 999)) : new Date()
             };
+        }
+
+        // Branch Filter (Multi-tenant) - filter through student relation
+        // Note: branchId is on the Payment model too
+        if (dateRange && (dateRange as any).branchId) {
+            where.branchId = (dateRange as any).branchId;
         }
 
         const payments = await db.payment.findMany({

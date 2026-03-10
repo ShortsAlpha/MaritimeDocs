@@ -1,10 +1,15 @@
 'use server'
 
 import { db } from "@/lib/db"
+import { getCurrentUserBranch, shouldFilterByBranch } from "@/lib/branch"
 
 export async function getActivityLogs(limit = 50) {
     try {
+        const branch = await getCurrentUserBranch();
+        const where = shouldFilterByBranch(branch) ? { branchId: branch!.branchId } : {};
+
         const logs = await db.activityLog.findMany({
+            where,
             orderBy: { createdAt: 'desc' },
             take: limit
         });
