@@ -113,7 +113,7 @@ export async function sendStudentWelcomeEmail(studentId: string) {
 
         // Send Email
         const { data, error } = await resend.emails.send({
-            from: 'Xone Academy <onboarding@resend.dev>',
+            from: 'Xone Academy <onboarding@student.xoneacademy.com>',
             to: student.email,
             subject: 'Welcome to Xone Superyacht Academy - Required Documents',
             html: getEmailTemplate(
@@ -168,7 +168,7 @@ export async function sendExamNotesEmail(studentId: string, courseName: string, 
         console.log("Base URL resolved:", baseUrl);
 
         await resend.emails.send({
-            from: 'Xone Academy <academics@resend.dev>',
+            from: 'Xone Academy <academics@student.xoneacademy.com>',
             to: student.email,
             subject: `Lecture Notes: ${courseName}`,
             html: getEmailTemplate(
@@ -232,7 +232,7 @@ export async function sendDocumentRejectionEmail(studentId: string, documentTitl
         const uploadLink = `${baseUrl}/upload/${token}`;
 
         await resend.emails.send({
-            from: 'Xone Academy <support@resend.dev>',
+            from: 'Xone Academy <support@student.xoneacademy.com>',
             to: student.email,
             subject: `Action Required: Document Rejected - ${documentTitle}`,
             html: getEmailTemplate(
@@ -282,7 +282,7 @@ export async function sendFeedbackEmail(studentId: string) {
         const feedbackLink = `${baseUrl}/feedback/${token}`;
 
         await resend.emails.send({
-            from: 'Xone Academy <feedback@resend.dev>',
+            from: 'Xone Academy <feedback@student.xoneacademy.com>',
             to: student.email,
             subject: 'We Value Your Feedback - Xone Superyacht Academy',
             html: getEmailTemplate(

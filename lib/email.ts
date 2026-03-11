@@ -18,7 +18,7 @@ export async function sendEmail({ to, subject, html }: EmailOptions) {
 
     try {
         const data = await resend.emails.send({
-            from: 'Maritime Academy <onboarding@resend.dev>', // Use default testing domain or your verified domain
+            from: 'Xone Academy <noreply@student.xoneacademy.com>', // Verified domain
             to: to,
             subject: subject,
             html: html,
