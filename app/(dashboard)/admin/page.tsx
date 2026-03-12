@@ -17,23 +17,57 @@ import { getCurrentUserBranch, shouldFilterByBranch } from "@/lib/branch";
 export default async function AdminPage() {
     const branch = await getCurrentUserBranch();
     const branchFilter = shouldFilterByBranch(branch) ? { branchId: branch!.branchId } : {};
-    // 1. Fetch Data
-    const students = await db.student.findMany({
-        where: branchFilter,
-        include: { payments: true }
-    });
-
-    const payments = await db.payment.findMany({ where: branchFilter });
-
-    // Fetch Active Courses
-    const activeCoursesCount = await db.courseEvent.count({
-        where: {
-            endDate: {
-                gte: new Date()
+    // 1. Fetch Data Concurrently
+    const [
+        students,
+        payments,
+        activeCoursesCount,
+        pendingDocs,
+        documentsNeeded,
+        potentialNotesReady,
+        requiredDocTypes
+    ] = await Promise.all([
+        db.student.findMany({
+            where: branchFilter,
+            include: { payments: true }
+        }),
+        db.payment.findMany({ where: branchFilter }),
+        db.courseEvent.count({
+            where: {
+                endDate: { gte: new Date() },
+                ...branchFilter
+            }
+        }),
+        db.studentDocument.findMany({
+            where: {
+                status: 'PENDING',
+                ...(shouldFilterByBranch(branch) ? { student: { is: { branchId: branch!.branchId } } } : {})
             },
-            ...branchFilter
-        }
-    });
+            include: {
+                student: { select: { id: true, fullName: true } },
+                documentType: { select: { title: true } }
+            },
+            orderBy: { createdAt: 'desc' }
+        }),
+        db.student.findMany({
+            where: { status: 'REGISTERED', ...branchFilter },
+            select: { id: true, fullName: true, email: true, status: true }
+        }),
+        db.student.findMany({
+            where: {
+                OR: [
+                    { status: 'DOCS_REQ_SENT' as any },
+                    { status: 'PAYMENT_COMPLETED' as any }
+                ],
+                ...branchFilter
+            },
+            select: { id: true, fullName: true, email: true, status: true }
+        }),
+        db.documentType.findMany({
+            where: { isRequired: true },
+            select: { id: true }
+        })
+    ]);
 
     // 2. Calculate KPIs
     const studentCount = students.length;
@@ -71,67 +105,7 @@ export default async function AdminPage() {
         },
     ];
 
-    // 4. Prepare "Performance & Revenue" (StatsWithChart)
-    // For now, we simulate chart history based on current totals because we don't have historical snapshots.
-    // In a real app, we would query group-by date.
-
-    // Mocking chart data based on real total to look nice but representing "Recent Activity"
-
-
-    // Better Mock: 7 Days history generator (constant for stable UI, or randomized around average)
-
-
-
-
-
-    // 5. Fetch Pending Documents
-    const pendingDocs = await db.studentDocument.findMany({
-        where: {
-            status: 'PENDING',
-            ...(shouldFilterByBranch(branch) ? { student: { is: { branchId: branch!.branchId } } } : {})
-        },
-        include: {
-            student: { select: { id: true, fullName: true } },
-            documentType: { select: { title: true } }
-        },
-        orderBy: { createdAt: 'desc' }
-    });
-
-    // 6. Fetch Students for Automation Suggestions
-    // Students who need document requests (REGISTERED status)
-    const documentsNeeded = await db.student.findMany({
-        where: { status: 'REGISTERED', ...branchFilter },
-        select: {
-            id: true,
-            fullName: true,
-            email: true,
-            status: true
-        }
-    });
-
-    // Students with documents ready for lecture notes
-    // (DOCS_REQ_SENT or PAYMENT_COMPLETED with all required docs approved)
-    const potentialNotesReady = await db.student.findMany({
-        where: {
-            OR: [
-                { status: 'DOCS_REQ_SENT' as any },
-                { status: 'PAYMENT_COMPLETED' as any }
-            ],
-            ...branchFilter
-        },
-        select: {
-            id: true,
-            fullName: true,
-            email: true,
-            status: true
-        }
-    });
-
     // Check which students have all documents complete (Optimized Bulk Check)
-    const requiredDocTypes = await db.documentType.findMany({
-        where: { isRequired: true },
-        select: { id: true }
-    });
     const requiredDocTypeIds = new Set(requiredDocTypes.map(d => d.id));
 
     const studentIds = potentialNotesReady.map(s => s.id);

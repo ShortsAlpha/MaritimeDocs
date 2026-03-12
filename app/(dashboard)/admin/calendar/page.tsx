@@ -9,31 +9,30 @@ export default async function AdminCalendarPage() {
     const branch = await getCurrentUserBranch();
     const branchFilter = shouldFilterByBranch(branch) ? { branchId: branch!.branchId } : {};
 
-    const events = await db.courseEvent.findMany({
-        where: branchFilter,
-        include: {
-            instructor: true,
-            checklist: {
-                orderBy: { id: 'asc' }
+    const [events, instructors, courses, intakes] = await Promise.all([
+        db.courseEvent.findMany({
+            where: branchFilter,
+            include: {
+                instructor: true,
+                checklist: {
+                    orderBy: { id: 'asc' }
+                }
             }
-        }
-    });
-
-    const instructors = await db.instructor.findMany({
-        where: branchFilter,
-        select: { id: true, fullName: true }
-    });
-
-    const courses = await db.course.findMany({
-        select: { id: true, title: true },
-        orderBy: { title: 'asc' }
-    });
-
-    const intakes = await db.intake.findMany({
-        where: branchFilter,
-        select: { id: true, name: true },
-        orderBy: { startDate: 'desc' }
-    });
+        }),
+        db.instructor.findMany({
+            where: branchFilter,
+            select: { id: true, fullName: true }
+        }),
+        db.course.findMany({
+            select: { id: true, title: true },
+            orderBy: { title: 'asc' }
+        }),
+        db.intake.findMany({
+            where: branchFilter,
+            select: { id: true, name: true },
+            orderBy: { startDate: 'desc' }
+        })
+    ]);
 
     // Transform for big-calendar
     const calendarEvents = events.map(evt => ({

@@ -77,35 +77,35 @@ export default async function AdminStudentsPage(props: Props) {
 
     // Fetch students with their payments to calculate balance
     // Fetch students with their payments to calculate balance
-    const [students, totalCount] = await Promise.all([
+    // Fetch all data concurrently
+    const [
+        students,
+        totalCount,
+        courses,
+        intakes,
+        nationalitiesArray
+    ] = await Promise.all([
         db.student.findMany({
             where,
-            include: {
-                payments: true
-            },
+            include: { payments: true },
             orderBy,
             skip,
             take: pageSize
         }),
-        db.student.count({ where })
+        db.student.count({ where }),
+        db.course.findMany({ orderBy: { title: 'asc' } }),
+        db.intake.findMany({
+            where: shouldFilterByBranch(branch) ? { branchId: branch!.branchId } : {},
+            orderBy: { startDate: 'desc' }
+        }),
+        db.student.groupBy({
+            by: ['nationality'],
+            where: { nationality: { not: null } },
+            orderBy: { nationality: 'asc' }
+        })
     ]);
 
-    const courses = await db.course.findMany({
-        orderBy: { title: 'asc' }
-    });
-
-    const intakes = await db.intake.findMany({
-        where: shouldFilterByBranch(branch) ? { branchId: branch!.branchId } : {},
-        orderBy: { startDate: 'desc' }
-    });
-
-    const nationalities = await db.student.groupBy({
-        by: ['nationality'],
-        where: {
-            nationality: { not: null }
-        },
-        orderBy: { nationality: 'asc' }
-    }).then(groups => groups.map(g => g.nationality).filter(Boolean) as string[]);
+    const nationalities = nationalitiesArray.map(g => g.nationality).filter(Boolean) as string[];
 
     return (
         <div className="space-y-6">
