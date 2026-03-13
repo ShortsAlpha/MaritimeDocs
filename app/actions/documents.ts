@@ -2,7 +2,7 @@
 
 // Force rebuild
 import { db } from "@/lib/db";
-import { r2 } from "@/lib/r2";
+import { r2, R2_BUCKET_NAME } from "@/lib/r2";
 import { deleteFileFromR2 } from "@/lib/r2";
 import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -38,7 +38,7 @@ export async function getDocumentPreviewUrl(docId: string) {
         if (!key) return { success: false, message: "Invalid file key" };
 
         const command = new GetObjectCommand({
-            Bucket: process.env.R2_BUCKET_NAME,
+            Bucket: R2_BUCKET_NAME,
             Key: key,
             ResponseContentDisposition: 'inline' // Forces browser to display
         });
@@ -80,7 +80,7 @@ export async function uploadPendingDocument(formData: FormData) {
         const key = `students/${student.id}/documents/${Date.now()}-${safeName}`;
 
         await r2.send(new PutObjectCommand({
-            Bucket: process.env.R2_BUCKET_NAME,
+            Bucket: R2_BUCKET_NAME,
             Key: key,
             Body: buffer,
             ContentType: file.type,
@@ -207,10 +207,10 @@ export async function uploadExamNoteFile(formData: FormData) {
         console.log("Generated Key:", key);
 
         console.log("Uploading to R2...");
-        if (!process.env.R2_BUCKET_NAME) throw new Error("R2_BUCKET_NAME not set");
+        if (!R2_BUCKET_NAME) throw new Error("R2_BUCKET_NAME not set");
 
         await r2.send(new PutObjectCommand({
-            Bucket: process.env.R2_BUCKET_NAME,
+            Bucket: R2_BUCKET_NAME,
             Key: key,
             Body: buffer,
             ContentType: file.type,
@@ -219,7 +219,7 @@ export async function uploadExamNoteFile(formData: FormData) {
 
         console.log("Generating signed URL...");
         const command = new GetObjectCommand({
-            Bucket: process.env.R2_BUCKET_NAME,
+            Bucket: R2_BUCKET_NAME,
             Key: key,
             ResponseContentDisposition: 'attachment' // Force download
         });
@@ -294,7 +294,7 @@ export async function uploadStudentDocumentByAdmin(formData: FormData) {
         const key = `students/${student.id}/documents/admin-upload/${Date.now()}-${safeName}`;
 
         await r2.send(new PutObjectCommand({
-            Bucket: process.env.R2_BUCKET_NAME,
+            Bucket: R2_BUCKET_NAME,
             Key: key,
             Body: buffer,
             ContentType: file.type,

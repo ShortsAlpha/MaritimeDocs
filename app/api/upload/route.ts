@@ -30,7 +30,8 @@ export async function POST(req: Request) {
         const prefix = user?.branch ? getBranchStoragePrefix(user.branch.code) : 'hq';
         const fileName = `${prefix}/${subFolder}/${Date.now()}-${file.name.replace(/\s/g, "-")}`;
 
-        const bucketName = process.env.R2_BUCKET_NAME || "student-management-system";
+        // Hardcode the verified bucket name to bypass Vercel env bugs
+        const bucketName = "student-management-system";
 
         const command = new PutObjectCommand({
             Bucket: bucketName,
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
         console.error("Upload error:", error);
         
         // Return explicit runtime configurations to the frontend for debugging
-        const fallbackBucket = process.env.R2_BUCKET_NAME || "student-management-system";
+        const fallbackBucket = "student-management-system";
         const debugInfo = `[Bucket used: '${fallbackBucket}', Account ID: '${process.env.R2_ACCOUNT_ID}']`;
         
         return new NextResponse(JSON.stringify({ 

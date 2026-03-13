@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { r2, deleteFileFromR2 } from "@/lib/r2";
+import { r2, deleteFileFromR2, R2_BUCKET_NAME } from "@/lib/r2";
 export { deleteFileFromR2 };
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -20,7 +20,7 @@ export async function getUploadUrl(filename: string, fileType: string, folder: s
         const key = `${branchFolder}/${uuidv4()}.${fileExtension}`;
 
         const command = new PutObjectCommand({
-            Bucket: process.env.R2_BUCKET_NAME,
+            Bucket: R2_BUCKET_NAME,
             Key: key,
             ContentType: fileType,
         });
@@ -115,7 +115,7 @@ export async function getDownloadUrl(fileUrl: string, options?: { inline?: boole
         const disposition = options?.inline ? 'inline' : `attachment; filename="${key.split('/').pop()}"`;
 
         const command = new GetObjectCommand({
-            Bucket: process.env.R2_BUCKET_NAME,
+            Bucket: R2_BUCKET_NAME,
             Key: key,
             ResponseContentDisposition: disposition,
         });

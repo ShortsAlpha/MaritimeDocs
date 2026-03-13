@@ -3,7 +3,7 @@
 import { db } from "@/lib/db"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
-import { r2, deleteFileFromR2, renameFolderInR2 } from "@/lib/r2"
+import { r2, deleteFileFromR2, renameFolderInR2, R2_BUCKET_NAME } from "@/lib/r2"
 import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { slugify } from "@/lib/utils"
@@ -371,7 +371,7 @@ export async function getSignedProfilePhotoUrl(storedUrl: string | null) {
     if (!storedUrl) return null;
     try {
         const publicUrl = process.env.R2_PUBLIC_URL || "";
-        const bucket = process.env.R2_BUCKET_NAME;
+        const bucket = R2_BUCKET_NAME;
 
         let key = "";
         if (storedUrl.startsWith(publicUrl)) {
@@ -413,7 +413,7 @@ export async function uploadProfilePhoto(formData: FormData) {
         const key = `${prefix}/students/${slugify(student.fullName)}/profile-${Date.now()}-${safeName}`;
 
         await r2.send(new PutObjectCommand({
-            Bucket: process.env.R2_BUCKET_NAME,
+            Bucket: R2_BUCKET_NAME,
             Key: key,
             Body: buffer,
             ContentType: file.type,

@@ -1,5 +1,7 @@
 import { S3Client, DeleteObjectCommand, ListObjectsV2Command, CopyObjectCommand, HeadObjectCommand, ListObjectsV2CommandOutput } from "@aws-sdk/client-s3";
 
+export const R2_BUCKET_NAME = "student-management-system";
+
 export const r2 = new S3Client({
     region: "auto",
     endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
@@ -34,7 +36,7 @@ export async function deleteFileFromR2(fileUrlOrKey: string) {
         console.log(`Deleting file from R2: ${key}`);
 
         await r2.send(new DeleteObjectCommand({
-            Bucket: process.env.R2_BUCKET_NAME,
+            Bucket: R2_BUCKET_NAME,
             Key: key,
         }));
         return true;
@@ -54,7 +56,7 @@ export async function renameFolderInR2(oldFolder: string, newFolder: string) {
         let continuationToken: string | undefined = undefined;
         do {
             const listCmd: ListObjectsV2Command = new ListObjectsV2Command({
-                Bucket: process.env.R2_BUCKET_NAME,
+                Bucket: R2_BUCKET_NAME,
                 Prefix: oldFolder,
                 ContinuationToken: continuationToken,
             });
@@ -74,18 +76,18 @@ export async function renameFolderInR2(oldFolder: string, newFolder: string) {
                     // However, we are using Bucket-relative source usually. R2/S3 is weird with CopySource.
                     // Best practice: Bucket/Key, where Key is encoded.
                     const encodedKey = oldKey.split('/').map(encodeURIComponent).join('/');
-                    const copySource = `${process.env.R2_BUCKET_NAME}/${encodedKey}`;
+                    const copySource = `${R2_BUCKET_NAME}/${encodedKey}`;
 
                     // Copy
                     await r2.send(new CopyObjectCommand({
-                        Bucket: process.env.R2_BUCKET_NAME,
+                        Bucket: R2_BUCKET_NAME,
                         CopySource: copySource,
                         Key: newKey,
                     }));
 
                     // Delete old
                     await r2.send(new DeleteObjectCommand({
-                        Bucket: process.env.R2_BUCKET_NAME,
+                        Bucket: R2_BUCKET_NAME,
                         Key: oldKey,
                     }));
                 }));
