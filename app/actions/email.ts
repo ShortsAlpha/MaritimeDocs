@@ -102,11 +102,8 @@ export async function sendStudentWelcomeEmail(studentId: string) {
         });
 
 
-        // Resolve Base URL dynamically
-        const headersList = await headers();
-        const host = headersList.get('host') || 'localhost:3000';
-        const protocol = headersList.get('x-forwarded-proto') || 'http';
-        const baseUrl = `${protocol}://${host}`;
+        // Resolve Base URL dynamically using env instead of headers() which throws in Server Actions
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://student.xoneacademy.com';
 
         const uploadLink = `${baseUrl}/upload/${token}`;
         console.log(`Attempting to send welcome email to: ${student.email}`);
@@ -160,11 +157,8 @@ export async function sendExamNotesEmail(studentId: string, courseName: string, 
             throw new Error("Student not found or no email");
         }
 
-        // Resolve Base URL
-        const headersList = await headers();
-        const host = headersList.get('host') || 'localhost:3000';
-        const protocol = headersList.get('x-forwarded-proto') || 'http';
-        const baseUrl = `${protocol}://${host}`;
+        // Resolve Base URL dynamically using env instead of headers() which throws in Server Actions
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://student.xoneacademy.com';
         console.log("Base URL resolved:", baseUrl);
 
         await resend.emails.send({
@@ -223,11 +217,8 @@ export async function sendDocumentRejectionEmail(studentId: string, documentTitl
             });
         }
 
-        // Resolve Base URL
-        const headersList = await headers();
-        const host = headersList.get('host') || 'localhost:3000';
-        const protocol = headersList.get('x-forwarded-proto') || 'http';
-        const baseUrl = `${protocol}://${host}`;
+        // Resolve Base URL dynamically using env instead of headers() which throws in Server Actions
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://student.xoneacademy.com';
 
         const uploadLink = `${baseUrl}/upload/${token}`;
 
@@ -273,11 +264,8 @@ export async function sendFeedbackEmail(studentId: string) {
             });
         }
 
-        // Resolve Base URL
-        const headersList = await headers();
-        const host = headersList.get('host') || 'localhost:3000';
-        const protocol = headersList.get('x-forwarded-proto') || 'http';
-        const baseUrl = `${protocol}://${host}`;
+        // Resolve Base URL dynamically using env instead of headers() which throws in Server Actions
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://student.xoneacademy.com';
 
         const feedbackLink = `${baseUrl}/feedback/${token}`;
 

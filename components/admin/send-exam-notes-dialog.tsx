@@ -35,21 +35,31 @@ export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { s
         }
 
         try {
-            // 1. Upload File
+            // 1. Upload File via standard API route (bypasses server action limits)
             const uploadFormData = new FormData();
             uploadFormData.append("file", file);
-            uploadFormData.append("studentId", studentId);
+            uploadFormData.append("subFolder", `students/${studentId}/exam-notes`);
 
-            const uploadRes = await uploadExamNoteFile(uploadFormData);
+            const uploadResponse = await fetch('/api/upload', {
+                method: 'POST',
+                body: uploadFormData,
+            });
 
-            if (!uploadRes.success || !uploadRes.url) {
-                toast.error("Failed to upload note");
+            if (!uploadResponse.ok) {
+                const errorData = await uploadResponse.json().catch(() => ({}));
+                throw new Error(errorData.error || "Failed to upload note");
+            }
+
+            const uploadRes = await uploadResponse.json();
+
+            if (!uploadRes.fileUrl) {
+                toast.error("Upload succeeded but no URL returned.");
                 setIsLoading(false);
                 return;
             }
 
             // 2. Send Email
-            const emailRes = await sendExamNotesEmail(studentId, course, uploadRes.url);
+            const emailRes = await sendExamNotesEmail(studentId, course, uploadRes.fileUrl);
 
             if (emailRes.success) {
                 toast.success("Lecture notes sent successfully!");
@@ -58,9 +68,9 @@ export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { s
             } else {
                 toast.error("Failed to send email");
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            toast.error("An unexpected error occurred");
+            toast.error(error.message || "An unexpected error occurred");
         } finally {
             setIsLoading(false);
         }
