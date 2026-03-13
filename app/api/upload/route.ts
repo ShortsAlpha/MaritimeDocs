@@ -58,7 +58,14 @@ export async function POST(req: Request) {
         });
     } catch (error: any) {
         console.error("Upload error:", error);
-        return new NextResponse(JSON.stringify({ error: error.message }), {
+        
+        // Return explicit runtime configurations to the frontend for debugging
+        const fallbackBucket = process.env.R2_BUCKET_NAME || "student-management-system";
+        const debugInfo = `[Bucket used: '${fallbackBucket}', Account ID: '${process.env.R2_ACCOUNT_ID}']`;
+        
+        return new NextResponse(JSON.stringify({ 
+            error: `${error.message || "Unknown S3 Error"} ${debugInfo}` 
+        }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });
