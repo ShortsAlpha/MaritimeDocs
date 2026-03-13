@@ -77,7 +77,6 @@ model Student {
   email       String?
   phone       String?
   address     String?
-  course      String?
   nationality String?
   dateOfBirth DateTime?
   
@@ -108,6 +107,7 @@ model Student {
   updatedAt   DateTime @updatedAt
 
   // Relations
+  courses     Course[] // Many-to-many relation for enrolled courses
   documents   StudentDocument[]
   documentNotes StudentDocumentNote[]
   payments    Payment[]
@@ -314,9 +314,12 @@ enum DocumentStatus {
 model DocumentType {
   id          String      @id @default(cuid())
   title       String
+  titleTr     String?     // Optional Turkish title
   description String?
+  descriptionTr String?   // Optional Turkish description
   category    DocCategory @default(STUDENT)
   isRequired  Boolean     @default(true)
+  exampleUrl  String?     // URL to an example document or template
   
   documents   StudentDocument[]
   instructorDocuments InstructorDocument[]
@@ -346,6 +349,7 @@ model StudentDocument {
 model Course {
   id        String   @id @default(cuid())
   title     String   @unique
+  titleTr   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
@@ -353,6 +357,7 @@ model Course {
   
   events    CourseEvent[]
   requiredDocuments CourseDocument[]
+  students  Student[]
 }
 
 model CourseDocument {

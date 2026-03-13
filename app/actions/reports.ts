@@ -27,7 +27,9 @@ export async function generateStudentReport(filters: ReportFilters) {
 
         // 1. Course Filter
         if (filters.course && filters.course.length > 0) {
-            where.course = { in: filters.course };
+            where.courses = { 
+                some: { title: { in: filters.course } } 
+            };
         }
 
         // 2. Intake Filter
@@ -59,6 +61,7 @@ export async function generateStudentReport(filters: ReportFilters) {
             where,
             include: {
                 payments: true,
+                courses: true,
                 intake: true
             },
             orderBy: { createdAt: 'desc' }
@@ -89,7 +92,7 @@ export async function generateStudentReport(filters: ReportFilters) {
                 "Email": s.email || '',
                 "Phone": s.phone || '',
                 "Nationality": s.nationality || '',
-                "Course": s.course || '',
+                "Course": s.courses?.[0]?.title || 'General',
                 "Intake": s.intake?.name || '',
                 "Status": s.status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
                 "Register Date": s.createdAt.toISOString().split('T')[0],
@@ -116,7 +119,7 @@ export async function exportFeedbackReportExcel() {
                 student: {
                     select: {
                         fullName: true,
-                        course: true,
+                        courses: { select: { title: true } },
                     }
                 }
             },
@@ -158,7 +161,7 @@ export async function exportFeedbackReportExcel() {
             const row = worksheet.addRow({
                 date: f.createdAt.toISOString().split('T')[0],
                 studentName: f.student.fullName,
-                course: f.courseAttended || f.student.course || "N/A",
+                course: f.courseAttended || f.student.courses?.[0]?.title || "N/A",
                 source: f.source || "N/A",
                 reg: f.registrationProcess,
                 prac: f.practicalStandards,
@@ -231,7 +234,7 @@ export async function exportPaymentReportExcel(dateRange?: { from?: Date; to?: D
                 student: {
                     select: {
                         fullName: true,
-                        course: true,
+                        courses: { select: { title: true } },
                         studentNumber: true
                     }
                 }
@@ -275,7 +278,7 @@ export async function exportPaymentReportExcel(dateRange?: { from?: Date; to?: D
                 date: p.date.toISOString().split('T')[0],
                 student: p.student.fullName,
                 studentNo: p.student.studentNumber || '-',
-                course: p.student.course || '-',
+                course: p.student.courses?.[0]?.title || "General",
                 amount: amt,
                 method: p.method,
                 note: p.note || ''

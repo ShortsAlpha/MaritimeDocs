@@ -72,20 +72,46 @@ const getEmailTemplate = (title: string, content: string, baseUrl: string, cta?:
     `;
 };
 
-export async function sendStudentWelcomeEmail(studentId: string) {
+export async function sendStudentWelcomeEmail(studentId: string, courseId?: string) {
     try {
-        const student = await db.student.findUnique({ where: { id: studentId } });
+        const student = await db.student.findUnique({ 
+            where: { id: studentId },
+            include: {
+                courses: {
+                    include: {
+                        requiredDocuments: {
+                            include: { documentType: true }
+                        }
+                    }
+                }
+            }
+        });
+        
         if (!student || !student.email) throw new Error("Student not found or no email");
 
-        // Fetch required documents dynamically
-        const requiredDocs = await db.documentType.findMany({
-            where: { isRequired: true },
-            select: { title: true }
-        });
+        // Fetch required documents dynamically based on enrolled courses
+        const requiredDocsMap = new Map<string, { title: string, exampleUrl: string | null }>();
+        
+        if (student.courses) {
+            student.courses.forEach((course: any) => {
+                if (!courseId || course.id === courseId) {
+                    if (course.requiredDocuments) {
+                        course.requiredDocuments.forEach((reqDoc: any) => {
+                            const dt = reqDoc.documentType;
+                            if (dt.isRequired && !requiredDocsMap.has(dt.id)) {
+                                requiredDocsMap.set(dt.id, { title: dt.title, exampleUrl: dt.exampleUrl });
+                            }
+                        });
+                    }
+                }
+            });
+        }
+        
+        const requiredDocs = Array.from(requiredDocsMap.values());
 
         const docListHtml = requiredDocs.length > 0
-            ? `<ul>${requiredDocs.map(doc => `<li>${doc.title}</li>`).join('')}</ul>`
-            : '';
+            ? `<ul>${requiredDocs.map(doc => `<li><strong>${doc.title}</strong>${doc.exampleUrl ? ` <em>(<a href="${doc.exampleUrl}" style="color: #2563eb; text-decoration: underline;">Download Example Template</a>)</em>` : ''}</li>`).join('')}</ul>`
+            : '<p><em>No specific documents required at this time.</em></p>';
 
         // Generate Token
         const token = uuidv4();

@@ -78,7 +78,8 @@ export async function createFeedback(formData: FormData) {
         }
 
         const student = await db.student.findUnique({
-            where: { feedbackToken: data.token }
+            where: { feedbackToken: data.token },
+            include: { courses: true }
         })
 
         if (!student) {
@@ -101,7 +102,7 @@ export async function createFeedback(formData: FormData) {
                 learningEffectiveness: data.learningEffectiveness,
 
                 recommend: data.recommend,
-                courseAttended: student.course || "Unknown",
+                courseAttended: student.courses?.[0]?.title || "Unknown",
                 comment: data.comment,
             }
         })

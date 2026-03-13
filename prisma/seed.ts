@@ -169,7 +169,7 @@ async function main() {
                 phone: `+${randomInt(10, 99)} ${randomInt(100, 999)} ${randomInt(1000, 9999)}`,
                 nationality: country,
                 address: `${randomInt(1, 999)} Some Street, Some City`,
-                course: course.title,
+                courses: { connect: [{ id: course.id }] },
                 status: status,
                 totalFee: totalFee,
                 intakeId: intake.id,

@@ -5,10 +5,10 @@ import { revalidatePath } from "next/cache"
 import { StudentStatus } from "@prisma/client"
 import { sendStudentWelcomeEmail, sendExamNotesEmail } from "@/app/actions/email"
 
-export async function sendDocumentRequest(studentId: string) {
+export async function sendDocumentRequest(studentId: string, courseId?: string) {
     try {
         // Use the existing email action which handles token generation and template
-        const emailResult = await sendStudentWelcomeEmail(studentId)
+        const emailResult = await sendStudentWelcomeEmail(studentId, courseId)
 
         if (!emailResult.success) {
             console.warn("⚠️ Email failed to send (likely due to Resend free tier limits), but updating status for demo purposes:", emailResult.message)
@@ -39,14 +39,14 @@ export async function sendLectureNotes(studentId: string) {
     try {
         const student = await db.student.findUnique({
             where: { id: studentId },
-            select: { course: true }
+            include: { courses: true }
         })
 
         // Use the existing email action
         // Note: We might want to pass a real notes URL if available in the future
         const emailResult = await sendExamNotesEmail(
             studentId,
-            student?.course || "Maritime Course",
+            student?.courses?.[0]?.title || "Maritime Course",
             "https://xone.academy/portal/notes" // Placeholder or real URL
         )
 

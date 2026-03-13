@@ -125,7 +125,9 @@ async function main() {
                 studentNumber: `26${randomInt(1000, 9999)}`, // 26XXXX format
                 nationality: randomElement(COUNTRIES),
                 status: status,
-                course: course.title, // Store snapshot
+                courses: {
+                    connect: [{ id: course.id }]
+                }, // Store relation
                 intakeId: intake.id,
                 totalFee: totalFee,
                 address: "Sample Address No: " + (i + 1),

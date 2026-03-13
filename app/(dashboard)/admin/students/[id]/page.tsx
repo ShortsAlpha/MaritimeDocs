@@ -9,6 +9,7 @@ import { format, differenceInYears } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { DeleteStudentButton } from "@/components/admin/delete-student-button";
 import { EditableField } from "@/components/admin/editable-field";
+import { StudentCoursesEdit } from "@/components/admin/student-courses-edit";
 import { StudentStatusSelect } from "@/components/admin/student-status-select";
 
 
@@ -39,7 +40,10 @@ export default async function StudentDetailPage({
             documents: { include: { documentType: true } },
             payments: { orderBy: { date: "desc" } },
             feedbacks: { orderBy: { createdAt: "desc" } },
-            intake: true
+            intake: true,
+            courses: {
+                include: { requiredDocuments: true }
+            }
         }
     });
 
@@ -85,7 +89,16 @@ export default async function StudentDetailPage({
                     />
 
                     <div className="min-w-0 flex-1 pt-1">
-                        <h1 className="text-xl sm:text-3xl font-bold tracking-tight truncate break-words mb-2">{student.fullName}</h1>
+                        <h1 className="text-xl sm:text-3xl font-bold tracking-tight truncate break-words mb-1">{student.fullName}</h1>
+                        <div className="flex flex-col gap-1 mb-2">
+                            {student.courses?.length > 0 ? (
+                                student.courses.map(course => (
+                                    <span key={course.id} className="text-sm font-medium text-primary uppercase">
+                                        {course.title}
+                                    </span>
+                                ))
+                            ) : null}
+                        </div>
                         <div className="flex flex-wrap gap-x-4 gap-y-1 text-muted-foreground">
                             <div className="flex items-center gap-2 min-w-0">
                                 <Mail className="h-3.5 w-3.5 shrink-0" />
@@ -99,7 +112,6 @@ export default async function StudentDetailPage({
                     </div>
                 </div>
 
-                {/* Right Section: Actions & Status */}
                 {/* Right Section: Actions & Status */}
                 <div className="flex flex-col gap-3 md:gap-4 w-full xl:w-auto">
                     {/* Row 1: Status & Balance */}
@@ -124,10 +136,10 @@ export default async function StudentDetailPage({
 
                     {/* Row 2: Quick Actions (Responsive Grid) */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
-                        <SendWelcomeEmailButton studentId={student.id} />
+                        <SendWelcomeEmailButton studentId={student.id} courses={student.courses?.map(c => ({ id: c.id, title: c.title }))} />
                         <SendExamNotesDialog
                             studentId={student.id}
-                            courseName={student.course || ""}
+                            courseName={student.courses?.[0]?.title || ""}
                             courses={courses}
                         />
                         <SendFeedbackEmailButton studentId={student.id} />
@@ -155,26 +167,26 @@ export default async function StudentDetailPage({
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="grid gap-1">
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-3 p-2">
                                         <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                                             <Hash className="h-4 w-4 text-primary" />
                                         </div>
                                         <div className="flex-1">
-                                            <div className="flex flex-col gap-1">
-                                                <span className="text-xs text-muted-foreground">Student Number</span>
-                                                <span className="text-sm font-medium">{student.studentNumber || "Not Assigned"}</span>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-medium text-muted-foreground">Student Number</span>
+                                                <span className="text-sm font-semibold">{student.studentNumber || "Not Assigned"}</span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-3 p-2">
                                         <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                                             <Calendar className="h-4 w-4 text-primary" />
                                         </div>
                                         <div className="flex-1">
-                                            <div className="flex flex-col gap-1">
-                                                <span className="text-xs text-muted-foreground">Intake Period</span>
-                                                <span className="text-sm font-medium">{student.intake?.name || "No Intake Assigned"}</span>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-medium text-muted-foreground">Intake Period</span>
+                                                <span className="text-sm font-semibold">{student.intake?.name || "No Intake Assigned"}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -278,6 +290,19 @@ export default async function StudentDetailPage({
                                                 label="Nationality"
                                                 name="nationality"
                                                 value={student.nationality}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                            <Calendar className="h-4 w-4 text-primary" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <StudentCoursesEdit
+                                                studentId={student.id}
+                                                currentCourses={student.courses}
+                                                allCourses={courses}
                                             />
                                         </div>
                                     </div>

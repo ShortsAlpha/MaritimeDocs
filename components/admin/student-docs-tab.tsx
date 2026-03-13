@@ -16,6 +16,12 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import {
+    Tabs,
+    TabsContent,
+    TabsList,
+    TabsTrigger,
+} from "@/components/ui/tabs";
 import { FileText, Download, Trash2, CloudUpload, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
@@ -49,6 +55,11 @@ interface StudentDocsTabProps {
     student: {
         id: string;
         documents: StudentDocument[];
+        courses?: {
+            id: string;
+            title: string;
+            requiredDocuments?: { documentTypeId: string }[];
+        }[];
     };
     docTypes: DocumentType[];
 }
@@ -61,6 +72,8 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
     const [uploadDocTypeId, setUploadDocTypeId] = useState<string | null>(null);
 
     const categories = ["OFFICE", "STUDENT", "MEDICAL", "CERTIFICATE"];
+    const courses = student.courses || [];
+    const defaultTab = courses.length > 0 ? courses[0].id : "general";
 
     async function handlePreview(doc: StudentDocument) {
         setLoadingPreview(true);
@@ -88,10 +101,20 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
         setDeletingId(null);
     }
 
-    return (
-        <div className="space-y-8">
+    const renderDocumentCategories = (courseId?: string) => (
+        <div className="space-y-8 mt-4">
             {categories.map((category) => {
-                const categoryTypes = docTypes.filter((dt) => dt.category === category);
+                let categoryTypes = docTypes.filter((dt) => dt.category === category);
+                
+                // If a specific course is selected, filter the docTypes based on its requiredDocuments
+                if (courseId && courseId !== "general") {
+                    const currentCourse = courses.find(c => c.id === courseId);
+                    if (currentCourse && currentCourse.requiredDocuments) {
+                        const requiredDocTypeIds = currentCourse.requiredDocuments.map(rd => rd.documentTypeId);
+                        categoryTypes = categoryTypes.filter(dt => requiredDocTypeIds.includes(dt.id));
+                    }
+                }
+
                 if (categoryTypes.length === 0) return null;
 
                 const categoryName = category.charAt(0) + category.slice(1).toLowerCase() + " Documents";
@@ -278,6 +301,35 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
                     </div>
                 );
             })}
+        </div>
+    );
+
+    return (
+        <div className="space-y-6">
+            <Tabs defaultValue={defaultTab} className="w-full">
+                <TabsList className="flex flex-wrap h-auto w-full justify-start mb-2">
+                    {courses.length === 0 && (
+                        <TabsTrigger value="general">General</TabsTrigger>
+                    )}
+                    {courses.map(course => (
+                        <TabsTrigger key={course.id} value={course.id} className="text-xs sm:text-sm">
+                            {course.title}
+                        </TabsTrigger>
+                    ))}
+                </TabsList>
+
+                {courses.length === 0 ? (
+                    <TabsContent value="general">
+                        {renderDocumentCategories("general")}
+                    </TabsContent>
+                ) : (
+                    courses.map(course => (
+                        <TabsContent key={course.id} value={course.id}>
+                            {renderDocumentCategories(course.id)}
+                        </TabsContent>
+                    ))
+                )}
+            </Tabs>
 
             {/* Preview Dialog */}
             <Dialog open={!!selectedDoc} onOpenChange={(open) => !open && setSelectedDoc(null)}>

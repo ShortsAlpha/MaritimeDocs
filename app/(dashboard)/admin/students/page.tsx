@@ -39,8 +39,6 @@ export default async function AdminStudentsPage(props: Props) {
 
     if (sort === 'country') {
         orderBy = { nationality: order };
-    } else if (sort === 'course') {
-        orderBy = { course: order };
     } else if (sort === 'status') {
         orderBy = { status: order };
     }
@@ -63,7 +61,7 @@ export default async function AdminStudentsPage(props: Props) {
     }
 
     if (courseFilter && courseFilter !== 'all') {
-        where.course = courseFilter;
+        where.courses = { some: { title: courseFilter } };
     }
     if (nationalityFilter && nationalityFilter !== 'all') {
         where.nationality = nationalityFilter;
@@ -87,7 +85,10 @@ export default async function AdminStudentsPage(props: Props) {
     ] = await Promise.all([
         db.student.findMany({
             where,
-            include: { payments: true },
+            include: { 
+                payments: true,
+                courses: { select: { title: true } } 
+            },
             orderBy,
             skip,
             take: pageSize
@@ -153,7 +154,11 @@ export default async function AdminStudentsPage(props: Props) {
                                     <div className="flex justify-between items-start">
                                         <div className="flex flex-col gap-1">
                                             <span className="font-semibold">{student.fullName}</span>
-                                            <span className="text-xs text-muted-foreground">{student.course || 'General'}</span>
+                                            <span className="text-xs text-muted-foreground">
+                                                {student.courses?.length > 0
+                                                    ? student.courses.map((c: any) => c.title).join(", ")
+                                                    : <span className="text-muted-foreground italic">General</span>}
+                                            </span>
                                         </div>
                                         <Badge variant={balance > 0 ? "destructive" : "secondary"} className="shrink-0">
                                             €{balance.toLocaleString()}
@@ -204,13 +209,7 @@ export default async function AdminStudentsPage(props: Props) {
                                         />
                                     </TableHead>
                                     <TableHead>
-                                        <SortableHeader
-                                            column="course"
-                                            currentSort={sort}
-                                            currentOrder={order}
-                                            label="Course Name"
-                                            searchParams={searchParams}
-                                        />
+                                        Course(s)
                                     </TableHead>
                                     <TableHead>
                                         <SortableHeader
@@ -263,9 +262,9 @@ export default async function AdminStudentsPage(props: Props) {
                                                 {student.nationality || '-'}
                                             </TableCell>
                                             <TableCell>
-                                                <div className="max-w-[160px] lg:max-w-[280px] xl:max-w-[400px]" title={student.course || 'General'}>
+                                                <div className="max-w-[160px] lg:max-w-[280px] xl:max-w-[400px]" title={student.courses?.map(c => c.title).join(", ") || 'General'}>
                                                     <Badge variant="outline" className="font-normal max-w-full">
-                                                        <span className="truncate">{student.course || 'General'}</span>
+                                                        <span className="truncate">{student.courses?.map(c => c.title).join(", ") || 'General'}</span>
                                                     </Badge>
                                                 </div>
                                             </TableCell>

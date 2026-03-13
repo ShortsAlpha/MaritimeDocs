@@ -56,7 +56,7 @@ const StudentSchema = z.object({
     fullName: z.string().min(2, "Name is too short"),
     email: z.string().email().optional().or(z.literal("")),
     phone: z.string().optional(),
-    course: z.string().optional(),
+    courses: z.array(z.string()).optional(),
     totalFee: z.coerce.number().min(0, "Fee must be positive"),
     status: z.nativeEnum(StudentStatus).optional(),
     address: z.string().optional(),
@@ -64,7 +64,7 @@ const StudentSchema = z.object({
     certificateExpiryDate: z.string().optional().or(z.literal("")),
     nationality: z.string().optional(),
     dateOfBirth: z.string().optional().or(z.literal("")),
-    intakeId: z.string().optional(),
+    intakeId: z.string().optional().or(z.literal("")), // Accept explicit intakeId
 })
 
 export async function createStudent(prevState: any, formData: FormData) {
@@ -72,11 +72,24 @@ export async function createStudent(prevState: any, formData: FormData) {
         const branch = await getCurrentUserBranch()
         if (!branch) return { success: false, message: "Unauthorized" }
 
+        // Form data 'courses' might be a JSON string if using a multi-select component, 
+        // or multiple form values if standard HTML multi-select. 
+        // We'll parse it as JSON if it looks like an array, or just string array.
+        let parsedCourses: string[] = [];
+        const coursesString = formData.get("courses") as string;
+        if (coursesString) {
+            try {
+                parsedCourses = JSON.parse(coursesString);
+            } catch {
+                parsedCourses = [coursesString]; // Fallback in case a single string is passed
+            }
+        }
+
         const rowData = {
             fullName: formData.get("fullName"),
             email: formData.get("email"),
             phone: formData.get("phone"),
-            course: formData.get("course"),
+            courses: parsedCourses,
             totalFee: formData.get("totalFee"),
             nationality: formData.get("nationality"),
             dateOfBirth: formData.get("dateOfBirth"),
@@ -94,12 +107,14 @@ export async function createStudent(prevState: any, formData: FormData) {
                 studentNumber: studentNumber,
                 email: data.email || null,
                 phone: data.phone || null,
-                course: data.course || null,
                 totalFee: data.totalFee,
                 nationality: data.nationality || null,
                 dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
                 intakeId: data.intakeId || null,
                 branchId: branch.branchId,
+                courses: data.courses && data.courses.length > 0 ? {
+                    connect: data.courses.map(id => ({ id }))
+                } : undefined
             }
         })
 
@@ -180,6 +195,18 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
         }
         if (data.certificateExpiryDate) {
             additionalData.certificateExpiryDate = new Date(data.certificateExpiryDate)
+        }
+
+        const coursesData = formData.get("courses")
+        if (coursesData && typeof coursesData === "string") {
+            try {
+                const courseIds: string[] = JSON.parse(coursesData)
+                additionalData.courses = {
+                    set: courseIds.map(id => ({ id }))
+                }
+            } catch (e) {
+                console.error("Failed to parse courses", e)
+            }
         }
 
         const COMPLETED_STATUSES = ["COURSE_COMPLETED", "CERTIFICATE_APPLIED", "CERTIFICATE_SHIPPED"];
