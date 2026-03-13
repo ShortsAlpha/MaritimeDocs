@@ -6,6 +6,8 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getBranchStoragePrefix } from "@/lib/branch";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
     try {
         const { userId } = await auth();
@@ -29,12 +31,16 @@ export async function POST(req: Request) {
         const prefix = user?.branch ? getBranchStoragePrefix(user.branch.code) : 'hq';
         const fileName = `${prefix}/${subFolder}/${Date.now()}-${file.name.replace(/\s/g, "-")}`;
 
+        const bucketName = process.env.R2_BUCKET_NAME || "student-management-system";
+
         const command = new PutObjectCommand({
-            Bucket: process.env.R2_BUCKET_NAME,
+            Bucket: bucketName,
             Key: fileName,
             Body: buffer,
             ContentType: file.type,
         });
+
+        console.log("DEBUG /api/upload -> Bucket:", bucketName, "Account:", process.env.R2_ACCOUNT_ID);
 
         await r2.send(command);
 

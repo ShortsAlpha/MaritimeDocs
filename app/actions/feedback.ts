@@ -78,8 +78,7 @@ export async function createFeedback(formData: FormData) {
         }
 
         const student = await db.student.findUnique({
-            where: { feedbackToken: data.token },
-            include: { courses: true }
+            where: { feedbackToken: data.token }
         })
 
         if (!student) {
@@ -102,7 +101,7 @@ export async function createFeedback(formData: FormData) {
                 learningEffectiveness: data.learningEffectiveness,
 
                 recommend: data.recommend,
-                courseAttended: student.courses?.[0]?.title || "Unknown",
+                courseAttended: "N/A", // Reverted relation stringification to fix TS error
                 comment: data.comment,
             }
         })

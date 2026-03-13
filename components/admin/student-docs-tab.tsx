@@ -101,26 +101,29 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
         setDeletingId(null);
     }
 
-    const renderDocumentCategories = (courseId?: string) => (
-        <div className="space-y-8 mt-4">
-            {categories.map((category) => {
-                let categoryTypes = docTypes.filter((dt) => dt.category === category);
-                
-                // If a specific course is selected, filter the docTypes based on its requiredDocuments
-                if (courseId && courseId !== "general") {
-                    const currentCourse = courses.find(c => c.id === courseId);
-                    if (currentCourse && currentCourse.requiredDocuments) {
-                        const requiredDocTypeIds = currentCourse.requiredDocuments.map(rd => rd.documentTypeId);
-                        categoryTypes = categoryTypes.filter(dt => requiredDocTypeIds.includes(dt.id));
-                    }
+    const renderDocumentCategories = (courseId?: string) => {
+        let hasAnyDocs = false;
+        const renderedCategories = categories.map((category) => {
+            let categoryTypes = docTypes.filter((dt) => dt.category === category);
+            
+            // Filter the docTypes based on its requiredDocuments
+            if (courseId) {
+                const currentCourse = courses.find(c => c.id === courseId);
+                if (currentCourse && currentCourse.requiredDocuments && currentCourse.requiredDocuments.length > 0) {
+                    const requiredDocTypeIds = currentCourse.requiredDocuments.map(rd => rd.documentTypeId);
+                    categoryTypes = categoryTypes.filter(dt => requiredDocTypeIds.includes(dt.id));
+                } else if (currentCourse && (!currentCourse.requiredDocuments || currentCourse.requiredDocuments.length === 0)) {
+                    categoryTypes = []; // Force empty if no mappings exist
                 }
+            }
 
-                if (categoryTypes.length === 0) return null;
+            if (categoryTypes.length === 0) return null;
+            hasAnyDocs = true;
 
-                const categoryName = category.charAt(0) + category.slice(1).toLowerCase() + " Documents";
+            const categoryName = category.charAt(0) + category.slice(1).toLowerCase() + " Documents";
 
-                return (
-                    <div key={category} className="space-y-2 md:space-y-4 overflow-hidden w-full">
+            return (
+                <div key={category} className="space-y-2 md:space-y-4 overflow-hidden w-full">
                         <div className="flex items-center justify-between">
                             <h3 className="text-sm md:text-lg font-semibold tracking-tight">{categoryName}</h3>
                         </div>
@@ -300,17 +303,28 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
                         </div>
                     </div>
                 );
-            })}
-        </div>
-    );
+            });
+
+        if (!hasAnyDocs) {
+            return (
+                <div className="p-8 mt-4 text-center border border-dashed rounded-lg bg-muted/20 text-muted-foreground flex flex-col items-center justify-center gap-3">
+                    <FileText className="h-8 w-8 text-muted-foreground/50" />
+                    <div>
+                        <h3 className="font-medium text-foreground">No Requirements Mapped</h3>
+                        <p className="text-sm mt-1">This course does not have any specific document requirements defined in the database.</p>
+                        <p className="text-sm mt-1">Please ask an administrator to add required documents for this course.</p>
+                    </div>
+                </div>
+            );
+        }
+
+        return <div className="space-y-8 mt-4">{renderedCategories}</div>;
+    };
 
     return (
         <div className="space-y-6">
             <Tabs defaultValue={defaultTab} className="w-full">
                 <TabsList className="flex flex-wrap h-auto w-full justify-start mb-2">
-                    {courses.length === 0 && (
-                        <TabsTrigger value="general">General</TabsTrigger>
-                    )}
                     {courses.map(course => (
                         <TabsTrigger key={course.id} value={course.id} className="text-xs sm:text-sm">
                             {course.title}
@@ -319,9 +333,9 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
                 </TabsList>
 
                 {courses.length === 0 ? (
-                    <TabsContent value="general">
-                        {renderDocumentCategories("general")}
-                    </TabsContent>
+                    <div className="p-8 mt-4 text-center border border-dashed rounded-lg bg-muted/20 text-muted-foreground">
+                        No courses enrolled. Enroll the student in a course to manage documents.
+                    </div>
                 ) : (
                     courses.map(course => (
                         <TabsContent key={course.id} value={course.id}>

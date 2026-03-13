@@ -143,26 +143,44 @@ export default async function AdminPage() {
     });
 
     // 7. Fetch Expiring Certificates (Next 30 Days)
-    const expiringStudents = await db.student.findMany({
+    const expiringDocs = await db.studentDocument.findMany({
         where: {
-            certificateExpiryDate: {
+            expiryDate: {
                 gte: new Date(),
                 lte: addDays(new Date(), 30)
             },
-            ...branchFilter
+            status: "APPROVED",
+            documentType: {
+                category: "CERTIFICATE"
+            },
+            ...(shouldFilterByBranch(branch) ? { student: { branchId: branch!.branchId } } : {})
         },
-        select: {
-            id: true,
-            fullName: true,
-            email: true,
-            phone: true,
-            certificateExpiryDate: true
+        include: {
+            student: {
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                    phone: true
+                }
+            },
+            documentType: {
+                select: { title: true }
+            }
         },
         orderBy: {
-            certificateExpiryDate: 'asc'
+            expiryDate: 'asc'
         },
         take: 10
-    } as any);
+    });
+
+    const expiringStudents = expiringDocs.map(doc => ({
+        id: doc.student.id,
+        fullName: `${doc.student.fullName} (${doc.documentType.title})`,
+        email: doc.student.email,
+        phone: doc.student.phone,
+        certificateExpiryDate: doc.expiryDate
+    }));
 
     return (
         <div className="p-6 space-y-8">
