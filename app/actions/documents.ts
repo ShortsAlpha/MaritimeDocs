@@ -125,6 +125,13 @@ export async function getStudentByToken(token: string) {
             documents: {
                 include: { documentType: true },
                 orderBy: { createdAt: 'desc' }
+            },
+            courses: {
+                include: {
+                    requiredDocuments: {
+                        include: { documentType: true }
+                    }
+                }
             }
         }
     });
@@ -139,6 +146,42 @@ export async function getPublicDocumentTypes() {
     return await db.documentType.findMany({
         where: { isRequired: true },
     });
+}
+
+/** Returns deduplicated document types required by the student's enrolled courses */
+export async function getPublicDocumentTypesForStudent(studentId: string) {
+    // Get all courses the student is enrolled in, with their required documents
+    const student = await db.student.findUnique({
+        where: { id: studentId },
+        include: {
+            courses: {
+                include: {
+                    requiredDocuments: {
+                        include: { documentType: true }
+                    }
+                }
+            }
+        }
+    });
+
+    if (!student || student.courses.length === 0) {
+        // Fallback to global required if student has no courses
+        return await db.documentType.findMany({
+            where: { isRequired: true },
+        });
+    }
+
+    // Collect all document types from all enrolled courses, deduplicated
+    const docTypeMap = new Map<string, any>();
+    for (const course of student.courses) {
+        for (const rd of course.requiredDocuments) {
+            if (!docTypeMap.has(rd.documentType.id)) {
+                docTypeMap.set(rd.documentType.id, rd.documentType);
+            }
+        }
+    }
+
+    return Array.from(docTypeMap.values());
 }
 
 export async function approveDocument(docId: string) {

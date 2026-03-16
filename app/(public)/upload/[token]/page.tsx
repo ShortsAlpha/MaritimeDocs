@@ -1,4 +1,4 @@
-import { getStudentByToken, getPublicDocumentTypes, uploadPendingDocument } from "@/app/actions/documents";
+import { getStudentByToken, getPublicDocumentTypesForStudent, uploadPendingDocument } from "@/app/actions/documents";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -28,7 +28,7 @@ export default async function UploadPage({ params }: { params: Promise<{ token: 
         );
     }
 
-    const docTypes = await getPublicDocumentTypes();
+    const docTypes = await getPublicDocumentTypesForStudent(student.id);
     const existingDocs = student.documents;
 
     return (
