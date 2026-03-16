@@ -35,7 +35,7 @@ export default async function UploadPage({ params }: { params: Promise<{ token: 
     const progressPercent = totalDocs > 0 ? Math.round((completedDocs / totalDocs) * 100) : 0;
 
     return (
-        <div className="bg-neutral-950" style={{ minHeight: '100dvh', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+        <div className="bg-neutral-950 pb-12">
             {/* Header */}
             <div className="sticky top-0 z-10 bg-neutral-950/80 backdrop-blur-xl border-b border-neutral-800/50">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
