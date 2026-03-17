@@ -98,7 +98,7 @@ export async function sendStudentWelcomeEmail(studentId: string, courseId?: stri
                     if (course.requiredDocuments) {
                         course.requiredDocuments.forEach((reqDoc: any) => {
                             const dt = reqDoc.documentType;
-                            if (dt.isRequired && !requiredDocsMap.has(dt.id)) {
+                            if (!requiredDocsMap.has(dt.id)) {
                                 requiredDocsMap.set(dt.id, { title: dt.title, exampleUrl: dt.exampleUrl });
                             }
                         });
