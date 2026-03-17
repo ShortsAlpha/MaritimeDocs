@@ -145,6 +145,10 @@ export async function sendStudentWelcomeEmail(studentId: string, courseId?: stri
                 <p>Welcome aboard! We are excited to have you join us at Xone Superyacht Academy.</p>
                 <p>To finalize your enrollment and ensure a smooth start, we require you to upload the following essential documents:</p>
                 ${docListHtml}
+                <br />
+                <p><strong>Sea Service Requirements:</strong></p>
+                <p style="font-size: 14px; color: #555;">Please note the sea service requirements below (required for the certification phase, not to attend the course):</p>
+                <img src="${baseUrl}/api/download?key=mail-example-documents/seaservice.png" alt="Sea Service Requirements" style="max-width: 100%; height: auto; border-radius: 8px; margin: 10px 0 20px 0; border: 1px solid #eaeaea;" />
                 <p>Please click the button below to access your secure upload portal. This link is valid for <strong>7 days</strong>.</p>`,
                 baseUrl,
                 { text: 'Upload Documents Securely', url: uploadLink }

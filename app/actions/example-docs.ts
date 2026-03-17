@@ -22,14 +22,28 @@ export async function getExampleDocuments() {
         
         if (!response.Contents) return [];
 
+        const friendlyNames: Record<string, string> = {
+            "Candidate Registration Form Malta Version.pdf": "Candidate Registration Form",
+            "IYT waiver-and-release-form (2) (3).pdf": "IYT Waiver And Release Form",
+            "Training Agreement (1).pdf": "Training Agreement",
+            "candidate_sea_time_form (1) (1) (1) (3).pdf": "Candidate Sea Time Form",
+            "how to iyt registration (4).pdf": "How to Register IYT",
+            "moy-student-acknowlge-course-completion-and-submission-time-limits-Rev2.pdf": "Moy Student Acknowlge Course Completion And Submission Time Limits"
+        };
+
         // Return the clean file names and their keys
         return response.Contents
-            .filter(item => item.Key && item.Key !== "mail-example-documents/") // exclude the folder itself
+            .filter(item => 
+                item.Key && 
+                item.Key !== "mail-example-documents/" && 
+                !item.Key.endsWith(".png") && 
+                !item.Key.endsWith(".jpg")
+            )
             .map(item => {
                 const parts = item.Key!.split('/');
                 const fileName = parts[parts.length - 1];
                 return {
-                    name: fileName,
+                    name: friendlyNames[fileName] || fileName,
                     key: item.Key!
                 };
             });
