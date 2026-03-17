@@ -133,17 +133,11 @@
 
   html {
     background-color: #000000;
-    overflow-x: hidden;
-    width: 100%;
   }
 
   body {
     @apply bg-background text-foreground;
     background-color: #000000;
-    /* Force black for overscroll */
-    overscroll-behavior-y: none;
     overflow-x: hidden;
-    width: 100%;
-    /* Optional: simpler wipe effect */
   }
 }

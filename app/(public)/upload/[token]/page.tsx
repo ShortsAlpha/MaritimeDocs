@@ -1,6 +1,7 @@
-import { getStudentByToken, getPublicDocumentTypesForStudent, uploadPendingDocument } from "@/app/actions/documents";
+import { getStudentByToken, getPublicDocumentTypesForStudent } from "@/app/actions/documents";
+import { getExampleDocuments } from "@/app/actions/example-docs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, UploadCloud, XCircle, FileText, ShieldCheck } from "lucide-react";
+import { CheckCircle2, UploadCloud, XCircle, FileText, ShieldCheck, Download } from "lucide-react";
 import { UploadForm } from "./upload-form";
 
 export default async function UploadPage({ params }: { params: Promise<{ token: string }> }) {
@@ -25,6 +26,7 @@ export default async function UploadPage({ params }: { params: Promise<{ token: 
 
     const docTypes = await getPublicDocumentTypesForStudent(student.id);
     const existingDocs = student.documents;
+    const exampleDocs = await getExampleDocuments();
 
     // Calculate progress
     const totalDocs = docTypes.length;
@@ -72,8 +74,38 @@ export default async function UploadPage({ params }: { params: Promise<{ token: 
                 </div>
             </div>
 
-            {/* Documents Grid */}
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+                
+                {/* Example Documents Section */}
+                {exampleDocs.length > 0 && (
+                    <div className="mb-8">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Download className="w-5 h-5 text-indigo-400" />
+                            <h2 className="text-lg font-bold text-white">Forms & Templates</h2>
+                        </div>
+                        <p className="text-sm text-neutral-400 mb-4">Download and fill out these templates before uploading them below.</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                            {exampleDocs.map((doc, idx) => (
+                                <a 
+                                    key={idx}
+                                    href={`/api/download?key=${encodeURIComponent(doc.key)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-3 p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/20 hover:bg-indigo-500/20 hover:border-indigo-500/30 transition-colors group"
+                                >
+                                    <div className="shrink-0 p-2 bg-indigo-500/20 rounded-md">
+                                        <FileText className="w-4 h-4 text-indigo-300" />
+                                    </div>
+                                    <span className="text-sm font-medium text-indigo-100 truncate group-hover:text-white transition-colors">
+                                        {doc.name}
+                                    </span>
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Documents Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {docTypes.map((type) => {
                         const uploadedDoc = existingDocs.find(d => d.documentTypeId === type.id);
