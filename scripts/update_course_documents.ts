@@ -145,14 +145,16 @@ const exactMappings: { doc: string, courses: string[], docId?: string }[] = [
       ]
     },
     {
-      doc: "Color photograph of seafarer",
+      doc: "Color photograph of seafarer (The image must show a full face, without dark eyewear and with a white background)",
       courses: [
+          "MASTER OF YACHTS 200 GT LIMITED",
           "ACCREDITED ENGINE-RATING COURSE (AEC)"
       ]
     },
     {
-      doc: "Signature of seafarer",
+      doc: "Signature of seafarer (The signature must be written with black ink and on a white background)",
       courses: [
+          "MASTER OF YACHTS 200 GT LIMITED",
           "MASTER OF YACHTS 200 GT UNLIMITED", 
           "MASTER ON YACHTS LESS THAN 200 GT (MALTA FLAG STATE)", 
           "ACCREDITED ENGINE-RATING COURSE (AEC)"
@@ -208,6 +210,14 @@ async function main() {
            t.title.toLowerCase().includes(mapping.doc.toLowerCase().replace(' copy', '')) ||
            mapping.doc.toLowerCase().includes(t.title.toLowerCase())
        ) || null;
+    }
+
+    if (exactMatch && exactMatch.title !== mapping.doc) {
+       console.log(`Updating Document Type title from "${exactMatch.title}" to "${mapping.doc}"`);
+       exactMatch = await prisma.documentType.update({
+           where: { id: exactMatch.id },
+           data: { title: mapping.doc }
+       });
     }
 
     if (!exactMatch) {
