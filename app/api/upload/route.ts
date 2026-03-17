@@ -53,8 +53,10 @@ export async function POST(req: Request) {
 
         await s3Client.send(command);
 
+        const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://student.xoneacademy.com";
+        
         return NextResponse.json({
-            fileUrl: `${process.env.R2_PUBLIC_URL}/${fileName}`,
+            fileUrl: `${appBaseUrl}/api/download?key=${encodeURIComponent(fileName)}`,
             key: fileName
         });
     } catch (error: any) {
