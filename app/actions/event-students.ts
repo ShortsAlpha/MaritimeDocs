@@ -61,18 +61,23 @@ export async function getEventStudents(eventId: string) {
 
         if (!event) return { success: false, message: "Event not found" }
 
-        // Fetch all document types to build the grid columns
-        const allDocTypes = await db.documentType.findMany({
-            orderBy: { title: 'asc' }
-        })
+        // Fetch only document types specifically required/mapped for this Event's Course
+        let eventDocTypes: any[] = []
+        if (event.courseId) {
+            const courseDocs = await db.courseDocument.findMany({
+                where: { courseId: event.courseId },
+                include: { documentType: true },
+                orderBy: { documentType: { title: 'asc' } }
+            })
+            eventDocTypes = courseDocs.map(cd => cd.documentType)
+        }
 
-        // Identify which ones are strictly required for "completeness" check (if any logic needed)
-        // For now, let's assume all are relevant.
-        const requiredDocTypes = allDocTypes.filter(d => d.isRequired)
+        // Identify which ones are strictly required for "completeness" check 
+        const requiredDocTypes = eventDocTypes.filter(d => d.isRequired)
 
         const studentsWithStatus = event.students.map(student => {
             const studentDocTypeIds = student.documents.map(d => d.documentTypeId)
-            // missing is based on REQUIRED ones
+            // missing is based on REQUIRED ones strictly mapped to this course
             const missingDocs = requiredDocTypes.filter(type => !studentDocTypeIds.includes(type.id))
 
             return {
@@ -83,7 +88,7 @@ export async function getEventStudents(eventId: string) {
             }
         })
 
-        return { success: true, students: studentsWithStatus, documentTypes: allDocTypes }
+        return { success: true, students: studentsWithStatus, documentTypes: eventDocTypes }
     } catch (error: any) {
         console.error("Error fetching event students:", error)
         return { success: false, message: error.message }
