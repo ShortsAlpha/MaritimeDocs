@@ -62,7 +62,7 @@ export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { s
                 throw new Error(`Cloudflare R2 Error: ${uploadResponse.status} - ${errorText.substring(0, 50)}`);
             }
 
-            const finalUrl = `/api/download?key=${encodeURIComponent(urlResult.key)}`;
+            const finalUrl = `${window.location.origin}/download?key=${encodeURIComponent(urlResult.key)}`;
 
             // 3. Send Email
             const emailRes = await sendExamNotesEmail(studentId, course, finalUrl);

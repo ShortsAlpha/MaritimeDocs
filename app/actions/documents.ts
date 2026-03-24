@@ -261,8 +261,8 @@ export async function uploadExamNoteFile(formData: FormData) {
         console.log("Upload successful");
 
         const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://student.xoneacademy.com";
-        const internalUrl = `${appBaseUrl}/api/download?key=${encodeURIComponent(key)}`;
-        console.log("Internal Download URL generated:", internalUrl);
+        const internalUrl = `${appBaseUrl}/download?key=${encodeURIComponent(key)}`;
+        console.log("Interstitial Download Page URL generated:", internalUrl);
 
         return { success: true, url: internalUrl };
     } catch (error: any) {
