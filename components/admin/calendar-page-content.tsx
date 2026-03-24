@@ -27,8 +27,11 @@ export function CalendarPageContent({ events, instructors, courses, intakes }: P
     const selectedEvents = events.filter(event => {
         const start = new Date(event.start)
         start.setHours(0, 0, 0, 0)
-        const end = new Date(event.end)
+        let end = new Date(event.end)
         end.setHours(23, 59, 59, 999)
+        if (end.getTime() < start.getTime()) {
+            end = new Date(start.getTime() + 86399999)
+        }
         const current = new Date(selectedDate)
         current.setHours(12, 0, 0, 0)
         return current >= start && current <= end
@@ -42,8 +45,11 @@ export function CalendarPageContent({ events, instructors, courses, intakes }: P
         const dayEvents = events.filter(event => {
             const start = new Date(event.start)
             start.setHours(0, 0, 0, 0)
-            const end = new Date(event.end)
+            let end = new Date(event.end)
             end.setHours(23, 59, 59, 999)
+            if (end.getTime() < start.getTime()) {
+                end = new Date(start.getTime() + 86399999)
+            }
             const current = new Date(newDate)
             current.setHours(12, 0, 0, 0)
             return current >= start && current <= end

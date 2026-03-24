@@ -94,10 +94,16 @@ export function CalendarTwin({
                                                 const start = new Date(e.start)
                                                 start.setHours(0, 0, 0, 0)
                                                 const end = new Date(e.end)
-                                                end.setHours(23, 59, 59, 999) // Ensure end date includes the full day
+                                                end.setHours(23, 59, 59, 999) 
+                                                
+                                                // Fallback: If End Date is before Start Date, clamp End Date to Start Date EOD
+                                                const actualEnd = end.getTime() < start.getTime() 
+                                                    ? new Date(start.getTime() + 86399999) 
+                                                    : end;
+
                                                 const current = new Date(day)
-                                                current.setHours(12, 0, 0, 0) // Avoid timezone edge cases
-                                                return current >= start && current <= end
+                                                current.setHours(12, 0, 0, 0)
+                                                return current >= start && current <= actualEnd
                                             })
                                             .slice(0, 3)
                                             .map((e, idx) => (

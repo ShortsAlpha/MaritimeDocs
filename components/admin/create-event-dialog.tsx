@@ -152,7 +152,15 @@ export function CreateEventDialog({ instructors, courses = [], intakes = [], ope
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label className="text-right">Start Date</Label>
                             <div className="col-span-3">
-                                <DateTimePicker date={startDate} setDate={setStartDate} />
+                                <DateTimePicker 
+                                    date={startDate} 
+                                    setDate={(date) => {
+                                        setStartDate(date);
+                                        if (date && endDate && date.getTime() > endDate.getTime()) {
+                                            setEndDate(date);
+                                        }
+                                    }} 
+                                />
                                 <input type="hidden" name="startDate" value={startDate ? startDate.toISOString() : ""} />
                             </div>
                         </div>
