@@ -1,5 +1,6 @@
 'use client';
 
+import { getUploadUrl } from "@/app/actions/uploads";
 import { sendExamNotesEmail } from "@/app/actions/email";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,31 +36,36 @@ export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { s
         }
 
         try {
-            // 1. Upload File via standard API route (bypasses server action limits)
-            const uploadFormData = new FormData();
-            uploadFormData.append("file", file);
-            uploadFormData.append("subFolder", `students/${studentId}/exam-notes`);
-
-            const uploadResponse = await fetch('/api/upload', {
-                method: 'POST',
-                body: uploadFormData,
-            });
-
-            if (!uploadResponse.ok) {
-                const errorData = await uploadResponse.json().catch(() => ({}));
-                throw new Error(errorData.error || "Failed to upload note");
-            }
-
-            const uploadRes = await uploadResponse.json();
-
-            if (!uploadRes.fileUrl) {
-                toast.error("Upload succeeded but no URL returned.");
+            // 1. Get Presigned URL directly from server to bypass 4.5MB Vercel payload limit
+            const urlResult = await getUploadUrl(file.name, file.type, `students/${studentId}/exam-notes`);
+            
+            if (!urlResult.success || !urlResult.uploadUrl || !urlResult.key) {
+                toast.error("Failed to generate secure upload link.");
                 setIsLoading(false);
                 return;
             }
 
-            // 2. Send Email
-            const emailRes = await sendExamNotesEmail(studentId, course, uploadRes.fileUrl);
+            console.log("Presigned URL received, attempting PUT to R2...", urlResult.uploadUrl.substring(0, 80));
+
+            // 2. Upload file directly to Cloudflare R2 from browser
+            const uploadResponse = await fetch(urlResult.uploadUrl, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": file.type,
+                },
+                body: file,
+            });
+
+            if (!uploadResponse.ok) {
+                const errorText = await uploadResponse.text().catch(() => "No text body");
+                console.error("R2 Upload Rejected:", uploadResponse.status, uploadResponse.statusText, errorText);
+                throw new Error(`Cloudflare R2 Error: ${uploadResponse.status} - ${errorText.substring(0, 50)}`);
+            }
+
+            const finalUrl = `/api/download?key=${encodeURIComponent(urlResult.key)}`;
+
+            // 3. Send Email
+            const emailRes = await sendExamNotesEmail(studentId, course, finalUrl);
 
             if (emailRes.success) {
                 toast.success("Lecture notes sent successfully!");
