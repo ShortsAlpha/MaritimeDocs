@@ -24,10 +24,12 @@ export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { s
     const [isLoading, setIsLoading] = useState(false);
     const [course, setCourse] = useState(courseName || "");
     const [file, setFile] = useState<File | null>(null);
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     async function handleSend(e: React.FormEvent) {
         e.preventDefault();
         setIsLoading(true);
+        setUploadProgress(0);
 
         if (!file || !course) {
             toast.error("Please select a course and a file");
@@ -45,22 +47,35 @@ export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { s
                 return;
             }
 
-            console.log("Presigned URL received, attempting PUT to R2...", urlResult.uploadUrl.substring(0, 80));
+            console.log("Presigned URL received, attempting XHR PUT to R2...", urlResult.uploadUrl.substring(0, 80));
 
-            // 2. Upload file directly to Cloudflare R2 from browser
-            const uploadResponse = await fetch(urlResult.uploadUrl, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": file.type,
-                },
-                body: file,
+            // 2. Upload natively via XHR to track 0-100% progress
+            await new Promise<void>((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                
+                xhr.upload.addEventListener('progress', (event) => {
+                    if (event.lengthComputable) {
+                        const percentComplete = Math.round((event.loaded / event.total) * 100);
+                        setUploadProgress(percentComplete);
+                    }
+                });
+
+                xhr.addEventListener('load', () => {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        setUploadProgress(100);
+                        resolve();
+                    } else {
+                        reject(new Error(`Cloudflare R2 Error: ${xhr.status} - ${xhr.responseText.substring(0, 50)}`));
+                    }
+                });
+
+                xhr.addEventListener('error', () => reject(new Error("Network error during Cloudflare R2 upload.")));
+                xhr.addEventListener('abort', () => reject(new Error("Upload aborted by user.")));
+
+                xhr.open('PUT', urlResult.uploadUrl);
+                xhr.setRequestHeader('Content-Type', file.type);
+                xhr.send(file);
             });
-
-            if (!uploadResponse.ok) {
-                const errorText = await uploadResponse.text().catch(() => "No text body");
-                console.error("R2 Upload Rejected:", uploadResponse.status, uploadResponse.statusText, errorText);
-                throw new Error(`Cloudflare R2 Error: ${uploadResponse.status} - ${errorText.substring(0, 50)}`);
-            }
 
             const finalUrl = `${window.location.origin}/download?key=${encodeURIComponent(urlResult.key)}`;
 
@@ -71,6 +86,7 @@ export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { s
                 toast.success("Lecture notes sent successfully!");
                 setIsOpen(false);
                 setFile(null);
+                setUploadProgress(0);
             } else {
                 toast.error("Failed to send email");
             }
@@ -100,7 +116,7 @@ export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { s
                 <form onSubmit={handleSend} className="space-y-4">
                     <div className="space-y-2">
                         <Label>Course Name</Label>
-                        <Select value={course} onValueChange={setCourse} required>
+                        <Select value={course} onValueChange={setCourse} required disabled={isLoading}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select course" />
                             </SelectTrigger>
@@ -124,9 +140,32 @@ export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { s
                             name="file"
                             required
                             accept=".pdf,.doc,.docx"
+                            disabled={isLoading}
                             onChange={(e) => setFile(e.target.files?.[0] || null)}
                         />
                     </div>
+                    
+                    {isLoading && uploadProgress > 0 && uploadProgress < 100 && (
+                        <div className="space-y-1.5">
+                            <div className="flex justify-between text-xs text-neutral-500 font-medium">
+                                <span>Uploading...</span>
+                                <span>{uploadProgress}%</span>
+                            </div>
+                            <div className="w-full bg-neutral-100 rounded-full h-2 overflow-hidden">
+                                <div 
+                                    className="bg-indigo-600 h-2 rounded-full transition-all duration-300" 
+                                    style={{ width: `${uploadProgress}%` }}
+                                />
+                            </div>
+                        </div>
+                    )}
+                    
+                    {isLoading && uploadProgress === 100 && (
+                        <p className="text-xs text-center text-neutral-500 font-medium animate-pulse">
+                            Upload complete. Generating and sending email...
+                        </p>
+                    )}
+
                     <Button type="submit" disabled={isLoading} className="w-full">
                         {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send Email"}
                     </Button>
