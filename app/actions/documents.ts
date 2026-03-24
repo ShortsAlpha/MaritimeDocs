@@ -260,17 +260,11 @@ export async function uploadExamNoteFile(formData: FormData) {
         }));
         console.log("Upload successful");
 
-        console.log("Generating signed URL...");
-        const command = new GetObjectCommand({
-            Bucket: R2_BUCKET_NAME,
-            Key: key,
-            ResponseContentDisposition: 'attachment' // Force download
-        });
+        const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://student.xoneacademy.com";
+        const internalUrl = `${appBaseUrl}/api/download?key=${encodeURIComponent(key)}`;
+        console.log("Internal Download URL generated:", internalUrl);
 
-        const signedUrl = await getSignedUrl(r2, command, { expiresIn: 604800 }); // 7 Days
-        console.log("Signed URL generated:", signedUrl.substring(0, 50) + "...");
-
-        return { success: true, url: signedUrl };
+        return { success: true, url: internalUrl };
     } catch (error: any) {
         console.error("Upload Exam Note Logic Error (Catch Block):", error);
         return { success: false, message: error.message || "Unknown error" };
