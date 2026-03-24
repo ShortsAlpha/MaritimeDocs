@@ -20,6 +20,15 @@ interface DateTimePickerProps {
 
 export function DateTimePicker({ date, setDate }: DateTimePickerProps) {
     const [isOpen, setIsOpen] = React.useState(false)
+    const [month, setMonth] = React.useState<Date>(date || new Date())
+
+    // If the external date prop changes (e.g. from linking Start/End Dates),
+    // force the calendar popup to jump to that fresh month.
+    React.useEffect(() => {
+        if (date) {
+            setMonth(new Date(date.getFullYear(), date.getMonth(), 1))
+        }
+    }, [date])
 
     const handleDateSelect = (selectedDate: Date | undefined) => {
         if (!selectedDate) {
@@ -65,6 +74,8 @@ export function DateTimePicker({ date, setDate }: DateTimePickerProps) {
                 <Calendar
                     mode="single"
                     selected={date}
+                    month={month}
+                    onMonthChange={setMonth}
                     onSelect={handleDateSelect}
                     initialFocus
                 />
