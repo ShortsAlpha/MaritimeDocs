@@ -154,10 +154,18 @@ export function CreateEventDialog({ instructors, courses = [], intakes = [], ope
                             <div className="col-span-3">
                                 <DateTimePicker 
                                     date={startDate} 
-                                    setDate={(date) => {
-                                        setStartDate(date);
-                                        if (date && endDate && date.getTime() > endDate.getTime()) {
-                                            setEndDate(date);
+                                    setDate={(newDate) => {
+                                        if (newDate && startDate && endDate) {
+                                            const diff = endDate.getTime() - startDate.getTime();
+                                            setStartDate(newDate);
+                                            if (diff >= 0) {
+                                                setEndDate(new Date(newDate.getTime() + diff));
+                                            } else {
+                                                setEndDate(newDate);
+                                            }
+                                        } else {
+                                            setStartDate(newDate);
+                                            if (newDate) setEndDate(newDate);
                                         }
                                     }} 
                                 />
