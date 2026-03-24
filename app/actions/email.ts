@@ -194,9 +194,12 @@ export async function sendExamNotesEmail(studentId: string, courseName: string, 
             html: getEmailTemplate(
                 `Lecture Notes: ${courseName}`,
                 `<p>Dear ${student.fullName},</p>
-                <p>We have prepared the lecture notes for your upcoming exam in <strong>${courseName}</strong>.</p>
-                <p>You can download them directly using the link below. We recommend reviewing them thoroughly before your assessment.</p>
-                <p>Good luck with your studies!</p>`,
+                <p>I hope everything is going well with you.</p>
+                <p>Greetings from Xone Maritime Academy. We are pleased to welcome you to the <strong>${courseName}</strong> program.</p>
+                <p>We have prepared the lecture notes for your review. You can download them directly using the link below.</p>
+                <p>Feel free to review the materials to get a better idea of what to expect during the course. All topics will be covered during the lessons, and we will support you throughout your learning from start to finish.</p>
+                <p>We look forward to have you as our student.</p>
+                <p>Please feel free to reach out if you have any questions.</p>`,
                 baseUrl,
                 { text: 'Download Lecture Notes', url: notesUrl }
             ),
