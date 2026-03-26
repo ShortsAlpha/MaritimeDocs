@@ -438,3 +438,43 @@ export async function uploadProfilePhoto(formData: FormData) {
         return { success: false, message: error.message };
     }
 }
+
+export async function addStudentRemark(studentId: string, note: string, dateStr: string) {
+    try {
+        const user = await currentUser();
+        if (!user) return { success: false, message: "Unauthorized" };
+
+        const parsedDate = dateStr ? new Date(dateStr) : new Date();
+
+        await db.studentRemark.create({
+            data: {
+                studentId,
+                note,
+                date: parsedDate
+            }
+        });
+
+        revalidatePath(`/admin/students/${studentId}`);
+        return { success: true, message: "Remark added successfully" };
+    } catch (error: any) {
+        console.error("Add remark error:", error);
+        return { success: false, message: error.message };
+    }
+}
+
+export async function deleteStudentRemark(remarkId: string, studentId: string) {
+    try {
+        const user = await currentUser();
+        if (!user) return { success: false, message: "Unauthorized" };
+
+        await db.studentRemark.delete({
+            where: { id: remarkId }
+        });
+
+        revalidatePath(`/admin/students/${studentId}`);
+        return { success: true, message: "Remark deleted successfully" };
+    } catch (error: any) {
+        console.error("Delete remark error:", error);
+        return { success: false, message: error.message };
+    }
+}

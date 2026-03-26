@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 import type { Viewport } from "next";
 
 export const metadata: Metadata = {
-  title: "Xone Superyacht Academy Docs",
-  description: "Xone Superyacht Academy Student Management System",
+  title: "Xone Maritime Academy Docs",
+  description: "Xone Maritime Academy Student Management System",
   icons: {
     icon: "/icon.png",
     shortcut: "/icon.png",

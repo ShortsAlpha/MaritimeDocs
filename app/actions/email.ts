@@ -48,7 +48,7 @@ const getEmailTemplate = (title: string, content: string, baseUrl: string, cta?:
                             <img src="${baseUrl}/logo.png" alt="Xone" height="40" style="display: block; max-height: 40px; width: auto;" />
                         </td>
                         <td>
-                            <span style="color: #ffffff; font-size: 20px; font-weight: 600; letter-spacing: -0.5px;">Xone Superyacht Academy</span>
+                            <span style="color: #ffffff; font-size: 20px; font-weight: 600; letter-spacing: -0.5px;">Xone Maritime Academy</span>
                         </td>
                     </tr>
                 </table>
@@ -64,7 +64,7 @@ const getEmailTemplate = (title: string, content: string, baseUrl: string, cta?:
                 <p style="margin-top: 32px; font-size: 15px; color: #52525b;">Best regards,<br><strong>Xone Academy Team</strong></p>
             </div>
             <div class="footer">
-                <p>© ${new Date().getFullYear()} Xone Superyacht Academy. All rights reserved.</p>
+                <p>© ${new Date().getFullYear()} Xone Maritime Academy. All rights reserved.</p>
             </div>
         </div>
     </body>
@@ -138,11 +138,11 @@ export async function sendStudentWelcomeEmail(studentId: string, courseId?: stri
         const { data, error } = await resend.emails.send({
             from: 'Xone Academy <onboarding@student.xoneacademy.com>',
             to: student.email,
-            subject: 'Welcome to Xone Superyacht Academy - Required Documents',
+            subject: 'Welcome to Xone Maritime Academy - Required Documents',
             html: getEmailTemplate(
                 'Completing your Registration',
                 `<p>Dear ${student.fullName},</p>
-                <p>Welcome aboard! We are excited to have you join us at Xone Superyacht Academy.</p>
+                <p>Welcome aboard! We are excited to have you join us at Xone Maritime Academy.</p>
                 <p>To finalize your enrollment and ensure a smooth start, we require you to upload the following essential documents:</p>
                 ${docListHtml}
                 <p>Please click the button below to access your secure upload portal. This link is valid for <strong>7 days</strong>.</p>`,
@@ -301,11 +301,11 @@ export async function sendFeedbackEmail(studentId: string) {
         await resend.emails.send({
             from: 'Xone Academy <feedback@student.xoneacademy.com>',
             to: student.email,
-            subject: 'We Value Your Feedback - Xone Superyacht Academy',
+            subject: 'We Value Your Feedback - Xone Maritime Academy',
             html: getEmailTemplate(
                 'Course Completion Feedback',
                 `<p>Dear ${student.fullName},</p>
-                <p>Congratulations on completing your course at Xone Superyacht Academy!</p>
+                <p>Congratulations on completing your course at Xone Maritime Academy!</p>
                 <p>We constantly strive to improve our training and facilities. We would greatly appreciate it if you could take a moment to share your experience with us.</p>
                 <p>Please click the link below to answer a few brief questions.</p>`,
                 baseUrl,

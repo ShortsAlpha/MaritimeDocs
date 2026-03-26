@@ -12,7 +12,7 @@ import {
     SidebarMenuItem,
     SidebarFooter,
 } from "@/components/ui/sidebar"
-import { LayoutDashboard, Users, Settings, Calendar, FileBarChart, BookOpen } from "lucide-react"
+import { LayoutDashboard, Users, Settings, Calendar, FileBarChart, BookOpen, Inbox, ClipboardCheck } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -23,6 +23,8 @@ const adminRoutes = [
     { href: "/admin/instructors", label: "Instructors", icon: Users },
     { href: "/admin/calendar", label: "Calendar", icon: Calendar },
     { href: "/admin/workbook", label: "Workbook", icon: BookOpen },
+    { href: "/admin/attendance", label: "Attendance", icon: ClipboardCheck },
+    { href: "/admin/tickets", label: "Tickets", icon: Inbox },
     { href: "/admin/reports", label: "Reports", icon: FileBarChart },
 ]
 
@@ -35,7 +37,7 @@ export function AppSidebar({ role }: { role: string }) {
                 <div className="flex items-center gap-2 px-2 py-2 group-data-[collapsible=icon]:!p-0 group-data-[collapsible=icon]:!gap-0 group-data-[collapsible=icon]:justify-center">
                     <img src="/logo.png" alt="Logo" className="w-8 h-8 shrink-0 object-contain group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10 group-data-[collapsible=icon]:translate-x-1 transition-all duration-300" />
                     <span className="font-semibold truncate group-data-[collapsible=icon]:hidden">
-                        Xone Superyacht Academy
+                        Xone Maritime Academy
                     </span>
                 </div>
             </SidebarHeader>

@@ -47,7 +47,7 @@ export default function AboutPage() {
                         {/* Brand Name Only */}
                         <div className="flex items-center gap-2">
                             <img src="/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
-                            <span className="text-xl font-bold text-white">Xone Superyacht Academy</span>
+                            <span className="text-xl font-bold text-white">Xone Maritime Academy</span>
                         </div>
 
                         {/* Navigation Pills - Centered */}
@@ -75,16 +75,16 @@ export default function AboutPage() {
                 {/* Introduction Section */}
                 <section className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
                     <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-                        About <span className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 bg-clip-text text-transparent">Xone Superyacht Academy</span>
+                        About <span className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 bg-clip-text text-transparent">Xone Maritime Academy</span>
                     </h1>
                     <div className="prose prose-invert max-w-none text-lg text-gray-300 leading-relaxed space-y-6">
                         <p>
                             No matter where you are in your career journey - whether just starting or seeking advancement -
-                            Xone Superyacht Academy has the perfect course or program for every seafarer. Our comprehensive training
+                            Xone Maritime Academy has the perfect course or program for every seafarer. Our comprehensive training
                             covers all sides of maritime operations, including navigation, safety, hospitality, and management.
                         </p>
                         <p>
-                            Xone Superyacht Academy has a Quality Management System under ISO 9001:2015 and is certified by
+                            Xone Maritime Academy has a Quality Management System under ISO 9001:2015 and is certified by
                             Lloyds Register Quality Assurance (LRQA). We are an approved maritime training center of the
                             Malta Flag State, the Marshall Islands, and an IYT Worldwide partner school. With experienced
                             instructors, state-of-the-art facilities, and hands-on training, we ensure our students are
@@ -114,7 +114,7 @@ export default function AboutPage() {
                     </div>
                     <div className="md:col-span-8 flex flex-col justify-center space-y-6 text-lg text-gray-300 leading-relaxed">
                         <blockquote className="border-l-4 border-blue-500 pl-6 italic bg-white/5 py-4 pr-4 rounded-r-lg">
-                            "On behalf of our unique and strong team, I welcome you to Superyacht Group. I have built and cultivated
+                            "On behalf of our unique and strong team, I welcome you to Maritime Group. I have built and cultivated
                             a vast network, blending and growing with the strengths of the colleagues and partners who joined our
                             ship on its way."
                         </blockquote>
@@ -195,7 +195,7 @@ export default function AboutPage() {
             </main>
 
             <footer className="py-8 text-center text-sm text-gray-600 border-t border-white/5 mt-12 bg-black z-20 relative">
-                © 2026 Xone Superyacht Academy Student Management System. All rights reserved.
+                © 2026 Xone Maritime Academy Student Management System. All rights reserved.
             </footer>
         </div>
     );

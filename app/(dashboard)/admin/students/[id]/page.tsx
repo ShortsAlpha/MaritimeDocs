@@ -17,6 +17,7 @@ import { StudentStatusSelect } from "@/components/admin/student-status-select";
 // Placeholder imports for now, we will create these files next
 import { StudentDocsTab } from "@/components/admin/student-docs-tab";
 import { StudentAccountingTab } from "@/components/admin/student-accounting-tab";
+import { StudentRemarksTab } from "@/components/admin/student-remarks-tab";
 import { SendWelcomeEmailButton } from "@/components/admin/send-welcome-button";
 import { SendExamNotesDialog } from "@/components/admin/send-exam-notes-dialog";
 import { SendFeedbackEmailButton } from "@/components/admin/send-feedback-email-button";
@@ -40,6 +41,7 @@ export default async function StudentDetailPage({
             documents: { include: { documentType: true } },
             payments: { orderBy: { date: "desc" } },
             feedbacks: { orderBy: { createdAt: "desc" } },
+            remarks: { orderBy: { date: "desc" } },
             intake: true,
             courses: {
                 include: { requiredDocuments: true }
@@ -153,6 +155,7 @@ export default async function StudentDetailPage({
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="documents">Documents</TabsTrigger>
                     <TabsTrigger value="accounting">Accounting</TabsTrigger>
+                    <TabsTrigger value="remarks">Remarks</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="overview" className="space-y-4">
@@ -469,6 +472,10 @@ export default async function StudentDetailPage({
 
                 <TabsContent value="accounting">
                     <StudentAccountingTab student={studentData} />
+                </TabsContent>
+
+                <TabsContent value="remarks">
+                    <StudentRemarksTab studentId={student.id} remarks={student.remarks} />
                 </TabsContent>
             </Tabs>
         </div>

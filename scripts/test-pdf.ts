@@ -143,7 +143,7 @@ async function main() {
     const paragraphParts = [
         { text: 'Has successfully completed training of ""', font: timesItalic },
         { text: courseName, font: timesBoldItalic },
-        { text: '"" at Xone Superyacht Academy, approved by the Merchant Shipping Directorate of the Authority for Transport in Malta as meeting the requirements laid down in', font: timesItalic }
+        { text: '"" at Xone Maritime Academy, approved by the Merchant Shipping Directorate of the Authority for Transport in Malta as meeting the requirements laid down in', font: timesItalic }
     ];
 
     const pFontSize = 10;

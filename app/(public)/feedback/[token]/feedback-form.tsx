@@ -120,7 +120,7 @@ export function FeedbackForm({ token: authToken, initialSubmitted = false }: Fee
                 <h3 className="text-lg font-semibold border-b pb-2">1. General Information</h3>
 
                 <div className="space-y-3">
-                    <Label className="text-base">How did you hear of Xone Superyacht?</Label>
+                    <Label className="text-base">How did you hear of Xone Maritime?</Label>
                     <RadioGroup name="source" className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {SOURCES.map((source) => (
                             <div key={source.value} className="flex items-center space-x-2 border rounded-md p-3 hover:bg-muted/50 transition-colors">

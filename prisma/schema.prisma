@@ -26,6 +26,7 @@ model Branch {
   payments    Payment[]
   intakes     Intake[]
   activityLogs ActivityLog[]
+  tickets     Ticket[]
 
   createdAt DateTime @default(now())
 }
@@ -110,12 +111,15 @@ model Student {
   courses     Course[] // Many-to-many relation for enrolled courses
   documents   StudentDocument[]
   documentNotes StudentDocumentNote[]
+  remarks     StudentRemark[]
   payments    Payment[]
   feedbacks   Feedback[]
   events      CourseEvent[]
+  tickets     Ticket[]
   
   intakeId    String?
   intake      Intake?   @relation(fields: [intakeId], references: [id])
+  attendances Attendance[]
 }
 
 model StudentDocumentNote {
@@ -132,6 +136,19 @@ model StudentDocumentNote {
   updatedAt      DateTime     @updatedAt
   
   @@unique([studentId, documentTypeId])
+}
+
+model StudentRemark {
+  id        String   @id @default(cuid())
+  
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  note      String   @db.Text
+  date      DateTime @default(now()) // The user wants a date next to the note
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum FeedbackSource {
@@ -247,8 +264,9 @@ model CourseEvent {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  checklist EventChecklistItem[]
-  students  Student[]
+  checklist   EventChecklistItem[]
+  students    Student[]
+  attendances Attendance[]
 }
 
 model EventChecklistItem {
@@ -411,7 +429,71 @@ model ActivityLog {
   userAgent String?
   
   metadata  Json?    // Flexible storage for extra data (fileId, studentId etc)
-  
   createdAt DateTime @default(now())
 }
 
+// ----------------------------------------------------------------------------
+// Ticketing / Inbox System
+// ----------------------------------------------------------------------------
+
+enum TicketStatus {
+  OPEN
+  CLOSED
+}
+
+model Ticket {
+  id          String   @id @default(cuid())
+  subject     String   @db.Text
+  contactEmail  String?
+  status      TicketStatus @default(OPEN)
+  
+  studentId   String?
+  student     Student?  @relation(fields: [studentId], references: [id])
+  
+  branchId    String?
+  branch      Branch?  @relation(fields: [branchId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  messages    TicketMessage[]
+}
+
+model TicketMessage {
+  id          String   @id @default(cuid())
+  ticketId    String
+  ticket      Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  
+  body        String   @db.Text
+  fromEmail   String
+  toEmail     String
+  
+  isFromStudent Boolean @default(true) // Identify direction of email
+  
+  attachments Json? // Keep simple list of URLs
+  messageId   String? // Store inbound Message-Id to track threads properly
+  
+  createdAt   DateTime @default(now())
+}
+
+// ----------------------------------------------------------------------------
+// Attendance Tracking Matrix
+// ----------------------------------------------------------------------------
+
+model Attendance {
+  id          String   @id @default(cuid())
+  
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  eventId     String
+  event       CourseEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  
+  date        DateTime // The specific date of attendance
+  isPresent   Boolean  @default(true) // Maps to "X" in the UI
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([studentId, eventId, date]) // A student can only have 1 attendance record per event day
+}
