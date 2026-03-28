@@ -63,6 +63,7 @@ const StudentSchema = z.object({
     certificateIssueDate: z.string().optional().or(z.literal("")),
     certificateExpiryDate: z.string().optional().or(z.literal("")),
     nationality: z.string().optional(),
+    passportNumber: z.string().optional(),
     dateOfBirth: z.string().optional().or(z.literal("")),
     intakeId: z.string().optional().or(z.literal("")), // Accept explicit intakeId
 })
@@ -92,6 +93,7 @@ export async function createStudent(prevState: any, formData: FormData) {
             courses: parsedCourses,
             totalFee: formData.get("totalFee"),
             nationality: formData.get("nationality"),
+            passportNumber: formData.get("passportNumber"),
             dateOfBirth: formData.get("dateOfBirth"),
             intakeId: formData.get("intakeId"),
         }
@@ -109,6 +111,7 @@ export async function createStudent(prevState: any, formData: FormData) {
                 phone: data.phone || null,
                 totalFee: data.totalFee,
                 nationality: data.nationality || null,
+                passportNumber: data.passportNumber || null,
                 dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null,
                 intakeId: data.intakeId || null,
                 branchId: branch.branchId,
@@ -170,6 +173,7 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
             certificateIssueDate: formData.get("certificateIssueDate") === null ? undefined : formData.get("certificateIssueDate"),
             certificateExpiryDate: formData.get("certificateExpiryDate") === null ? undefined : formData.get("certificateExpiryDate"),
             nationality: formData.get("nationality") === null ? undefined : formData.get("nationality"),
+            passportNumber: formData.get("passportNumber") === null ? undefined : formData.get("passportNumber"),
             dateOfBirth: formData.get("dateOfBirth") === null ? undefined : formData.get("dateOfBirth"),
             intakeId: formData.get("intakeId") === null ? undefined : formData.get("intakeId"),
         }
@@ -273,6 +277,7 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
                 ...(data.address !== undefined && { address: data.address || null }),
                 ...(data.status && { status: data.status }),
                 ...(data.nationality !== undefined && { nationality: data.nationality || null }),
+                ...(data.passportNumber !== undefined && { passportNumber: data.passportNumber || null }),
                 ...(data.dateOfBirth !== undefined && { dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : null }),
                 ...(data.intakeId !== undefined && { intakeId: data.intakeId || null }),
                 ...additionalData

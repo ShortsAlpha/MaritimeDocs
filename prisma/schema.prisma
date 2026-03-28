@@ -79,6 +79,7 @@ model Student {
   phone       String?
   address     String?
   nationality String?
+  passportNumber String?
   dateOfBirth DateTime?
   
   // Certificate Info

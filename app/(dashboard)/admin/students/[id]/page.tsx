@@ -23,6 +23,7 @@ import { SendExamNotesDialog } from "@/components/admin/send-exam-notes-dialog";
 import { SendFeedbackEmailButton } from "@/components/admin/send-feedback-email-button";
 import { StudentPhotoUpload } from "@/components/admin/student-photo-upload";
 import { getSignedProfilePhotoUrl } from "@/app/actions/students";
+import { DocumentGeneratorDialog } from "@/components/admin/document-generation/document-generator-dialog";
 
 export default async function StudentDetailPage({
     params,
@@ -145,6 +146,7 @@ export default async function StudentDetailPage({
                             courses={courses}
                         />
                         <SendFeedbackEmailButton studentId={student.id} />
+                        <DocumentGeneratorDialog student={studentData} courses={student.courses} />
                         <DeleteStudentButton studentId={student.id} />
                     </div>
                 </div>
@@ -293,6 +295,20 @@ export default async function StudentDetailPage({
                                                 label="Nationality"
                                                 name="nationality"
                                                 value={student.nationality}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                            <Hash className="h-4 w-4 text-primary" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <EditableField
+                                                studentId={student.id}
+                                                label="Passport / ID Number"
+                                                name="passportNumber"
+                                                value={student.passportNumber}
                                             />
                                         </div>
                                     </div>
