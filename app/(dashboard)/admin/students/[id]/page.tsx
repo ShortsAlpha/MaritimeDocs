@@ -95,11 +95,10 @@ export default async function StudentDetailPage({
                         <h1 className="text-xl sm:text-3xl font-bold tracking-tight truncate break-words mb-1">{student.fullName}</h1>
                         <div className="flex flex-col gap-1 mb-2">
                             {student.courses?.length > 0 ? (
-                                student.courses.map(course => (
-                                    <span key={course.id} className="text-sm font-medium text-primary uppercase">
-                                        {course.title}
-                                    </span>
-                                ))
+                                <span className="text-sm font-medium text-primary uppercase">
+                                    {student.courses[0].title}
+                                    {student.courses.length > 1 && <span className="text-muted-foreground ml-2 text-xs lowercase border rounded px-1.5 py-0.5">+{student.courses.length - 1} more</span>}
+                                </span>
                             ) : null}
                         </div>
                         <div className="flex flex-wrap gap-x-4 gap-y-1 text-muted-foreground">

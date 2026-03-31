@@ -117,6 +117,7 @@ model Student {
   feedbacks   Feedback[]
   events      CourseEvent[]
   tickets     Ticket[]
+  certificates StudentCertificate[]
   
   intakeId    String?
   intake      Intake?   @relation(fields: [intakeId], references: [id])
@@ -268,6 +269,7 @@ model CourseEvent {
   checklist   EventChecklistItem[]
   students    Student[]
   attendances Attendance[]
+  certificates StudentCertificate[]
 }
 
 model EventChecklistItem {
@@ -497,4 +499,26 @@ model Attendance {
   updatedAt   DateTime @updatedAt
   
   @@unique([studentId, eventId, date]) // A student can only have 1 attendance record per event day
+}
+
+// ----------------------------------------------------------------------------
+// Generated Certificates (Track TM unique rules safely)
+// ----------------------------------------------------------------------------
+
+model StudentCertificate {
+  id              String   @id @default(cuid())
+  studentId       String
+  student         Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  courseEventId   String?  // The specific run of the STCW course
+  courseEvent     CourseEvent? @relation(fields: [courseEventId], references: [id])
+  
+  certificateType String   // e.g. "stcw-basic-safety"
+  certificateNo   String?  // e.g. "2604-01"
+  issueDate       DateTime?
+  expiryDate      DateTime?
+  
+  createdAt       DateTime @default(now())
+  
+  @@unique([studentId, courseEventId, certificateType]) 
 }

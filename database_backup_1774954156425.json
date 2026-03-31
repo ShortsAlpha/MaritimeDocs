@@ -1,0 +1,2431 @@
+{
+  "timestamp": "2026-03-31T10:49:02.854Z",
+  "branches": [
+    {
+      "id": "cmml50vr20000vfy0dlvmssx7",
+      "code": "HQ",
+      "name": "Malta (Headquarters)",
+      "timezone": "Europe/Malta",
+      "currency": "EUR",
+      "createdAt": "2026-03-10T21:44:10.431Z"
+    },
+    {
+      "id": "cmml50vx90001vfy0llua5b45",
+      "code": "BG",
+      "name": "Bulgaria",
+      "timezone": "Europe/Sofia",
+      "currency": "BGN",
+      "createdAt": "2026-03-10T21:44:10.654Z"
+    },
+    {
+      "id": "cmml50w230002vfy0oli4anl4",
+      "code": "GR",
+      "name": "Greece",
+      "timezone": "Europe/Athens",
+      "currency": "EUR",
+      "createdAt": "2026-03-10T21:44:10.828Z"
+    }
+  ],
+  "users": [
+    {
+      "id": "user_37ZuEr6fEuC4TiZYgDWEf4pbycP",
+      "email": "yadaumur@gmail.com",
+      "name": "Yağız Ada Umur",
+      "role": "SUPER_ADMIN",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-10T22:22:57.034Z"
+    },
+    {
+      "id": "user_38ybPd5MXapYrzclfqk5D35EWVJ",
+      "email": "dilara@xoneyacht.com",
+      "name": "Dilara TOPAL",
+      "role": "SUPER_ADMIN",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-13T12:35:52.633Z"
+    },
+    {
+      "id": "user_37qCksbcQRqTvzXq2BZBorwkRqP",
+      "email": "training@xoneyacht.com",
+      "name": "training . xonesuperyacht",
+      "role": "SUPER_ADMIN",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-13T13:18:45.967Z"
+    },
+    {
+      "id": "user_39CwKQnOnL6S4xEaLZGcAnI1PEZ",
+      "email": "emin@xoneyacht.com",
+      "name": "Emin Cihan Duyan",
+      "role": "SUPER_ADMIN",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-24T12:44:09.842Z"
+    }
+  ],
+  "students": [
+    {
+      "id": "cmn4i4kwi0002l404j4cto0vy",
+      "studentNumber": "260006",
+      "fullName": "Maria Constanza",
+      "email": "constanzamugni@gmail.com",
+      "phone": null,
+      "address": null,
+      "nationality": null,
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "DOCS_REQ_SENT",
+      "totalFee": "850",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": "4e6d9e3d-d8c4-44d5-b0ac-97f3388f7977",
+      "uploadTokenExpiry": "2026-03-31T12:39:56.245Z",
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-24T10:58:35.347Z",
+      "updatedAt": "2026-03-24T12:39:56.706Z",
+      "intakeId": "cml6ou8z4000jvfdo9i0f2y44"
+    },
+    {
+      "id": "cmn4i57qm0001jy049hguefsq",
+      "studentNumber": "260007",
+      "fullName": "Daria Bochkova",
+      "email": "dariabochkova@icloud.com",
+      "phone": null,
+      "address": null,
+      "nationality": null,
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "DOCS_REQ_SENT",
+      "totalFee": "850",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": "5ac724dd-9a40-4964-a1bb-8b5041da6865",
+      "uploadTokenExpiry": "2026-03-31T12:41:13.572Z",
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-24T10:59:04.942Z",
+      "updatedAt": "2026-03-24T12:41:14.057Z",
+      "intakeId": "cml6ou8z4000jvfdo9i0f2y44"
+    },
+    {
+      "id": "cmn4i5pdj0003jy04qlz4ydmm",
+      "studentNumber": "260008",
+      "fullName": "Mohamed Jaamiu Shaugy",
+      "email": "natalie.heywood@hili.company",
+      "phone": null,
+      "address": null,
+      "nationality": null,
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "DOCS_REQ_SENT",
+      "totalFee": "850",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": "4d065567-0b7a-4ce5-9759-0486b3b10431",
+      "uploadTokenExpiry": "2026-03-31T15:12:26.101Z",
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-24T10:59:27.799Z",
+      "updatedAt": "2026-03-24T15:12:26.633Z",
+      "intakeId": "cml6ou8z4000jvfdo9i0f2y44"
+    },
+    {
+      "id": "cmmt8wq5o0001le04gqygdy10",
+      "studentNumber": "260005",
+      "fullName": "Yağız Ada Umur",
+      "email": "yadaumur@gmail.com",
+      "phone": "5523459102",
+      "address": null,
+      "nationality": "Turkey",
+      "passportNumber": "U1084034B1",
+      "dateOfBirth": "2005-11-16T00:00:00.000Z",
+      "certificateIssueDate": "2026-03-28T12:33:22.781Z",
+      "certificateExpiryDate": "2027-04-28T12:33:22.781Z",
+      "status": "COURSE_COMPLETED",
+      "totalFee": "2500",
+      "photoUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/hq/students/yagiz_ada_umur/profile-1774707771846-fatheeeer.jpg",
+      "currency": "EUR",
+      "uploadToken": "ae5e1870-0024-4114-82d6-c33c2daf1e5a",
+      "uploadTokenExpiry": "2026-03-31T18:14:35.632Z",
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-16T13:55:04.428Z",
+      "updatedAt": "2026-03-28T14:22:52.376Z",
+      "intakeId": "cml6ou90m000kvfdowwvndggl"
+    },
+    {
+      "id": "cmn78x6jz0001ld04vam2bxwb",
+      "studentNumber": "260010",
+      "fullName": "Alessandro Macri",
+      "email": "alessandro.macri@hotmail.com",
+      "phone": "+39 320 212 5277",
+      "address": null,
+      "nationality": null,
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "REGISTERED",
+      "totalFee": "8750",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": null,
+      "uploadTokenExpiry": null,
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-26T09:04:12.143Z",
+      "updatedAt": "2026-03-26T09:04:12.143Z",
+      "intakeId": null
+    },
+    {
+      "id": "cmn799m8w0001l104em8faux8",
+      "studentNumber": "260011",
+      "fullName": "Mathias Fronteddu",
+      "email": "mathiasfronteddu@gmail.com",
+      "phone": "+39 347 330 9999",
+      "address": null,
+      "nationality": null,
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "REGISTERED",
+      "totalFee": "9100",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": null,
+      "uploadTokenExpiry": null,
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-26T09:13:52.352Z",
+      "updatedAt": "2026-03-26T09:13:52.352Z",
+      "intakeId": null
+    },
+    {
+      "id": "cmn79dpda0003kz04svpmr1sn",
+      "studentNumber": "260012",
+      "fullName": "Handre Coetzee",
+      "email": "handrecoetzee990331@gmail.com",
+      "phone": "+27 72 848 8434",
+      "address": null,
+      "nationality": null,
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "REGISTERED",
+      "totalFee": "7600",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": null,
+      "uploadTokenExpiry": null,
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-26T09:17:03.023Z",
+      "updatedAt": "2026-03-26T09:17:03.023Z",
+      "intakeId": null
+    },
+    {
+      "id": "cmn79h2bs0001l5045l3v4khk",
+      "studentNumber": "260013",
+      "fullName": "Paul Jordan",
+      "email": "thepauljordan@icloud.com",
+      "phone": "+44 7701 329878",
+      "address": null,
+      "nationality": null,
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "REGISTERED",
+      "totalFee": "9500",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": null,
+      "uploadTokenExpiry": null,
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-26T09:19:39.784Z",
+      "updatedAt": "2026-03-26T09:19:39.784Z",
+      "intakeId": null
+    },
+    {
+      "id": "cmn79mjbq0003l504gultlmq2",
+      "studentNumber": "260014",
+      "fullName": "Benjamin Truter",
+      "email": "ben.truter.j@gmail.com",
+      "phone": "+44 7513 396774",
+      "address": null,
+      "nationality": null,
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "REGISTERED",
+      "totalFee": "7850",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": null,
+      "uploadTokenExpiry": null,
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-26T09:23:55.094Z",
+      "updatedAt": "2026-03-26T09:23:55.094Z",
+      "intakeId": null
+    },
+    {
+      "id": "cmn7bjd6u0001ju04rs41sc1a",
+      "studentNumber": "260015",
+      "fullName": "Trayan Todorov Markob",
+      "email": "Traqntm@gmail.com",
+      "phone": "+359 89 867 0604",
+      "address": null,
+      "nationality": null,
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "REGISTERED",
+      "totalFee": "7850",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": null,
+      "uploadTokenExpiry": null,
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-26T10:17:26.406Z",
+      "updatedAt": "2026-03-26T10:17:26.406Z",
+      "intakeId": null
+    },
+    {
+      "id": "cmn7bwcsj0001jl04mdo1ugi7",
+      "studentNumber": "260016",
+      "fullName": "Valere Vermersch",
+      "email": "valerev@hotmail.com",
+      "phone": "+33 6 20 27 30 57",
+      "address": null,
+      "nationality": null,
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "REGISTERED",
+      "totalFee": "10850",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": null,
+      "uploadTokenExpiry": null,
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-26T10:27:32.419Z",
+      "updatedAt": "2026-03-26T10:27:32.419Z",
+      "intakeId": null
+    },
+    {
+      "id": "cmn7bynax0003jl044aj1ovxq",
+      "studentNumber": "260017",
+      "fullName": "Deven Jones",
+      "email": "dev.jones94@hotmail.com",
+      "phone": "+44 7309 356765",
+      "address": null,
+      "nationality": null,
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "REGISTERED",
+      "totalFee": "10750",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": null,
+      "uploadTokenExpiry": null,
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-26T10:29:19.353Z",
+      "updatedAt": "2026-03-26T10:29:19.353Z",
+      "intakeId": null
+    },
+    {
+      "id": "cmn7c6bfg0005jl042wzulxc1",
+      "studentNumber": "260018",
+      "fullName": "Matej Rozman",
+      "email": "matejrozman@yahoo.com",
+      "phone": "+386 31 507 081",
+      "address": null,
+      "nationality": null,
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "REGISTERED",
+      "totalFee": "8600",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": null,
+      "uploadTokenExpiry": null,
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-26T10:35:17.212Z",
+      "updatedAt": "2026-03-26T10:35:17.212Z",
+      "intakeId": null
+    },
+    {
+      "id": "cmn7chl8f0009jl04iet3fxf9",
+      "studentNumber": "260019",
+      "fullName": "Dmytro Dikikh",
+      "email": "dikikh.dm@gmail.com",
+      "phone": "+356 7962 5244",
+      "address": null,
+      "nationality": null,
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "REGISTERED",
+      "totalFee": "12750",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": null,
+      "uploadTokenExpiry": null,
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-26T10:44:03.135Z",
+      "updatedAt": "2026-03-26T10:44:03.135Z",
+      "intakeId": null
+    },
+    {
+      "id": "cmn7cjwfw0001jr04460u8036",
+      "studentNumber": "260020",
+      "fullName": "Velizar Petkov Petkov",
+      "email": "velizar.petkov@icloud.com",
+      "phone": "+359 88 819 2777",
+      "address": null,
+      "nationality": null,
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "REGISTERED",
+      "totalFee": "9100",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": null,
+      "uploadTokenExpiry": null,
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-26T10:45:50.972Z",
+      "updatedAt": "2026-03-26T10:45:50.972Z",
+      "intakeId": null
+    },
+    {
+      "id": "cmn7cvzfc000bjl04gw82hoyx",
+      "studentNumber": "260021",
+      "fullName": "OSCAR VALMASEDA GREIL",
+      "email": "oscar1998vg@gmail.com",
+      "phone": "+34 693 50 02 03",
+      "address": null,
+      "nationality": null,
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "REGISTERED",
+      "totalFee": "9100",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": null,
+      "uploadTokenExpiry": null,
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-26T10:55:14.712Z",
+      "updatedAt": "2026-03-26T10:55:14.712Z",
+      "intakeId": null
+    },
+    {
+      "id": "cmn7cy4iq0001l104p1kusmpm",
+      "studentNumber": "260022",
+      "fullName": "Devon Seaton",
+      "email": "devonseaton1991@gmail.com",
+      "phone": "+40 765 889 489",
+      "address": null,
+      "nationality": null,
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "REGISTERED",
+      "totalFee": "11400",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": null,
+      "uploadTokenExpiry": null,
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-26T10:56:54.626Z",
+      "updatedAt": "2026-03-26T10:56:54.626Z",
+      "intakeId": null
+    },
+    {
+      "id": "cmmowgvxv001hkz04mjm1h6v9",
+      "studentNumber": "260002",
+      "fullName": "Vincent Dormehl",
+      "email": "vdormehl400@gmail.com",
+      "phone": null,
+      "address": null,
+      "nationality": "NA",
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "DOCS_REQ_SENT",
+      "totalFee": "3150",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": null,
+      "uploadTokenExpiry": null,
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-13T12:55:45.331Z",
+      "updatedAt": "2026-03-27T08:09:19.901Z",
+      "intakeId": "cml6ou8z4000jvfdo9i0f2y44"
+    },
+    {
+      "id": "cmmowflei001fkz0495918qgw",
+      "studentNumber": "260001",
+      "fullName": "Dilara Topal",
+      "email": "dilaratopal42@gmail.com",
+      "phone": "9900 8395",
+      "address": null,
+      "nationality": "Turkish",
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "DOCS_REQ_SENT",
+      "totalFee": "2950",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": "1b7769ab-092f-4d0a-9835-e7ecff398488",
+      "uploadTokenExpiry": "2026-03-31T10:53:33.847Z",
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-13T12:54:45.019Z",
+      "updatedAt": "2026-03-24T10:53:34.344Z",
+      "intakeId": "cml6ou8z4000jvfdo9i0f2y44"
+    },
+    {
+      "id": "cmmowl6yj001lkz04ozx6uxpy",
+      "studentNumber": "260003",
+      "fullName": "Hazem Alnaggar",
+      "email": "hazemgamilalnaggar@gmail.com",
+      "phone": null,
+      "address": null,
+      "nationality": "NA",
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "DOCS_REQ_SENT",
+      "totalFee": "3750",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": null,
+      "uploadTokenExpiry": null,
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-13T12:59:06.235Z",
+      "updatedAt": "2026-03-24T12:12:16.198Z",
+      "intakeId": "cml6ou8z4000jvfdo9i0f2y44"
+    },
+    {
+      "id": "cmmowm5lz0006kw04vovl7hlv",
+      "studentNumber": "260004",
+      "fullName": "Camillo Remirez",
+      "email": "camilloramirez001@gmail.com",
+      "phone": null,
+      "address": null,
+      "nationality": "NA",
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "DOCS_REQ_SENT",
+      "totalFee": "3150",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": null,
+      "uploadTokenExpiry": null,
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-13T12:59:51.143Z",
+      "updatedAt": "2026-03-24T12:12:26.548Z",
+      "intakeId": "cml6ou8z4000jvfdo9i0f2y44"
+    },
+    {
+      "id": "cmn4i954t000ajy043l62b13m",
+      "studentNumber": "260009",
+      "fullName": "Tuba Ozden",
+      "email": "training@xoneyacht.com",
+      "phone": null,
+      "address": null,
+      "nationality": "Turkish",
+      "passportNumber": null,
+      "dateOfBirth": null,
+      "certificateIssueDate": null,
+      "certificateExpiryDate": null,
+      "status": "DOCS_REQ_SENT",
+      "totalFee": "850",
+      "photoUrl": null,
+      "currency": "EUR",
+      "uploadToken": "b5619cef-b726-4f17-a775-6de526c72df0",
+      "uploadTokenExpiry": "2026-03-31T12:38:57.786Z",
+      "feedbackToken": null,
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-24T11:02:08.189Z",
+      "updatedAt": "2026-03-24T12:38:58.315Z",
+      "intakeId": "cml6ou8z4000jvfdo9i0f2y44"
+    }
+  ],
+  "studentDocuments": [
+    {
+      "id": "cmmt0cy710001la047luoa6c7",
+      "title": "Board Resolution for MBR.pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowflei001fkz0495918qgw/documents/1773654943066-Board_Resolution_for_MBR.pdf",
+      "fileType": "pdf",
+      "status": "REJECTED",
+      "expiryDate": null,
+      "createdAt": "2026-03-16T09:55:44.797Z",
+      "studentId": "cmmowflei001fkz0495918qgw",
+      "documentTypeId": "cmljf0dv50000vfok2tebm5z9"
+    },
+    {
+      "id": "cmmtb3yu20005l104kbsclc0f",
+      "title": "fa85294c-ff13-48db-8608-a5913d97dddf.jpg",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmt8wq5o0001le04gqygdy10/documents/1773673000493-fa85294c-ff13-48db-8608-a5913d97dddf.jpg",
+      "fileType": "jpeg",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-16T14:56:41.498Z",
+      "studentId": "cmmt8wq5o0001le04gqygdy10",
+      "documentTypeId": "cmmp1aovy0001vf6c1gwawkre"
+    },
+    {
+      "id": "cmmupbnx60001l804xgwxpybs",
+      "title": "moy-student-acknowlge-course-completion-and-submission-time-limits-Rev2.pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmt8wq5o0001le04gqygdy10/documents/1773757340804-moy-student-acknowlge-course-completion-and-submission-time-limits-Rev2.pdf",
+      "fileType": "pdf",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-17T14:22:21.402Z",
+      "studentId": "cmmt8wq5o0001le04gqygdy10",
+      "documentTypeId": "cmljiy2q60001vf2kr6zmdiie"
+    },
+    {
+      "id": "cmmtb3b000001l1049srt1poj",
+      "title": "fa85294c-ff13-48db-8608-a5913d97dddf.jpg",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmt8wq5o0001le04gqygdy10/documents/1773672969414-fa85294c-ff13-48db-8608-a5913d97dddf.jpg",
+      "fileType": "jpeg",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-16T14:56:10.609Z",
+      "studentId": "cmmt8wq5o0001le04gqygdy10",
+      "documentTypeId": "cmmp1aog40000vf6c2i35yp1l"
+    },
+    {
+      "id": "cmn4fkcqc0001jm04nsg9r2h2",
+      "title": "Training Agreement (6).pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowgvxv001hkz04mjm1h6v9/documents/admin-upload/1774345611356-Training_Agreement__6_.pdf",
+      "fileType": "pdf",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T09:46:52.405Z",
+      "studentId": "cmmowgvxv001hkz04mjm1h6v9",
+      "documentTypeId": "cmljiy2q60001vf2kr6zmdiie"
+    },
+    {
+      "id": "cmn4fksvv0004jm04bmbxfmlh",
+      "title": "Candidate Registration Form Malta Version (8).pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowgvxv001hkz04mjm1h6v9/documents/admin-upload/1774345632592-Candidate_Registration_Form_Malta_Version__8_.pdf",
+      "fileType": "pdf",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T09:47:13.340Z",
+      "studentId": "cmmowgvxv001hkz04mjm1h6v9",
+      "documentTypeId": "cmmp1aovy0001vf6c1gwawkre"
+    },
+    {
+      "id": "cmn4fpyz80007jm04x07wzcbv",
+      "title": "Passport  Passeport.pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowgvxv001hkz04mjm1h6v9/documents/admin-upload/1774345873767-Passport__Passeport.pdf",
+      "fileType": "pdf",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T09:51:14.516Z",
+      "studentId": "cmmowgvxv001hkz04mjm1h6v9",
+      "documentTypeId": "cmmp1aog40000vf6c2i35yp1l"
+    },
+    {
+      "id": "cmn4fqdat000ajm0434hdohu8",
+      "title": "Photo white background .HEIC",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowgvxv001hkz04mjm1h6v9/documents/admin-upload/1774345891881-Photo_white_background_.HEIC",
+      "fileType": "octet-stream",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T09:51:33.077Z",
+      "studentId": "cmmowgvxv001hkz04mjm1h6v9",
+      "documentTypeId": "cmmp1apox0004vf6czi4i2hya"
+    },
+    {
+      "id": "cmn4fqohz000djm041cx7il0f",
+      "title": "Signature .pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowgvxv001hkz04mjm1h6v9/documents/admin-upload/1774345906723-Signature_.pdf",
+      "fileType": "pdf",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T09:51:47.499Z",
+      "studentId": "cmmowgvxv001hkz04mjm1h6v9",
+      "documentTypeId": "cmljiy2xb0003vf2ke6abefr0"
+    },
+    {
+      "id": "cmn4gka4d0003i904385bvgiz",
+      "title": "IYT waiver-and-release-form (2) (3).pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowgvxv001hkz04mjm1h6v9/documents/admin-upload/1774347287937-IYT_waiver-and-release-form__2___3_.pdf",
+      "fileType": "pdf",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T10:14:48.638Z",
+      "studentId": "cmmowgvxv001hkz04mjm1h6v9",
+      "documentTypeId": "cmmuo9a1e0000vfl45gkskmbt"
+    },
+    {
+      "id": "cmn4gki6q0006i904ieje2w5o",
+      "title": "moy-student-acknowlge-course-completion-and-submission-time-limits-Rev2 (4).pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowgvxv001hkz04mjm1h6v9/documents/admin-upload/1774347298386-moy-student-acknowlge-course-completion-and-submission-time-limits-Rev2__4_.pdf",
+      "fileType": "pdf",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T10:14:59.090Z",
+      "studentId": "cmmowgvxv001hkz04mjm1h6v9",
+      "documentTypeId": "cmmuo9au40001vfl4mfeqi5hf"
+    },
+    {
+      "id": "cmn4h7060000al104evwqd0c5",
+      "title": "Egyptian Passport - Hazem Alnaggar.jpg",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowl6yj001lkz04ozx6uxpy/documents/admin-upload/1774348347858-Egyptian_Passport_-_Hazem_Alnaggar.jpg",
+      "fileType": "jpeg",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T10:32:28.824Z",
+      "studentId": "cmmowl6yj001lkz04ozx6uxpy",
+      "documentTypeId": "cmmp1aog40000vf6c2i35yp1l"
+    },
+    {
+      "id": "cmn4h7tll000dl104si7y1ywa",
+      "title": "IYT waiver-and-release-form (2) (3).pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowl6yj001lkz04ozx6uxpy/documents/admin-upload/1774348385733-IYT_waiver-and-release-form__2___3_.pdf",
+      "fileType": "pdf",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T10:33:06.969Z",
+      "studentId": "cmmowl6yj001lkz04ozx6uxpy",
+      "documentTypeId": "cmmuo9a1e0000vfl45gkskmbt"
+    },
+    {
+      "id": "cmn4h8209000gl104pdp1szod",
+      "title": "moy-student-acknowlge-course-completion-and-submission-time-limits-Rev2.pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowl6yj001lkz04ozx6uxpy/documents/admin-upload/1774348397171-moy-student-acknowlge-course-completion-and-submission-time-limits-Rev2.pdf",
+      "fileType": "pdf",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T10:33:17.866Z",
+      "studentId": "cmmowl6yj001lkz04ozx6uxpy",
+      "documentTypeId": "cmmuo9au40001vfl4mfeqi5hf"
+    },
+    {
+      "id": "cmn4h8jbq000jl104850r9gpa",
+      "title": "Training Agreement.pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowl6yj001lkz04ozx6uxpy/documents/admin-upload/1774348419120-Training_Agreement.pdf",
+      "fileType": "pdf",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T10:33:40.310Z",
+      "studentId": "cmmowl6yj001lkz04ozx6uxpy",
+      "documentTypeId": "cmljiy2q60001vf2kr6zmdiie"
+    },
+    {
+      "id": "cmn4h8tnb000ml104dmm0g6xz",
+      "title": "Candidate Registration Form Malta Version.pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowl6yj001lkz04ozx6uxpy/documents/admin-upload/1774348432471-Candidate_Registration_Form_Malta_Version.pdf",
+      "fileType": "pdf",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T10:33:53.687Z",
+      "studentId": "cmmowl6yj001lkz04ozx6uxpy",
+      "documentTypeId": "cmmp1aovy0001vf6c1gwawkre"
+    },
+    {
+      "id": "cmn4h9s6k000pl104ievxojfq",
+      "title": "212183.png",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowl6yj001lkz04ozx6uxpy/documents/admin-upload/1774348477669-212183.png",
+      "fileType": "png",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T10:34:38.444Z",
+      "studentId": "cmmowl6yj001lkz04ozx6uxpy",
+      "documentTypeId": "cmmuo9cjn0003vfl4z3nd720k"
+    },
+    {
+      "id": "cmn4ha0i5000bi904kjjmfc7q",
+      "title": "Photo.png",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowl6yj001lkz04ozx6uxpy/documents/admin-upload/1774348488233-Photo.png",
+      "fileType": "png",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T10:34:49.229Z",
+      "studentId": "cmmowl6yj001lkz04ozx6uxpy",
+      "documentTypeId": "cmmp1apox0004vf6czi4i2hya"
+    },
+    {
+      "id": "cmn4hbrjo0001jg04l770daia",
+      "title": "VHF Radio Licence - Hazem Alnaggar.jpg",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowl6yj001lkz04ozx6uxpy/documents/admin-upload/1774348570153-VHF_Radio_Licence_-_Hazem_Alnaggar.jpg",
+      "fileType": "jpeg",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T10:36:10.932Z",
+      "studentId": "cmmowl6yj001lkz04ozx6uxpy",
+      "documentTypeId": "cmmpfwqr60003vfrsdsyagmpy"
+    },
+    {
+      "id": "cmn4hc03q0004jg04oucvvspt",
+      "title": "Signature.jpg",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowl6yj001lkz04ozx6uxpy/documents/admin-upload/1774348581356-Signature.jpg",
+      "fileType": "jpeg",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T10:36:22.022Z",
+      "studentId": "cmmowl6yj001lkz04ozx6uxpy",
+      "documentTypeId": "cmljiy2xb0003vf2ke6abefr0"
+    },
+    {
+      "id": "cmn4hfujx0001jp04vpkyb17f",
+      "title": "seaman's medical certificate beliz.pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmowl6yj001lkz04ozx6uxpy/documents/admin-upload/1774348760411-seaman_s_medical_certificate_beliz.pdf",
+      "fileType": "pdf",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-24T10:39:21.454Z",
+      "studentId": "cmmowl6yj001lkz04ozx6uxpy",
+      "documentTypeId": "cmljf0e0c0001vfok1vfshi7b"
+    },
+    {
+      "id": "cmn7wziu00001l4041zzzob4h",
+      "title": "7ef73b03-16a9-4dcf-a971-fcff58c7262a.jpeg",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmn4i4kwi0002l404j4cto0vy/documents/1774556271082-7ef73b03-16a9-4dcf-a971-fcff58c7262a.jpeg",
+      "fileType": "jpeg",
+      "status": "PENDING",
+      "expiryDate": null,
+      "createdAt": "2026-03-26T20:17:52.153Z",
+      "studentId": "cmn4i4kwi0002l404j4cto0vy",
+      "documentTypeId": "cmmp1aog40000vf6c2i35yp1l"
+    },
+    {
+      "id": "cmn7x0yrj0001kz04a3f9b2vm",
+      "title": "Candidate Registration Form Malta Version.pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmn4i4kwi0002l404j4cto0vy/documents/1774556337949-Candidate_Registration_Form_Malta_Version.pdf",
+      "fileType": "pdf",
+      "status": "PENDING",
+      "expiryDate": null,
+      "createdAt": "2026-03-26T20:18:59.455Z",
+      "studentId": "cmn4i4kwi0002l404j4cto0vy",
+      "documentTypeId": "cmmp1aovy0001vf6c1gwawkre"
+    },
+    {
+      "id": "cmn7x1g720004kz04800b9hao",
+      "title": "Training Agreement (1) (1).pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmn4i4kwi0002l404j4cto0vy/documents/1774556360747-Training_Agreement__1___1_.pdf",
+      "fileType": "pdf",
+      "status": "PENDING",
+      "expiryDate": null,
+      "createdAt": "2026-03-26T20:19:22.046Z",
+      "studentId": "cmn4i4kwi0002l404j4cto0vy",
+      "documentTypeId": "cmljiy2q60001vf2kr6zmdiie"
+    },
+    {
+      "id": "cmn7x1pxm0007kz048wkhzu95",
+      "title": "IYT waiver-and-release-form (2) (3) (2).pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmn4i4kwi0002l404j4cto0vy/documents/1774556373556-IYT_waiver-and-release-form__2___3___2_.pdf",
+      "fileType": "pdf",
+      "status": "PENDING",
+      "expiryDate": null,
+      "createdAt": "2026-03-26T20:19:34.666Z",
+      "studentId": "cmn4i4kwi0002l404j4cto0vy",
+      "documentTypeId": "cmmuo9a1e0000vfl45gkskmbt"
+    },
+    {
+      "id": "cmn93nxqr0001la04weekdcrp",
+      "title": "Jaamiu Shaugy Mohamed_Passport_LA26E9262_2027.01.18_all pages.pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmn4i5pdj0003jy04qlz4ydmm/documents/1774627954203-Jaamiu_Shaugy_Mohamed_Passport_LA26E9262_2027.01.18_all_pages.pdf",
+      "fileType": "pdf",
+      "status": "PENDING",
+      "expiryDate": null,
+      "createdAt": "2026-03-27T16:12:35.091Z",
+      "studentId": "cmn4i5pdj0003jy04qlz4ydmm",
+      "documentTypeId": "cmmp1aog40000vf6c2i35yp1l"
+    },
+    {
+      "id": "cmn93on080004la045uaerill",
+      "title": "Candidate Registration Form_Jaamiu Shaugy_.pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmn4i5pdj0003jy04qlz4ydmm/documents/1774627987260-Candidate_Registration_Form_Jaamiu_Shaugy_.pdf",
+      "fileType": "pdf",
+      "status": "PENDING",
+      "expiryDate": null,
+      "createdAt": "2026-03-27T16:13:07.833Z",
+      "studentId": "cmn4i5pdj0003jy04qlz4ydmm",
+      "documentTypeId": "cmmp1aovy0001vf6c1gwawkre"
+    },
+    {
+      "id": "cmn93oush0007la04hrqxv8cw",
+      "title": "Training Agreement_Jaamiu Shaugy_.pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmn4i5pdj0003jy04qlz4ydmm/documents/1774627997354-Training_Agreement_Jaamiu_Shaugy_.pdf",
+      "fileType": "pdf",
+      "status": "PENDING",
+      "expiryDate": null,
+      "createdAt": "2026-03-27T16:13:17.922Z",
+      "studentId": "cmn4i5pdj0003jy04qlz4ydmm",
+      "documentTypeId": "cmljiy2q60001vf2kr6zmdiie"
+    },
+    {
+      "id": "cmn93oz8q000ala04he2omu0i",
+      "title": "IYT waiver-and-release-form_Jaamiu Shaugy_.pdf",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmn4i5pdj0003jy04qlz4ydmm/documents/1774628002796-IYT_waiver-and-release-form_Jaamiu_Shaugy_.pdf",
+      "fileType": "pdf",
+      "status": "PENDING",
+      "expiryDate": null,
+      "createdAt": "2026-03-27T16:13:23.690Z",
+      "studentId": "cmn4i5pdj0003jy04qlz4ydmm",
+      "documentTypeId": "cmmuo9a1e0000vfl45gkskmbt"
+    },
+    {
+      "id": "cmnaf4mid000avfekdqoudiar",
+      "title": "Yağız Ada Umur - STCW Basic Safety Training Certificate",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmt8wq5o0001le04gqygdy10/documents/generated/1774707671599-STCW_Basic_Safety_Training_Certificate.pdf",
+      "fileType": "pdf",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-28T14:21:15.638Z",
+      "studentId": "cmmt8wq5o0001le04gqygdy10",
+      "documentTypeId": "cmnaf4j7a0008vfekddvhziex"
+    },
+    {
+      "id": "cmnaf6jm4000dvfekj7vvoby1",
+      "title": "fatheeeer.jpg",
+      "fileUrl": "https://c2624b8e6f52b7cabc27afdb93aa98f4.r2.cloudflarestorage.com/students/cmmt8wq5o0001le04gqygdy10/documents/admin-upload/1774707764677-fatheeeer.jpg",
+      "fileType": "jpeg",
+      "status": "APPROVED",
+      "expiryDate": null,
+      "createdAt": "2026-03-28T14:22:45.197Z",
+      "studentId": "cmmt8wq5o0001le04gqygdy10",
+      "documentTypeId": "cmmuo9a1e0000vfl45gkskmbt"
+    }
+  ],
+  "studentDocumentNotes": [],
+  "studentRemarks": [
+    {
+      "id": "cmn7fc7q10003jo04pdlhkdwc",
+      "studentId": "cmn7cy4iq0001l104p1kusmpm",
+      "note": "He will do OOW now and ancillaries later",
+      "date": "2026-03-26T00:00:00.000Z",
+      "createdAt": "2026-03-26T12:03:51.105Z",
+      "updatedAt": "2026-03-26T12:03:51.105Z"
+    },
+    {
+      "id": "cmn7fcwlc0004i6044igt0o8h",
+      "studentId": "cmn79h2bs0001l5045l3v4khk",
+      "note": "He will do OOW now and ancillaries later",
+      "date": "2026-03-26T00:00:00.000Z",
+      "createdAt": "2026-03-26T12:04:23.332Z",
+      "updatedAt": "2026-03-26T12:04:23.332Z"
+    }
+  ],
+  "feedbacks": [],
+  "instructors": [
+    {
+      "id": "cml9ibuja0002vf0oba9icq4z",
+      "fullName": "Test Instructor",
+      "email": "studentmanagementsystem6@gmail.com",
+      "phone": "+90 552 345 9102",
+      "bio": "Safety Test Instructor",
+      "specialties": "Safety",
+      "employmentType": "FULL_TIME",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-02-05T13:43:40.538Z",
+      "updatedAt": "2026-03-10T21:44:11.615Z"
+    },
+    {
+      "id": "cmmowbgh00002kz04anxtwz4y",
+      "fullName": "Marcello LAvorato",
+      "email": "marcello@xoneyacht.com",
+      "phone": "+39 320 532 2289",
+      "bio": null,
+      "specialties": null,
+      "employmentType": "FULL_TIME",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-03-13T12:51:32.004Z",
+      "updatedAt": "2026-03-13T12:51:32.004Z"
+    }
+  ],
+  "instructorDocuments": [],
+  "courses": [
+    {
+      "id": "cmmup68ei0000vfyocvdq6phc",
+      "title": "STCW BASIC SAFETY TRAINING CERTIFICATE",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:08.010Z",
+      "updatedAt": "2026-03-17T14:18:08.010Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup68la0001vfyog0cy5xta",
+      "title": "SUPERYACHT DECK CREW",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:08.255Z",
+      "updatedAt": "2026-03-17T14:18:08.255Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup68nm0002vfyo369me191",
+      "title": "SMALL POWERBOAT & RIB MASTER MCA RECOGNISED",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:08.338Z",
+      "updatedAt": "2026-03-17T14:18:08.338Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup68qj0003vfyo81sd027n",
+      "title": "PROFESSIONAL SUPERYACHT HOSPITALITY",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:08.443Z",
+      "updatedAt": "2026-03-17T14:18:08.443Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup68vm0004vfyoy7gy2cky",
+      "title": "MARINE COMMUNICATIONS (VHF-SRC)",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:08.626Z",
+      "updatedAt": "2026-03-17T14:18:08.626Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup68xa0005vfyotokz788p",
+      "title": "ACCREDITED ENGINE-RATING COURSE (AEC)",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:08.687Z",
+      "updatedAt": "2026-03-17T14:18:08.687Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup690f0006vfyofvbbc6kx",
+      "title": "PROFESSIONAL SUPERYACHT CHEF",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:08.799Z",
+      "updatedAt": "2026-03-17T14:18:08.799Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup692q0007vfyo9uszg7zd",
+      "title": "MASTER OF YACHTS 200 GT COASTAL / MATE",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:08.883Z",
+      "updatedAt": "2026-03-17T14:18:08.883Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup69600008vfyo3gv42egc",
+      "title": "MASTER OF YACHTS 200 GT LIMITED",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:09.001Z",
+      "updatedAt": "2026-03-17T14:18:09.001Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup698l0009vfyorythjz0b",
+      "title": "MASTER ON YACHTS LESS THAN 200 GT (MALTA FLAG STATE)",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:09.094Z",
+      "updatedAt": "2026-03-17T14:18:09.094Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup69cn000avfyojyw55gk0",
+      "title": "MASTER OF YACHTS 200 GT UNLIMITED",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:09.239Z",
+      "updatedAt": "2026-03-17T14:18:09.239Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup69fp000bvfyoxidgmo01",
+      "title": "OOW ON YACHTS LESS THAN 3000GT",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:09.350Z",
+      "updatedAt": "2026-03-17T14:18:09.350Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup69kt000cvfyo993e0t59",
+      "title": "MASTER OF YACHTS 500 GT / CHIEF MATE 3000 GT",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:09.534Z",
+      "updatedAt": "2026-03-17T14:18:09.534Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup69n2000dvfyojvay97vf",
+      "title": "PROFICIENCY IN ADVANCED FIRE FIGHTING",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:09.615Z",
+      "updatedAt": "2026-03-17T14:18:09.615Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup69pe000evfyojn0nkwnm",
+      "title": "MEDICAL FIRST AID",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:09.699Z",
+      "updatedAt": "2026-03-17T14:18:09.699Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup69rt000fvfyo8qt9pt9l",
+      "title": "PROFICIENCY IN MEDICAL CARE",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:09.785Z",
+      "updatedAt": "2026-03-17T14:18:09.785Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup69ti000gvfyo2fg1p9fy",
+      "title": "PROFICIENCY IN SURVIVAL CRAFT AND RESCUE BOATS",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:09.846Z",
+      "updatedAt": "2026-03-17T14:18:09.846Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup69vr000hvfyo1up0oue3",
+      "title": "LEADERSHIP AND TEAMWORK (HELM Operational Level)",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:09.928Z",
+      "updatedAt": "2026-03-17T14:18:09.928Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup69xt000ivfyoso0p3u0n",
+      "title": "LEADERSHIP AND MANAGERIAL SKILLS (MANAGEMENT LEVEL)",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:10.002Z",
+      "updatedAt": "2026-03-17T14:18:10.002Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup69zt000jvfyo5u68x725",
+      "title": "ECDIS - ELECTRONIC CHART DISPLAY AND INFORMATION SYSTEM",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:10.073Z",
+      "updatedAt": "2026-03-17T14:18:10.073Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6a2m000kvfyod8xu8yl3",
+      "title": "RADAR / ARPA (OPERATIONAL LEVEL)",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:10.175Z",
+      "updatedAt": "2026-03-17T14:18:10.175Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6a4f000lvfyow7c0h2tl",
+      "title": "RADAR / ARPA (MANAGEMENT LEVEL)",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:10.240Z",
+      "updatedAt": "2026-03-17T14:18:10.240Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6a65000mvfyo0riznf7u",
+      "title": "GMDSS GENERAL OPERATORS CERTIFICATE (GOC) CoC",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:10.302Z",
+      "updatedAt": "2026-03-17T14:18:10.302Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6a7z000nvfyoeg2sxvk0",
+      "title": "EFFICIENT DECK HAND COURSE",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:10.368Z",
+      "updatedAt": "2026-03-17T14:18:10.368Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6a9u000ovfyo9yszm7i1",
+      "title": "IYT INSTRUCTOR TRAINING PROGRAMME",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:10.434Z",
+      "updatedAt": "2026-03-17T14:18:10.434Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6abr000pvfyo0smi6ft9",
+      "title": "PERSONAL WATERCRAFT OPERATOR ( PWC )",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:10.504Z",
+      "updatedAt": "2026-03-17T14:18:10.504Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6afr000qvfyo7xhsm7l4",
+      "title": "INTERNATIONAL BAREBOAT SKIPPER POWER / SAIL",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:10.648Z",
+      "updatedAt": "2026-03-17T14:18:10.648Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6ahy000rvfyo7a1lging",
+      "title": "INTERNATIONAL BAREBOAT SKIPPER SAIL / CATAMARAN",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:10.727Z",
+      "updatedAt": "2026-03-17T14:18:10.727Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6aki000svfyor3qm07gv",
+      "title": "INTERNATIONAL CERTIFICATE OF COMPETENCY COURSE",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:10.819Z",
+      "updatedAt": "2026-03-17T14:18:10.819Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6aoi000tvfyo016lg9gt",
+      "title": "INTERNATIONAL FLOTILLA SKIPPER",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:10.963Z",
+      "updatedAt": "2026-03-17T14:18:10.963Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6are000uvfyom5mvc0vz",
+      "title": "INTERNATIONAL FLOTILLA SKIPPER SAIL / CATAMARAN",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:11.066Z",
+      "updatedAt": "2026-03-17T14:18:11.066Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6aw5000vvfyo3gsvodm3",
+      "title": "YACHT MASTER COASTAL POWER / SAIL",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:11.238Z",
+      "updatedAt": "2026-03-17T14:18:11.238Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6b36000wvfyogbreljji",
+      "title": "YACHT MASTER COASTAL SAIL / CATAMARAN",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:11.490Z",
+      "updatedAt": "2026-03-17T14:18:11.490Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6ba2000xvfyok13t7nyw",
+      "title": "YACHT MASTER OCEAN",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:11.739Z",
+      "updatedAt": "2026-03-17T14:18:11.739Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6bfe000yvfyompcxk4p6",
+      "title": "YACHT MASTER OFFSHORE POWER / SAIL",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:11.931Z",
+      "updatedAt": "2026-03-17T14:18:11.931Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6bou000zvfyo1fmgbalo",
+      "title": "YACHT MASTER OFFSHORE SAIL / CATAMARAN",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:12.270Z",
+      "updatedAt": "2026-03-17T14:18:12.270Z",
+      "checklistTemplate": null
+    },
+    {
+      "id": "cmmup6btp0010vfyocymizczo",
+      "title": "PROFICIENCY IN MARITIME SECURITY AWARENESS",
+      "titleTr": null,
+      "createdAt": "2026-03-17T14:18:12.446Z",
+      "updatedAt": "2026-03-17T14:18:12.446Z",
+      "checklistTemplate": null
+    }
+  ],
+  "courseEvents": [
+    {
+      "id": "cmn4knwxe0001la04ht2e24b2",
+      "title": "April 2026 MoY 200GT Limited",
+      "startDate": "2026-04-12T22:00:00.000Z",
+      "endDate": "2026-04-25T22:00:00.000Z",
+      "location": null,
+      "color": "#3b82f6",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "instructorId": "cmmowbgh00002kz04anxtwz4y",
+      "courseId": "cmmup69600008vfyo3gv42egc",
+      "intakeId": null,
+      "createdAt": "2026-03-24T12:09:36.626Z",
+      "updatedAt": "2026-03-24T12:09:36.626Z"
+    },
+    {
+      "id": "cmn4pyk800001l104us1axjl9",
+      "title": "STCW BST April",
+      "startDate": "2026-04-06T13:37:00.000Z",
+      "endDate": "2026-04-11T13:37:00.000Z",
+      "location": null,
+      "color": "#eab308",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "instructorId": "cmmowbgh00002kz04anxtwz4y",
+      "courseId": "cmmup68ei0000vfyocvdq6phc",
+      "intakeId": null,
+      "createdAt": "2026-03-24T14:37:51.456Z",
+      "updatedAt": "2026-03-24T14:37:51.456Z"
+    },
+    {
+      "id": "cmn78a6ec0004lb04i6wgy1hl",
+      "title": "OOW Jan 2026 Intake",
+      "startDate": "2026-01-02T08:45:00.000Z",
+      "endDate": "2026-04-01T07:45:00.000Z",
+      "location": null,
+      "color": "#ef4444",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "instructorId": null,
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "intakeId": null,
+      "createdAt": "2026-03-26T08:46:18.853Z",
+      "updatedAt": "2026-03-26T08:46:18.853Z"
+    }
+  ],
+  "eventChecklistItems": [],
+  "courseDocuments": [
+    {
+      "id": "cmmup6ebn0012vfyo037307tv",
+      "courseId": "cmmup68ei0000vfyocvdq6phc",
+      "documentTypeId": "cmmp1aog40000vf6c2i35yp1l",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:15.684Z"
+    },
+    {
+      "id": "cmmup6egz0014vfyov1zlfret",
+      "courseId": "cmmup69600008vfyo3gv42egc",
+      "documentTypeId": "cmmp1aog40000vf6c2i35yp1l",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:15.875Z"
+    },
+    {
+      "id": "cmmup6eiq0016vfyoi2pv5oj8",
+      "courseId": "cmmup69cn000avfyojyw55gk0",
+      "documentTypeId": "cmmp1aog40000vf6c2i35yp1l",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:15.938Z"
+    },
+    {
+      "id": "cmmup6eki0018vfyoq6vrekm3",
+      "courseId": "cmmup68nm0002vfyo369me191",
+      "documentTypeId": "cmmp1aog40000vf6c2i35yp1l",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:16.003Z"
+    },
+    {
+      "id": "cmmup6emc001avfyoqzgiz5ov",
+      "courseId": "cmmup68vm0004vfyoy7gy2cky",
+      "documentTypeId": "cmmp1aog40000vf6c2i35yp1l",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:16.069Z"
+    },
+    {
+      "id": "cmmup6eo7001cvfyo5j6c36tx",
+      "courseId": "cmmup698l0009vfyorythjz0b",
+      "documentTypeId": "cmmp1aog40000vf6c2i35yp1l",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:16.136Z"
+    },
+    {
+      "id": "cmmup6epx001evfyomxn6jwlz",
+      "courseId": "cmmup68xa0005vfyotokz788p",
+      "documentTypeId": "cmmp1aog40000vf6c2i35yp1l",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:16.197Z"
+    },
+    {
+      "id": "cmmup6esd001gvfyoz6kp1hq9",
+      "courseId": "cmmup68ei0000vfyocvdq6phc",
+      "documentTypeId": "cmmp1aovy0001vf6c1gwawkre",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:16.285Z"
+    },
+    {
+      "id": "cmmup6ewd001ivfyoa2zkv9p2",
+      "courseId": "cmmup69600008vfyo3gv42egc",
+      "documentTypeId": "cmmp1aovy0001vf6c1gwawkre",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:16.429Z"
+    },
+    {
+      "id": "cmmup6eyj001kvfyoyrdlwkn2",
+      "courseId": "cmmup69cn000avfyojyw55gk0",
+      "documentTypeId": "cmmp1aovy0001vf6c1gwawkre",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:16.508Z"
+    },
+    {
+      "id": "cmmup6f2r001mvfyop3uxgy27",
+      "courseId": "cmmup68nm0002vfyo369me191",
+      "documentTypeId": "cmmp1aovy0001vf6c1gwawkre",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:16.660Z"
+    },
+    {
+      "id": "cmmup6f4q001ovfyof6dwqtfy",
+      "courseId": "cmmup68vm0004vfyoy7gy2cky",
+      "documentTypeId": "cmmp1aovy0001vf6c1gwawkre",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:16.730Z"
+    },
+    {
+      "id": "cmmup6f7a001qvfyotwqz4vu6",
+      "courseId": "cmmup698l0009vfyorythjz0b",
+      "documentTypeId": "cmmp1aovy0001vf6c1gwawkre",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:16.822Z"
+    },
+    {
+      "id": "cmmup6fa3001svfyomyksnh6b",
+      "courseId": "cmmup68xa0005vfyotokz788p",
+      "documentTypeId": "cmmp1aovy0001vf6c1gwawkre",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:16.923Z"
+    },
+    {
+      "id": "cmmup6fcx001uvfyo85kygj0g",
+      "courseId": "cmmup68ei0000vfyocvdq6phc",
+      "documentTypeId": "cmljiy2q60001vf2kr6zmdiie",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:17.026Z"
+    },
+    {
+      "id": "cmmup6feq001wvfyoxle6uai9",
+      "courseId": "cmmup69600008vfyo3gv42egc",
+      "documentTypeId": "cmljiy2q60001vf2kr6zmdiie",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:17.091Z"
+    },
+    {
+      "id": "cmmup6fgw001yvfyowt3ofwtb",
+      "courseId": "cmmup69cn000avfyojyw55gk0",
+      "documentTypeId": "cmljiy2q60001vf2kr6zmdiie",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:17.168Z"
+    },
+    {
+      "id": "cmmup6fip0020vfyopgl729tb",
+      "courseId": "cmmup68nm0002vfyo369me191",
+      "documentTypeId": "cmljiy2q60001vf2kr6zmdiie",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:17.234Z"
+    },
+    {
+      "id": "cmmup6fl30022vfyowbl1xsz4",
+      "courseId": "cmmup68vm0004vfyoy7gy2cky",
+      "documentTypeId": "cmljiy2q60001vf2kr6zmdiie",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:17.320Z"
+    },
+    {
+      "id": "cmmup6fon0024vfyomwu7dbr5",
+      "courseId": "cmmup698l0009vfyorythjz0b",
+      "documentTypeId": "cmljiy2q60001vf2kr6zmdiie",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:17.447Z"
+    },
+    {
+      "id": "cmmup6fqt0026vfyotxl1p4vx",
+      "courseId": "cmmup68xa0005vfyotokz788p",
+      "documentTypeId": "cmljiy2q60001vf2kr6zmdiie",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:17.526Z"
+    },
+    {
+      "id": "cmmup6fsk0028vfyowmn89e1p",
+      "courseId": "cmmup68ei0000vfyocvdq6phc",
+      "documentTypeId": "cmmuo9a1e0000vfl45gkskmbt",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:17.588Z"
+    },
+    {
+      "id": "cmmup6fu7002avfyo0g8dpemv",
+      "courseId": "cmmup69600008vfyo3gv42egc",
+      "documentTypeId": "cmmuo9a1e0000vfl45gkskmbt",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:17.648Z"
+    },
+    {
+      "id": "cmmup6fwx002cvfyou1iwlu1a",
+      "courseId": "cmmup69cn000avfyojyw55gk0",
+      "documentTypeId": "cmmuo9a1e0000vfl45gkskmbt",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:17.745Z"
+    },
+    {
+      "id": "cmmup6fzh002evfyoy6nxlc9y",
+      "courseId": "cmmup698l0009vfyorythjz0b",
+      "documentTypeId": "cmmuo9a1e0000vfl45gkskmbt",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:17.837Z"
+    },
+    {
+      "id": "cmmup6g1q002gvfyovxq2zfsh",
+      "courseId": "cmmup69600008vfyo3gv42egc",
+      "documentTypeId": "cmmuo9au40001vfl4mfeqi5hf",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:17.918Z"
+    },
+    {
+      "id": "cmmup6g4d002ivfyouy56cglx",
+      "courseId": "cmmup69cn000avfyojyw55gk0",
+      "documentTypeId": "cmmuo9au40001vfl4mfeqi5hf",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:18.013Z"
+    },
+    {
+      "id": "cmmup6g6i002kvfyohjjgjqvz",
+      "courseId": "cmmup69600008vfyo3gv42egc",
+      "documentTypeId": "cmljf0e0c0001vfok1vfshi7b",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:18.090Z"
+    },
+    {
+      "id": "cmmup6g8j002mvfyovj5t5dkm",
+      "courseId": "cmmup69cn000avfyojyw55gk0",
+      "documentTypeId": "cmljf0e0c0001vfok1vfshi7b",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:18.163Z"
+    },
+    {
+      "id": "cmmup6gbe002ovfyorsx95jy0",
+      "courseId": "cmmup698l0009vfyorythjz0b",
+      "documentTypeId": "cmljf0e0c0001vfok1vfshi7b",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:18.267Z"
+    },
+    {
+      "id": "cmmup6gdj002qvfyo8ab6sgkp",
+      "courseId": "cmmup68xa0005vfyotokz788p",
+      "documentTypeId": "cmljf0e0c0001vfok1vfshi7b",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:18.343Z"
+    },
+    {
+      "id": "cmmup6gfc002svfyo5xd2adca",
+      "courseId": "cmmup69600008vfyo3gv42egc",
+      "documentTypeId": "cmmuo9bse0002vfl4itnhfvya",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:18.409Z"
+    },
+    {
+      "id": "cmmup6gip002uvfyomjutvhqr",
+      "courseId": "cmmup69cn000avfyojyw55gk0",
+      "documentTypeId": "cmmuo9bse0002vfl4itnhfvya",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:18.529Z"
+    },
+    {
+      "id": "cmmup6gn5002wvfyofxgdvqnl",
+      "courseId": "cmmup698l0009vfyorythjz0b",
+      "documentTypeId": "cmmuo9bse0002vfl4itnhfvya",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:18.690Z"
+    },
+    {
+      "id": "cmmup6gqp002yvfyok9ljgnt3",
+      "courseId": "cmmup68xa0005vfyotokz788p",
+      "documentTypeId": "cmmuo9bse0002vfl4itnhfvya",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:18.817Z"
+    },
+    {
+      "id": "cmmup6gyk0030vfyoubmu8d7y",
+      "courseId": "cmmup69600008vfyo3gv42egc",
+      "documentTypeId": "cmmp1aph40003vf6cjgv0ff9p",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:19.101Z"
+    },
+    {
+      "id": "cmmup6h5q0032vfyoo6qycq8b",
+      "courseId": "cmmup698l0009vfyorythjz0b",
+      "documentTypeId": "cmmp1aph40003vf6cjgv0ff9p",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:19.358Z"
+    },
+    {
+      "id": "cmmup6h9m0034vfyozdmu5jgq",
+      "courseId": "cmmup69600008vfyo3gv42egc",
+      "documentTypeId": "cmmpfwqr60003vfrsdsyagmpy",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:19.498Z"
+    },
+    {
+      "id": "cmmup6hcq0036vfyogeilatnw",
+      "courseId": "cmmup69cn000avfyojyw55gk0",
+      "documentTypeId": "cmmpfwqr60003vfrsdsyagmpy",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:19.610Z"
+    },
+    {
+      "id": "cmmup6hhl0038vfyohh7nqc0x",
+      "courseId": "cmmup698l0009vfyorythjz0b",
+      "documentTypeId": "cmmpfwqr60003vfrsdsyagmpy",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:19.785Z"
+    },
+    {
+      "id": "cmmup6hl4003avfyoql1n7smo",
+      "courseId": "cmmup68xa0005vfyotokz788p",
+      "documentTypeId": "cmmpfwqr60003vfrsdsyagmpy",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:19.912Z"
+    },
+    {
+      "id": "cmmup6hoc003cvfyo69wsgof1",
+      "courseId": "cmmup69600008vfyo3gv42egc",
+      "documentTypeId": "cmmuo9cjn0003vfl4z3nd720k",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:20.028Z"
+    },
+    {
+      "id": "cmmup6hua003evfyow20x0t19",
+      "courseId": "cmmup69cn000avfyojyw55gk0",
+      "documentTypeId": "cmmuo9cjn0003vfl4z3nd720k",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:20.242Z"
+    },
+    {
+      "id": "cmmup6hxa003gvfyocuwcr7bm",
+      "courseId": "cmmup68nm0002vfyo369me191",
+      "documentTypeId": "cmmuo9cjn0003vfl4z3nd720k",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:20.351Z"
+    },
+    {
+      "id": "cmmup6i42003ivfyodqnw2ek9",
+      "courseId": "cmmup68vm0004vfyoy7gy2cky",
+      "documentTypeId": "cmmuo9cjn0003vfl4z3nd720k",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:20.595Z"
+    },
+    {
+      "id": "cmmup6i61003kvfyo8wuk2ggi",
+      "courseId": "cmmup698l0009vfyorythjz0b",
+      "documentTypeId": "cmmuo9cvr0004vfl4dftchgxo",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:20.666Z"
+    },
+    {
+      "id": "cmmup6i9z003mvfyouruyg0mh",
+      "courseId": "cmmup69600008vfyo3gv42egc",
+      "documentTypeId": "cmmp1apox0004vf6czi4i2hya",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:20.807Z"
+    },
+    {
+      "id": "cmmup6ifz003ovfyoa0lzioq3",
+      "courseId": "cmmup68xa0005vfyotokz788p",
+      "documentTypeId": "cmmp1apox0004vf6czi4i2hya",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:21.023Z"
+    },
+    {
+      "id": "cmmup6iod003qvfyowb4rpo0u",
+      "courseId": "cmmup69600008vfyo3gv42egc",
+      "documentTypeId": "cmljiy2xb0003vf2ke6abefr0",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:21.325Z"
+    },
+    {
+      "id": "cmmup6itu003svfyoaj1t0776",
+      "courseId": "cmmup69cn000avfyojyw55gk0",
+      "documentTypeId": "cmljiy2xb0003vf2ke6abefr0",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:21.523Z"
+    },
+    {
+      "id": "cmmup6iwh003uvfyojl0raqfo",
+      "courseId": "cmmup698l0009vfyorythjz0b",
+      "documentTypeId": "cmljiy2xb0003vf2ke6abefr0",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:21.618Z"
+    },
+    {
+      "id": "cmmup6j1s003wvfyotmtja76b",
+      "courseId": "cmmup68xa0005vfyotokz788p",
+      "documentTypeId": "cmljiy2xb0003vf2ke6abefr0",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:21.808Z"
+    },
+    {
+      "id": "cmmup6j3d003yvfyoftlfktai",
+      "courseId": "cmmup69cn000avfyojyw55gk0",
+      "documentTypeId": "cmmuo9ea50005vfl4fbo3hxhz",
+      "isRequired": true,
+      "createdAt": "2026-03-17T14:18:21.865Z"
+    },
+    {
+      "id": "cmn4l287a0001vf0o1wcl69g4",
+      "courseId": "cmmup69600008vfyo3gv42egc",
+      "documentTypeId": "cmljiy2tx0002vf2kra6qimvc",
+      "isRequired": false,
+      "createdAt": "2026-03-24T12:20:44.422Z"
+    },
+    {
+      "id": "cmn7gaok60001vfa4p515p0wa",
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "documentTypeId": "cmmp1aog40000vf6c2i35yp1l",
+      "isRequired": true,
+      "createdAt": "2026-03-26T12:30:39.319Z"
+    },
+    {
+      "id": "cmn7gaorg0003vfa4x5d7lt93",
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "documentTypeId": "cmmp1aovy0001vf6c1gwawkre",
+      "isRequired": true,
+      "createdAt": "2026-03-26T12:30:39.581Z"
+    },
+    {
+      "id": "cmn7gaowv0005vfa4x8vb5qdj",
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "documentTypeId": "cmljiy2q60001vf2kr6zmdiie",
+      "isRequired": true,
+      "createdAt": "2026-03-26T12:30:39.775Z"
+    },
+    {
+      "id": "cmn7gap1h0007vfa4qpp578d1",
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "documentTypeId": "cmmp1apbg0002vf6c12dege6z",
+      "isRequired": true,
+      "createdAt": "2026-03-26T12:30:39.942Z"
+    },
+    {
+      "id": "cmn7gapa5000avfa49x6vi0ba",
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "documentTypeId": "cmn7gap3o0008vfa44b38wz1c",
+      "isRequired": true,
+      "createdAt": "2026-03-26T12:30:40.254Z"
+    },
+    {
+      "id": "cmn7gapgm000dvfa4498ydspc",
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "documentTypeId": "cmn7gapd9000bvfa4j9w2b33q",
+      "isRequired": true,
+      "createdAt": "2026-03-26T12:30:40.486Z"
+    },
+    {
+      "id": "cmn7gapp7000fvfa4qjy4hcbi",
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "documentTypeId": "cmmp1apxf0005vf6cmws5s4ut",
+      "isRequired": true,
+      "createdAt": "2026-03-26T12:30:40.796Z"
+    },
+    {
+      "id": "cmn7gapsi000hvfa4aaoa57u1",
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "documentTypeId": "cmljiy30j0004vf2kb9fmdywn",
+      "isRequired": true,
+      "createdAt": "2026-03-26T12:30:40.914Z"
+    },
+    {
+      "id": "cmn7gapzy000jvfa4gf49atjj",
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "documentTypeId": "cmmp1aq720006vf6c1y25huun",
+      "isRequired": true,
+      "createdAt": "2026-03-26T12:30:41.182Z"
+    },
+    {
+      "id": "cmn7gaq8n000lvfa4xrqvvcwu",
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "documentTypeId": "cmmp1aqjf0007vf6cdf5m7xb0",
+      "isRequired": true,
+      "createdAt": "2026-03-26T12:30:41.496Z"
+    },
+    {
+      "id": "cmn7gaqgf000nvfa44lv5655i",
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "documentTypeId": "cmmp1aqtn0008vf6cqe1zsv6h",
+      "isRequired": true,
+      "createdAt": "2026-03-26T12:30:41.775Z"
+    },
+    {
+      "id": "cmn7gaqs9000pvfa472ylctvy",
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "documentTypeId": "cmmp1ar1u0009vf6cui2bjia1",
+      "isRequired": true,
+      "createdAt": "2026-03-26T12:30:42.202Z"
+    },
+    {
+      "id": "cmn7gar3k000rvfa4e3ec528b",
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "documentTypeId": "cmmp1ar8c000avf6cfwsqvxry",
+      "isRequired": true,
+      "createdAt": "2026-03-26T12:30:42.609Z"
+    },
+    {
+      "id": "cmn7gardm000tvfa4880dbq0i",
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "documentTypeId": "cmmp1arhr000bvf6cfxl9qcgd",
+      "isRequired": true,
+      "createdAt": "2026-03-26T12:30:42.970Z"
+    },
+    {
+      "id": "cmn7garjn000vvfa412i2bvk5",
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "documentTypeId": "cmmp1arou000cvf6c8esb83kb",
+      "isRequired": true,
+      "createdAt": "2026-03-26T12:30:43.188Z"
+    },
+    {
+      "id": "cmn7garrz000xvfa475lqjydg",
+      "courseId": "cmmup69fp000bvfyoxidgmo01",
+      "documentTypeId": "cmmp1arzm000dvf6cxlqfgviz",
+      "isRequired": true,
+      "createdAt": "2026-03-26T12:30:43.487Z"
+    }
+  ],
+  "intakes": [
+    {
+      "id": "cml6ou7lw000avfdocmz3t2e5",
+      "name": "January 2025",
+      "startDate": "2024-12-31T21:00:00.000Z",
+      "status": "ARCHIVED",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-02-03T14:22:36.548Z",
+      "updatedAt": "2026-03-10T21:44:12.563Z"
+    },
+    {
+      "id": "cml6ou7u0000bvfdoj6kvvewh",
+      "name": "February 2025",
+      "startDate": "2025-01-31T21:00:00.000Z",
+      "status": "ARCHIVED",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-02-03T14:22:36.841Z",
+      "updatedAt": "2026-03-10T21:44:12.563Z"
+    },
+    {
+      "id": "cml6ou81r000cvfdon5wb154k",
+      "name": "March 2025",
+      "startDate": "2025-02-28T21:00:00.000Z",
+      "status": "ARCHIVED",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-02-03T14:22:37.120Z",
+      "updatedAt": "2026-03-10T21:44:12.563Z"
+    },
+    {
+      "id": "cml6ou8gg000dvfdoc4aw2420",
+      "name": "April 2025",
+      "startDate": "2025-03-31T21:00:00.000Z",
+      "status": "ARCHIVED",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-02-03T14:22:37.649Z",
+      "updatedAt": "2026-03-10T21:44:12.563Z"
+    },
+    {
+      "id": "cml6ou8iw000evfdoip2dkh5a",
+      "name": "May 2025",
+      "startDate": "2025-04-30T21:00:00.000Z",
+      "status": "ARCHIVED",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-02-03T14:22:37.737Z",
+      "updatedAt": "2026-03-10T21:44:12.563Z"
+    },
+    {
+      "id": "cml6ou8lj000fvfdovs23jwqv",
+      "name": "June 2025",
+      "startDate": "2025-05-31T21:00:00.000Z",
+      "status": "ARCHIVED",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-02-03T14:22:37.832Z",
+      "updatedAt": "2026-03-10T21:44:12.563Z"
+    },
+    {
+      "id": "cml6ou8np000gvfdo6hmw1xnw",
+      "name": "January 2026",
+      "startDate": "2025-12-31T21:00:00.000Z",
+      "status": "ACTIVE",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-02-03T14:22:37.910Z",
+      "updatedAt": "2026-03-10T21:44:12.563Z"
+    },
+    {
+      "id": "cml6ou8ur000hvfdob575k6om",
+      "name": "February 2026",
+      "startDate": "2026-01-31T21:00:00.000Z",
+      "status": "ACTIVE",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-02-03T14:22:38.164Z",
+      "updatedAt": "2026-03-10T21:44:12.563Z"
+    },
+    {
+      "id": "cml6ou8x7000ivfdo0a7g5k7w",
+      "name": "March 2026",
+      "startDate": "2026-02-28T21:00:00.000Z",
+      "status": "ACTIVE",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-02-03T14:22:38.251Z",
+      "updatedAt": "2026-03-10T21:44:12.563Z"
+    },
+    {
+      "id": "cml6ou8z4000jvfdo9i0f2y44",
+      "name": "April 2026",
+      "startDate": "2026-03-31T21:00:00.000Z",
+      "status": "ACTIVE",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-02-03T14:22:38.320Z",
+      "updatedAt": "2026-03-10T21:44:12.563Z"
+    },
+    {
+      "id": "cml6ou90m000kvfdowwvndggl",
+      "name": "May 2026",
+      "startDate": "2026-04-30T21:00:00.000Z",
+      "status": "ACTIVE",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-02-03T14:22:38.375Z",
+      "updatedAt": "2026-03-10T21:44:12.563Z"
+    },
+    {
+      "id": "cml6ou92h000lvfdouo0vds06",
+      "name": "June 2026",
+      "startDate": "2026-05-31T21:00:00.000Z",
+      "status": "ACTIVE",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "createdAt": "2026-02-03T14:22:38.442Z",
+      "updatedAt": "2026-03-10T21:44:12.563Z"
+    }
+  ],
+  "payments": [
+    {
+      "id": "cmmowtg9f0009kw040qbfdn9a",
+      "amount": "500",
+      "currency": "EUR",
+      "date": "2026-03-13T13:05:31.539Z",
+      "method": "CASH",
+      "note": "",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "studentId": "cmmowflei001fkz0495918qgw",
+      "createdAt": "2026-03-13T13:05:31.539Z"
+    },
+    {
+      "id": "cmmoxd3kf0004l404bwh2y9yb",
+      "amount": "630",
+      "currency": "EUR",
+      "date": "2026-03-13T13:20:48.208Z",
+      "method": "BANK_TRANSFER",
+      "note": "HSBC  - Down Payment",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "studentId": "cmmowm5lz0006kw04vovl7hlv",
+      "createdAt": "2026-03-13T13:20:48.208Z"
+    },
+    {
+      "id": "cmmoxfdsj0003k104zbgc0v40",
+      "amount": "590",
+      "currency": "EUR",
+      "date": "2026-03-13T13:22:34.771Z",
+      "method": "BANK_TRANSFER",
+      "note": "HSBC  - Down Payment",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "studentId": "cmmowgvxv001hkz04mjm1h6v9",
+      "createdAt": "2026-03-13T13:22:34.771Z"
+    },
+    {
+      "id": "cmmoxghm70001jv041n01a7fd",
+      "amount": "630",
+      "currency": "EUR",
+      "date": "2026-03-13T13:23:26.383Z",
+      "method": "BANK_TRANSFER",
+      "note": "HSBC  - Down Payment",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "studentId": "cmmowl6yj001lkz04ozx6uxpy",
+      "createdAt": "2026-03-13T13:23:26.383Z"
+    },
+    {
+      "id": "cmn4i8d9q0005jy04k3w7z4hf",
+      "amount": "170",
+      "currency": "EUR",
+      "date": "2026-03-24T11:01:32.078Z",
+      "method": "BANK_TRANSFER",
+      "note": "HSBC  - Down Payment",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "studentId": "cmn4i4kwi0002l404j4cto0vy",
+      "createdAt": "2026-03-24T11:01:32.078Z"
+    },
+    {
+      "id": "cmn4lrxo90001ky048v32903d",
+      "amount": "170",
+      "currency": "EUR",
+      "date": "2026-03-24T12:40:43.834Z",
+      "method": "BANK_TRANSFER",
+      "note": "HSBC  - Down Payment",
+      "branchId": "cmml50vr20000vfy0dlvmssx7",
+      "studentId": "cmn4i57qm0001jy049hguefsq",
+      "createdAt": "2026-03-24T12:40:43.834Z"
+    }
+  ],
+  "documentTypes": [
+    {
+      "id": "cmljf0dv50000vfok2tebm5z9",
+      "title": "Passport Copy",
+      "titleTr": null,
+      "description": "Standard required document: Passport Copy",
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmljf0e0c0001vfok1vfshi7b",
+      "title": "Medical Certificate",
+      "titleTr": null,
+      "description": "Standard required document: Medical Certificate",
+      "descriptionTr": null,
+      "category": "MEDICAL",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmljf0e3k0002vfokvk4onau0",
+      "title": "Seaman's Book",
+      "titleTr": null,
+      "description": "Standard required document: Seaman's Book",
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmljf0e6s0003vfokc8ap312y",
+      "title": "STCW Basic Safety Training",
+      "titleTr": null,
+      "description": "Standard required document: STCW Basic Safety Training",
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmljf0ea70004vfokqhut25in",
+      "title": "Passport Photo",
+      "titleTr": null,
+      "description": "Standard required document: Passport Photo",
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmljiy2jm0000vf2kk0gy9c44",
+      "title": "Candidate Registration",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "OFFICE",
+      "isRequired": false,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmljiy2q60001vf2kr6zmdiie",
+      "title": "Training Agreement",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "OFFICE",
+      "isRequired": false,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmljiy2tx0002vf2kra6qimvc",
+      "title": "Seaservice Record",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": false,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmljiy30j0004vf2kb9fmdywn",
+      "title": "Steering Certificate",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": false,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1aog40000vf6c2i35yp1l",
+      "title": "Passport",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1aovy0001vf6c1gwawkre",
+      "title": "Candidate Registration Form",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "OFFICE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1apbg0002vf6c12dege6z",
+      "title": "Medical",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "MEDICAL",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1as4e000evf6cqlpkjauj",
+      "title": "Radar/ARPA Management Level",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1as8n000fvf6colqrqs9l",
+      "title": "Use of Leadership and Management Skills",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1asdv000gvf6cfakjauem",
+      "title": "Medical Care",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmpfwp4z0000vfrsmskjj7fo",
+      "title": "Yacht Rating Certificate (optional)",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmpfwpq90001vfrsfh13oovo",
+      "title": "STCW Basic Safety",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmpfwq8u0002vfrs1o13vj0h",
+      "title": "Student Record Password",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmpfwqxq0004vfrshzbg0k5m",
+      "title": "Yacht Rating",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmpfwr620005vfrsui66nz6y",
+      "title": "Watch Rating",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmpfwrgb0006vfrs1q6i5hji",
+      "title": "Yacht Rating Management Level",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmuo9a1e0000vfl45gkskmbt",
+      "title": "Waiver Form",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": false,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmuo9au40001vfl4mfeqi5hf",
+      "title": "Student Acknowledgement Form",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": false,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmuo9bse0002vfl4itnhfvya",
+      "title": "STCW BST 5 modules",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": false,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmuo9cjn0003vfl4z3nd720k",
+      "title": "IYT Student Number",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": false,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmuo9cvr0004vfl4dftchgxo",
+      "title": "Skipper license(2 years old)",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": false,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmuo9ea50005vfl4fbo3hxhz",
+      "title": "Copy of Limited or OOW",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": false,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1aph40003vf6cjgv0ff9p",
+      "title": "Seaservice Testimonial",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmpfwqr60003vfrsdsyagmpy",
+      "title": "VHF Certificate Copy",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1apox0004vf6czi4i2hya",
+      "title": "Color photograph of seafarer (The image must show a full face, without dark eyewear and with a white background)",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmljiy2xb0003vf2ke6abefr0",
+      "title": "Signature of seafarer (The signature must be written with black ink and on a white background)",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": false,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmn7gap3o0008vfa44b38wz1c",
+      "title": "Seaservice",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmn7gapd9000bvfa4j9w2b33q",
+      "title": "Color photograph of seafarer",
+      "titleTr": null,
+      "description": "The image must show a full face, without dark eyewear and with a white background.",
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1apxf0005vf6cmws5s4ut",
+      "title": "Signature of seafarer",
+      "titleTr": null,
+      "description": "The signature must be written with black ink and on a white background.",
+      "descriptionTr": null,
+      "category": "STUDENT",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1aq720006vf6c1y25huun",
+      "title": "ECDIS",
+      "titleTr": null,
+      "description": "Ancillary course",
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1aqjf0007vf6cdf5m7xb0",
+      "title": "RADAR/ARPA OPERATIONAL MODEL",
+      "titleTr": null,
+      "description": "Ancillary course",
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1aqtn0008vf6cqe1zsv6h",
+      "title": "Efficient Deck Hand",
+      "titleTr": null,
+      "description": "Ancillary course",
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1ar1u0009vf6cui2bjia1",
+      "title": "Leadership and Teamwork",
+      "titleTr": null,
+      "description": "Ancillary course",
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1ar8c000avf6cfwsqvxry",
+      "title": "GMDSS GoC",
+      "titleTr": null,
+      "description": "Ancillary course",
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1arhr000bvf6cfxl9qcgd",
+      "title": "MEDICAL FIRST AID",
+      "titleTr": null,
+      "description": "Ancillary course",
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1arou000cvf6c8esb83kb",
+      "title": "Advanced Fire Fighting",
+      "titleTr": null,
+      "description": "Ancillary course",
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmmp1arzm000dvf6cxlqfgviz",
+      "title": "PSCRB",
+      "titleTr": null,
+      "description": "Ancillary course",
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": true,
+      "exampleUrl": null
+    },
+    {
+      "id": "cmnaf4j7a0008vfekddvhziex",
+      "title": "STCW Basic Safety Training Certificate",
+      "titleTr": null,
+      "description": null,
+      "descriptionTr": null,
+      "category": "CERTIFICATE",
+      "isRequired": false,
+      "exampleUrl": null
+    }
+  ],
+  "tickets": [],
+  "ticketMessages": [],
+  "attendances": []
+}

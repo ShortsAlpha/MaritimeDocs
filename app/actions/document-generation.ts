@@ -49,7 +49,9 @@ export async function generateDocumentPreview(studentId: string, courseId: strin
         // 3. Fill the template (Safe from client bundle)
         const filler = TemplateFillers[templateDef.id];
         if (filler) {
-            await filler(pdfDoc, student, course);
+            const { applyTMMetadataToStudent } = await import("@/lib/transport-malta");
+            const processedStudent = await applyTMMetadataToStudent(student, course, templateDef.id);
+            await filler(pdfDoc, processedStudent, course);
         }
 
         // 4. Save to base64
@@ -102,10 +104,35 @@ export async function saveGeneratedDocument(studentId: string, courseId: string)
         const bytes = await response.Body.transformToByteArray();
 
         // 2. Load with pdf-lib and Fill
+        const { applyTMMetadataToStudent } = await import("@/lib/transport-malta");
+        const processedStudent = await applyTMMetadataToStudent(student, course, templateDef.id);
+
         const pdfDoc = await PDFDocument.load(bytes);
         const filler = TemplateFillers[templateDef.id];
         if (filler) {
-            await filler(pdfDoc, student, course);
+            await filler(pdfDoc, processedStudent, course);
+        }
+
+        // Lock in the TM record if applicable
+        if (processedStudent.__courseEventId) {
+            await db.studentCertificate.upsert({
+                where: {
+                    studentId_courseEventId_certificateType: {
+                        studentId: student.id,
+                        courseEventId: processedStudent.__courseEventId,
+                        certificateType: templateDef.id
+                    }
+                },
+                update: {}, // Once generated, usually we don't update it to avoid jumping numbers
+                create: {
+                    studentId: student.id,
+                    courseEventId: processedStudent.__courseEventId,
+                    certificateType: templateDef.id,
+                    certificateNo: processedStudent.studentNumber,
+                    issueDate: processedStudent.certificateIssueDate,
+                    expiryDate: processedStudent.certificateExpiryDate,
+                }
+            });
         }
 
         // 3. Save directly to Unit8Array buffer

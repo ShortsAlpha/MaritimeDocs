@@ -39,7 +39,7 @@ export const TemplateFillers: Record<string, (pdfDoc: PDFDocument, student: any,
             });
 
             // 2. Top Right Fields
-            const certNo = `STCW-${student.studentNumber || Math.floor(Math.random() * 100000)}`;
+            const certNo = student.studentNumber || `STCW-${Math.floor(Math.random() * 100000)}`;
             page.drawText(certNo, {
                 x: width - 120,
                 y: height - 98,
