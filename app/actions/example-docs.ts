@@ -24,7 +24,7 @@ export async function getExampleDocuments() {
 
         const friendlyNames: Record<string, string> = {
             "Candidate Registration Form Malta Version.pdf": "Candidate Registration Form",
-            "IYT waiver-and-release-form (2) (3).pdf": "IYT Waiver And Release Form",
+            "Marshall Island Waiver-and-release-form. (1).pdf": "Marshall Island Waiver And Release Form",
             "Training Agreement (1).pdf": "Training Agreement",
             "candidate_sea_time_form (1) (1) (1) (3).pdf": "Candidate Sea Time Form",
             "how to iyt registration (4).pdf": "How to Register IYT",
