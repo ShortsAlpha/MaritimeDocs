@@ -87,15 +87,15 @@ export async function createStudent(prevState: any, formData: FormData) {
         }
 
         const rowData = {
-            fullName: formData.get("fullName"),
-            email: formData.get("email"),
-            phone: formData.get("phone"),
+            fullName: formData.get("fullName") || undefined,
+            email: formData.get("email") || undefined,
+            phone: formData.get("phone") || undefined,
             courses: parsedCourses,
-            totalFee: formData.get("totalFee"),
-            nationality: formData.get("nationality"),
-            passportNumber: formData.get("passportNumber"),
-            dateOfBirth: formData.get("dateOfBirth"),
-            intakeId: formData.get("intakeId"),
+            totalFee: formData.get("totalFee") || 0,
+            nationality: formData.get("nationality") || undefined,
+            passportNumber: formData.get("passportNumber") || undefined,
+            dateOfBirth: formData.get("dateOfBirth") || undefined,
+            intakeId: formData.get("intakeId") || undefined,
         }
 
         const data = StudentSchema.parse(rowData)
@@ -123,9 +123,9 @@ export async function createStudent(prevState: any, formData: FormData) {
 
         revalidatePath("/admin/students")
         return { success: true, message: "Student created successfully" }
-    } catch (error) {
-        console.error(error)
-        return { success: false, message: "Failed to create student" }
+    } catch (error: any) {
+        console.error("CREATE STUDENT ERROR:", error)
+        return { success: false, message: error.message || "Failed to create student. Check console." }
     }
 }
 
