@@ -24,16 +24,16 @@ function formatFilename(filename: string) {
     return name.trim();
 }
 
-export default async function NotesPortalPage({
-    params,
-    searchParams
-}: {
-    params: { token: string },
-    searchParams: { [key: string]: string | undefined }
+export default async function NotesPortalPage(props: {
+    params: Promise<{ token: string }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+    const params = await props.params;
+    const searchParams = await props.searchParams;
+    
     const { token } = params;
-    const courseId = searchParams.courseId;
-    const courseTitle = searchParams.title;
+    const courseId = searchParams.courseId as string | undefined;
+    const courseTitle = searchParams.title as string | undefined;
 
     if (!token || !courseId || !courseTitle) {
         return (
