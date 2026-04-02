@@ -70,6 +70,54 @@ export async function sendLectureNotes(studentId: string) {
     }
 }
 
+export async function sendCloudLectureNotes(studentId: string, courseId: string, courseTitle: string) {
+    try {
+        const student = await db.student.findUnique({
+            where: { id: studentId }
+        });
+
+        if (!student) {
+            return { success: false, error: "Student not found" };
+        }
+
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://student.xoneacademy.com';
+
+        let token = student.uploadToken;
+        if (!token) {
+            token = crypto.randomUUID();
+            await db.student.update({
+                where: { id: studentId },
+                data: { uploadToken: token }
+            });
+        }
+
+        const magicLink = `${baseUrl}/notes/${token}?courseId=${courseId}&title=${encodeURIComponent(courseTitle)}`;
+
+        const emailResult = await sendExamNotesEmail(
+            studentId,
+            courseTitle,
+            magicLink
+        );
+
+        if (!emailResult.success) {
+            return { success: false, error: emailResult.message };
+        }
+
+        await db.student.update({
+            where: { id: studentId },
+            data: { status: StudentStatus.LECTURE_NOTES_SENT as any }
+        });
+
+        revalidatePath(`/admin/students/${studentId}`);
+        revalidatePath("/admin/students");
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error dispatching cloud lecture notes:", error)
+        return { success: false, error: "Failed to send cloud lecture notes" }
+    }
+}
+
 export async function checkDocumentCompleteness(studentId: string) {
     try {
         // Get all required document types

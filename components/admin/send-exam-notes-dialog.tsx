@@ -2,6 +2,8 @@
 
 import { getUploadUrl } from "@/app/actions/uploads";
 import { sendExamNotesEmail } from "@/app/actions/email";
+import { checkCloudLectureNotes } from "@/app/actions/lecture-notes";
+import { sendCloudLectureNotes } from "@/app/actions/student-automation";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -13,82 +15,139 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileText, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { FileText, Loader2, Cloud, UploadCloud } from "lucide-react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { uploadExamNoteFile } from "@/app/actions/documents";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { studentId: string, courseName?: string, courses?: any[] }) {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [course, setCourse] = useState(courseName || "");
+    
+    // We store course ID if available, default to empty
+    const defaultCourseId = courses.find(c => c.title === courseName)?.id || "";
+    const [courseId, setCourseId] = useState(defaultCourseId);
+    
+    const [cloudFiles, setCloudFiles] = useState<any[]>([]);
+    const [isCheckingCloud, setIsCheckingCloud] = useState(false);
+    const [deliveryMethod, setDeliveryMethod] = useState<'cloud' | 'manual'>('manual');
+    
     const [file, setFile] = useState<File | null>(null);
     const [uploadProgress, setUploadProgress] = useState(0);
 
+    const selectedCourseTitle = courses.find(c => c.id === courseId)?.title || courseName || "";
+
+    useEffect(() => {
+        if (!selectedCourseTitle || !isOpen) return;
+        
+        let active = true;
+        setIsCheckingCloud(true);
+        setCloudFiles([]);
+        
+        checkCloudLectureNotes(selectedCourseTitle).then(res => {
+            if (!active) return;
+            if (res.success && res.files) {
+                setCloudFiles(res.files);
+                if (res.files.length > 0) {
+                    setDeliveryMethod('cloud');
+                } else {
+                    setDeliveryMethod('manual');
+                }
+            }
+        }).finally(() => {
+            if (active) setIsCheckingCloud(false);
+        });
+
+        return () => { active = false; };
+    }, [selectedCourseTitle, isOpen]);
+
     async function handleSend(e: React.FormEvent) {
         e.preventDefault();
-        setIsLoading(true);
-        setUploadProgress(0);
-
-        if (!file || !course) {
-            toast.error("Please select a course and a file");
-            setIsLoading(false);
+        
+        if (!courseId && !selectedCourseTitle) {
+            toast.error("Please select a course");
             return;
         }
 
+        setIsLoading(true);
+        setUploadProgress(0);
+
         try {
-            // 1. Get Presigned URL directly from server to bypass 4.5MB Vercel payload limit
-            const urlResult = await getUploadUrl(file.name, file.type, `students/${studentId}/exam-notes`);
-            
-            if (!urlResult.success || !urlResult.uploadUrl || !urlResult.key) {
-                toast.error("Failed to generate secure upload link.");
-                setIsLoading(false);
-                return;
-            }
-
-            console.log("Presigned URL received, attempting XHR PUT to R2...", urlResult.uploadUrl.substring(0, 80));
-
-            // 2. Upload natively via XHR to track 0-100% progress
-            await new Promise<void>((resolve, reject) => {
-                const xhr = new XMLHttpRequest();
+            if (deliveryMethod === 'cloud') {
+                if (cloudFiles.length === 0) {
+                    toast.error("No cloud files detected for this course.");
+                    setIsLoading(false);
+                    return;
+                }
                 
-                xhr.upload.addEventListener('progress', (event) => {
-                    if (event.lengthComputable) {
-                        const percentComplete = Math.round((event.loaded / event.total) * 100);
-                        setUploadProgress(percentComplete);
-                    }
-                });
+                const cId = courseId || courses.find(c => c.title === selectedCourseTitle)?.id;
+                if (!cId) throw new Error("Could not map course ID.");
 
-                xhr.addEventListener('load', () => {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        setUploadProgress(100);
-                        resolve();
-                    } else {
-                        reject(new Error(`Cloudflare R2 Error: ${xhr.status} - ${xhr.responseText.substring(0, 50)}`));
-                    }
-                });
-
-                xhr.addEventListener('error', () => reject(new Error("Network error during Cloudflare R2 upload.")));
-                xhr.addEventListener('abort', () => reject(new Error("Upload aborted by user.")));
-
-                xhr.open('PUT', urlResult.uploadUrl);
-                xhr.setRequestHeader('Content-Type', file.type);
-                xhr.send(file);
-            });
-
-            const finalUrl = `${window.location.origin}/download?key=${encodeURIComponent(urlResult.key)}`;
-
-            // 3. Send Email
-            const emailRes = await sendExamNotesEmail(studentId, course, finalUrl);
-
-            if (emailRes.success) {
-                toast.success("Lecture notes sent successfully!");
-                setIsOpen(false);
-                setFile(null);
-                setUploadProgress(0);
+                const res = await sendCloudLectureNotes(studentId, cId, selectedCourseTitle);
+                if (res.success) {
+                    toast.success("Magic Student Portal Link sent successfully!");
+                    setIsOpen(false);
+                } else {
+                    toast.error(res.error || "Failed to send lecture notes");
+                }
             } else {
-                toast.error("Failed to send email");
+                // Manual Upload logic
+                if (!file) {
+                    toast.error("Please select a file to upload");
+                    setIsLoading(false);
+                    return;
+                }
+
+                // 1. Get Presigned URL directly from server to bypass payload limit
+                const urlResult = await getUploadUrl(file.name, file.type, `students/${studentId}/exam-notes`);
+                
+                if (!urlResult.success || !urlResult.uploadUrl || !urlResult.key) {
+                    toast.error("Failed to generate secure upload link.");
+                    setIsLoading(false);
+                    return;
+                }
+
+                // 2. Upload natively via XHR to track 0-100% progress
+                await new Promise<void>((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.upload.addEventListener('progress', (event) => {
+                        if (event.lengthComputable) {
+                            const percentComplete = Math.round((event.loaded / event.total) * 100);
+                            setUploadProgress(percentComplete);
+                        }
+                    });
+
+                    xhr.addEventListener('load', () => {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            setUploadProgress(100);
+                            resolve();
+                        } else {
+                            reject(new Error(`Cloudflare R2 Error: ${xhr.status} - ${xhr.responseText.substring(0, 50)}`));
+                        }
+                    });
+
+                    xhr.addEventListener('error', () => reject(new Error("Network error during upload.")));
+                    xhr.addEventListener('abort', () => reject(new Error("Upload aborted by user.")));
+
+                    xhr.open('PUT', urlResult.uploadUrl);
+                    xhr.setRequestHeader('Content-Type', file.type);
+                    xhr.send(file);
+                });
+
+                const finalUrl = `${window.location.origin}/download?key=${encodeURIComponent(urlResult.key)}`;
+
+                // 3. Send Email
+                const emailRes = await sendExamNotesEmail(studentId, selectedCourseTitle, finalUrl);
+
+                if (emailRes.success) {
+                    toast.success("Lecture notes sent successfully!");
+                    setIsOpen(false);
+                    setFile(null);
+                    setUploadProgress(0);
+                } else {
+                    toast.error("Failed to send email");
+                }
             }
         } catch (error: any) {
             console.error(error);
@@ -110,42 +169,74 @@ export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { s
                 <DialogHeader>
                     <DialogTitle>Send Lecture Notes</DialogTitle>
                     <DialogDescription>
-                        Upload a file (PDF) to send to the student.
+                        Send auto-detected cloud notes or upload a custom file.
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSend} className="space-y-4">
                     <div className="space-y-2">
                         <Label>Course Name</Label>
-                        <Select value={course} onValueChange={setCourse} required disabled={isLoading}>
+                        <Select value={courseId} onValueChange={setCourseId} required disabled={isLoading}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select course" />
                             </SelectTrigger>
                             <SelectContent>
                                 {courses.map((c) => (
-                                    <SelectItem key={c.id} value={c.title}>
+                                    <SelectItem key={c.id} value={c.id}>
                                         {c.title}
                                     </SelectItem>
                                 ))}
-                                {/* Fallback if current course is not in list */}
-                                {courseName && !courses.find(c => c.title === courseName) && (
-                                    <SelectItem value={courseName}>{courseName}</SelectItem>
-                                )}
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="space-y-2">
-                        <Label>Lecture Note File</Label>
-                        <Input
-                            type="file"
-                            name="file"
-                            required
-                            accept=".pdf,.doc,.docx"
-                            disabled={isLoading}
-                            onChange={(e) => setFile(e.target.files?.[0] || null)}
-                        />
-                    </div>
+
+                    {isCheckingCloud && (
+                        <div className="text-sm text-blue-600 flex items-center gap-2">
+                            <Loader2 className="w-4 h-4 animate-spin" /> Checking R2 Cloud for files...
+                        </div>
+                    )}
+
+                    {!isCheckingCloud && selectedCourseTitle && (
+                        cloudFiles.length > 0 ? (
+                            <div className="bg-emerald-50 text-emerald-800 p-3 rounded-md text-sm border border-emerald-200 flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <Cloud className="w-4 h-4" />
+                                    <span><strong>{cloudFiles.length} Cloud Documents</strong> detected in R2.</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="bg-orange-50 text-orange-800 p-3 rounded-md text-sm border border-orange-200">
+                                No cloud documents found. You must use manual upload.
+                            </div>
+                        )
+                    )}
+
+                    <Tabs value={deliveryMethod} onValueChange={(v: any) => setDeliveryMethod(v)} className="w-full">
+                        <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="cloud" disabled={cloudFiles.length === 0}>
+                                Cloud Portal
+                            </TabsTrigger>
+                            <TabsTrigger value="manual">Manual Upload</TabsTrigger>
+                        </TabsList>
+                        
+                        <TabsContent value="cloud" className="pt-2 text-sm text-neutral-500">
+                            The student will receive an email containing a secure Magic Link leading to their XONE Delivery Portal, where they can download the ({cloudFiles.length}) detected documents.
+                        </TabsContent>
+                        <TabsContent value="manual" className="pt-2">
+                            <div className="space-y-2">
+                                <Label>Select Custom File</Label>
+                                <Input
+                                    type="file"
+                                    name="file"
+                                    required={deliveryMethod === 'manual'}
+                                    accept=".pdf,.doc,.docx,.pptx"
+                                    disabled={isLoading}
+                                    onChange={(e) => setFile(e.target.files?.[0] || null)}
+                                />
+                            </div>
+                        </TabsContent>
+                    </Tabs>
                     
-                    {isLoading && uploadProgress > 0 && uploadProgress < 100 && (
+                    {isLoading && deliveryMethod === 'manual' && uploadProgress > 0 && uploadProgress < 100 && (
                         <div className="space-y-1.5">
                             <div className="flex justify-between text-xs text-neutral-500 font-medium">
                                 <span>Uploading...</span>
@@ -160,14 +251,16 @@ export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { s
                         </div>
                     )}
                     
-                    {isLoading && uploadProgress === 100 && (
+                    {isLoading && deliveryMethod === 'manual' && uploadProgress === 100 && (
                         <p className="text-xs text-center text-neutral-500 font-medium animate-pulse">
                             Upload complete. Generating and sending email...
                         </p>
                     )}
 
                     <Button type="submit" disabled={isLoading} className="w-full">
-                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send Email"}
+                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+                            deliveryMethod === 'cloud' ? "Send Magic Link via Email" : "Upload & Send Custom File"
+                        )}
                     </Button>
                 </form>
             </DialogContent>
