@@ -142,7 +142,7 @@ export default async function StudentDetailPage({
                         <SendExamNotesDialog
                             studentId={student.id}
                             courseName={student.courses?.[0]?.title || ""}
-                            courses={courses}
+                            courses={student.courses}
                         />
                         <SendFeedbackEmailButton studentId={student.id} />
                         <DocumentGeneratorDialog student={studentData} courses={student.courses} />
