@@ -85,12 +85,12 @@ export default async function NotesPortalPage(props: {
     const files = result.success && result.files ? result.files : [];
 
     return (
-        <div className="min-h-screen bg-neutral-100/50 flex flex-col items-center p-4 sm:p-8">
+        <div className="min-h-screen bg-slate-50 flex flex-col items-center p-4 sm:p-8">
             <div className="w-full max-w-5xl space-y-6">
                 
                 {/* Header Profile Card */}
                 <div className="bg-white rounded-2xl shadow-sm border border-neutral-200 overflow-hidden">
-                    <div className="h-32 bg-[#0a192f] p-6 relative">
+                    <div className="h-32 bg-gradient-to-r from-slate-900 to-neutral-800 p-6 relative">
                         <div className="absolute top-6 left-6 text-white tracking-tight font-semibold text-xl flex items-center gap-2">
                             Xone Maritime Academy
                         </div>

@@ -191,16 +191,25 @@ export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { s
 
                     {isCheckingCloud && (
                         <div className="text-sm text-blue-600 flex items-center gap-2">
-                            <Loader2 className="w-4 h-4 animate-spin" /> Checking R2 Cloud for files...
+                            <Loader2 className="w-4 h-4 animate-spin" /> Checking cloud for files...
                         </div>
                     )}
 
                     {!isCheckingCloud && selectedCourseTitle && (
                         cloudFiles.length > 0 ? (
-                            <div className="bg-emerald-50 text-emerald-800 p-3 rounded-md text-sm border border-emerald-200 flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <Cloud className="w-4 h-4" />
-                                    <span><strong>{cloudFiles.length} Cloud Documents</strong> detected in R2.</span>
+                            <div className="bg-emerald-50 text-emerald-800 p-3 rounded-md text-sm border border-emerald-200 flex flex-col justify-center">
+                                <div className="flex items-start gap-2">
+                                    <Cloud className="w-4 h-4 mt-0.5 shrink-0" />
+                                    <div className="flex flex-col min-w-0">
+                                        <span><strong>{cloudFiles.length} Cloud Documents</strong> available in the cloud.</span>
+                                        <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mt-2 text-[11px] opacity-85 border-t border-emerald-200/60 pt-2 pr-2">
+                                            {cloudFiles.map((f, i) => (
+                                                <div key={i} className="truncate font-medium flex items-center gap-1" title={f.name}>
+                                                    <span className="text-emerald-500">•</span> {f.name.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " ")}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         ) : (
@@ -219,7 +228,7 @@ export function SendExamNotesDialog({ studentId, courseName, courses = [] }: { s
                         </TabsList>
                         
                         <TabsContent value="cloud" className="pt-2 text-sm text-neutral-500">
-                            The student will receive an email containing a secure Magic Link leading to their XONE Delivery Portal, where they can download the ({cloudFiles.length}) detected documents.
+                            The student will receive a secure email link to download these {cloudFiles.length} documents.
                         </TabsContent>
                         <TabsContent value="manual" className="pt-2">
                             <div className="space-y-2">
