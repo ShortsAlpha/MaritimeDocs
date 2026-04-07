@@ -28,6 +28,11 @@ export default clerkMiddleware(async (auth, req) => {
         }
     }
 
+    // If user is hit the landing page but already logged in, redirect to admin automatically
+    if (userId && req.nextUrl.pathname === '/') {
+        return Response.redirect(new URL('/admin', req.url))
+    }
+
     // If user is logged in and trying to access sign-in/sign-up, redirect to admin
     if (userId && isPublicAuthRoute(req)) {
         return Response.redirect(new URL('/admin', req.url))
