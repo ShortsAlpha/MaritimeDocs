@@ -21,6 +21,7 @@ import { StudentRemarksTab } from "@/components/admin/student-remarks-tab";
 import { SendWelcomeEmailButton } from "@/components/admin/send-welcome-button";
 import { SendExamNotesDialog } from "@/components/admin/send-exam-notes-dialog";
 import { SendFeedbackEmailButton } from "@/components/admin/send-feedback-email-button";
+import { SendPaymentReminderButton } from "@/components/admin/send-payment-reminder-button";
 import { StudentPhotoUpload } from "@/components/admin/student-photo-upload";
 import { getSignedProfilePhotoUrl } from "@/app/actions/students";
 import { DocumentGeneratorDialog } from "@/components/admin/document-generation/document-generator-dialog";
@@ -145,6 +146,7 @@ export default async function StudentDetailPage({
                             courses={student.courses}
                         />
                         <SendFeedbackEmailButton studentId={student.id} />
+                        <SendPaymentReminderButton studentId={student.id} />
                         <DocumentGeneratorDialog student={studentData} courses={student.courses} />
                         <DeleteStudentButton studentId={student.id} />
                     </div>

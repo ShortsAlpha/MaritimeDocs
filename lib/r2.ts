@@ -1,4 +1,4 @@
-import { S3Client, DeleteObjectCommand, ListObjectsV2Command, CopyObjectCommand, HeadObjectCommand, ListObjectsV2CommandOutput } from "@aws-sdk/client-s3";
+import { S3Client, DeleteObjectCommand, ListObjectsV2Command, CopyObjectCommand, HeadObjectCommand, ListObjectsV2CommandOutput, GetObjectCommand } from "@aws-sdk/client-s3";
 
 export const R2_BUCKET_NAME = "student-management-system";
 
@@ -101,5 +101,26 @@ export async function renameFolderInR2(oldFolder: string, newFolder: string) {
         console.error("R2 Rename Error:", error);
         // Don't throw, just log. We might want to separate this logic to avoid blocking DB updates if R2 fails
         return false;
+    }
+}
+
+export async function getFileBufferFromR2(key: string): Promise<Buffer | null> {
+    try {
+        const command = new GetObjectCommand({
+            Bucket: R2_BUCKET_NAME,
+            Key: key,
+        });
+
+        const response = await r2.send(command);
+        
+        if (response.Body) {
+             // @ts-ignore - transformToByteArray is available in Node.js environment SDKs
+            const byteArray = await response.Body.transformToByteArray();
+            return Buffer.from(byteArray);
+        }
+        return null;
+    } catch (error) {
+        console.error(`Error downloading file ${key} from R2:`, error);
+        return null;
     }
 }

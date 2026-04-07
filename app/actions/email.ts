@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { logActivity } from "@/lib/logger";
+import { getFileBufferFromR2 } from "@/lib/r2";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -317,5 +318,128 @@ export async function sendFeedbackEmail(studentId: string) {
     } catch (error) {
         console.error("Send Feedback Email Error:", error);
         return { success: false, message: "Failed to send email" };
+    }
+}
+
+export async function sendPaymentReminderEmail(studentId: string) {
+    try {
+        const student = await db.student.findUnique({ 
+            where: { id: studentId },
+            include: { payments: { orderBy: { date: 'asc' } } }
+        });
+        if (!student || !student.email) throw new Error("Student not found or no email");
+
+        // Calculate financials
+        const totalFee = Number(student.totalFee);
+        const totalPaid = student.payments.reduce((sum, p) => sum + Number(p.amount), 0);
+        const balance = totalFee - totalPaid;
+
+        if (balance <= 0) {
+            return { success: false, message: "Student has no pending balance." };
+        }
+
+        // Build HTML table for payments
+        let paymentsHtml = "";
+        if (student.payments.length > 0) {
+            paymentsHtml = `
+                <div style="margin-top: 24px; border: 1px solid #e4e4e7; border-radius: 8px; overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                        <thead style="background-color: #f4f4f5; border-bottom: 1px solid #e4e4e7;">
+                            <tr>
+                                <th style="padding: 12px 16px; color: #52525b; font-weight: 600;">Date</th>
+                                <th style="padding: 12px 16px; color: #52525b; font-weight: 600;">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${student.payments.map(p => `
+                                <tr style="border-bottom: 1px solid #e4e4e7;">
+                                    <td style="padding: 12px 16px; color: #3f3f46;">${p.date.toLocaleDateString()}</td>
+                                    <td style="padding: 12px 16px; color: #3f3f46;">€${Number(p.amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                        <tfoot style="background-color: #fafafa;">
+                            <tr>
+                                <td style="padding: 12px 16px; color: #18181b; font-weight: 600; text-align: right;">Total Paid:</td>
+                                <td style="padding: 12px 16px; color: #18181b; font-weight: 600;">€${totalPaid.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Fetch PDF attachment from R2
+        const R2_FILE_KEY = "payment_info/Account Details - Foxtrium Limited.pdf";
+        const fileBuffer = await getFileBufferFromR2(R2_FILE_KEY);
+        
+        const attachments = [];
+        if (fileBuffer) {
+            attachments.push({
+                filename: 'Account Details - Foxtrium Limited.pdf',
+                content: fileBuffer
+            });
+        } else {
+            console.warn("Could not download payment details PDF from R2, sending without attachment.");
+        }
+
+        // Resolve Base URL
+        const headersList = await headers();
+        const host = headersList.get('host') || 'localhost:3000';
+        const protocol = headersList.get('x-forwarded-proto') || 'http';
+        const baseUrl = `${protocol}://${host}`;
+
+        // Send Email
+        const { error } = await resend.emails.send({
+            from: 'Xone Academy <noreply@student.xoneacademy.com>',
+            to: student.email,
+            subject: 'Payment Reminder - Xone Superyacht Academy',
+            attachments,
+            html: getEmailTemplate(
+                'Outstanding Balance Reminder',
+                `<p>Dear ${student.fullName},</p>
+                <p>This is a friendly reminder that you have an outstanding balance on your account.</p>
+                
+                <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 16px; margin: 24px 0; border-radius: 0 8px 8px 0;">
+                    <p style="margin: 0; color: #991b1b; font-size: 16px;">
+                        <strong>Remaining Balance:</strong> €${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </p>
+                </div>
+
+                <div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 0 8px 8px 0;">
+                    <p style="margin: 0; color: #b45309; font-size: 16px; font-weight: bold;">
+                        Action Required: Please ensure your payment is completed within this week.
+                    </p>
+                </div>
+                
+                <p>We have attached the account details (PDF) to this email for your convenience.</p>
+
+                ${student.payments.length > 0 ? `
+                    <h3 style="margin-top: 32px; color: #18181b; font-size: 16px;">Payment History</h3>
+                    ${paymentsHtml}
+                ` : ''}
+                
+                <p style="margin-top: 24px;">If you have already made this payment, please disregard this email or send us the receipt.</p>`,
+                baseUrl
+            )
+        });
+
+        if (error) {
+            throw new Error(error.message);
+        }
+
+        await logActivity({
+            action: 'EMAIL',
+            title: `Sent Payment Reminder Email`,
+            description: `Sent to ${student.email}`,
+            userId: student.id,
+            userEmail: student.email,
+            metadata: { type: 'PAYMENT_REMINDER', balance }
+        });
+
+        return { success: true };
+    } catch (error: any) {
+        console.error("Send Payment Reminder Email Error:", error);
+        return { success: false, message: error.message || "Failed to send email" };
     }
 }
