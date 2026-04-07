@@ -79,3 +79,55 @@ export async function getCourseChecklistTemplate(courseId: string) {
         return []
     }
 }
+
+// --- Course Document Requirements ---
+
+export async function getCourseRequiredDocs(courseId: string) {
+    try {
+        const docs = await db.courseDocument.findMany({
+            where: { courseId },
+            include: { documentType: true }
+        })
+        return docs
+    } catch (error) {
+        console.error("Get Course Docs Error:", error)
+        return []
+    }
+}
+
+export async function toggleCourseDocument(courseId: string, documentTypeId: string) {
+    try {
+        // Check if exists
+        const existing = await db.courseDocument.findUnique({
+            where: {
+                courseId_documentTypeId: {
+                    courseId,
+                    documentTypeId
+                }
+            }
+        })
+
+        if (existing) {
+            // Remove it
+            await db.courseDocument.delete({
+                where: { id: existing.id }
+            })
+            revalidatePath("/admin/settings")
+            return { success: true, message: "Document requirement removed", linked: false }
+        } else {
+            // Add it
+            await db.courseDocument.create({
+                data: {
+                    courseId,
+                    documentTypeId,
+                    isRequired: true
+                }
+            })
+            revalidatePath("/admin/settings")
+            return { success: true, message: "Document requirement added", linked: true }
+        }
+    } catch (error) {
+        console.error("Toggle Course Doc Error:", error)
+        return { success: false, message: "Failed to toggle document" }
+    }
+}

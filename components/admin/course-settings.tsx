@@ -11,6 +11,8 @@ import { createCourse, deleteCourse, updateCourse } from "@/app/actions/courses"
 import { Pencil, Trash, Loader2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ChecklistTemplateDialog } from "@/components/admin/checklist-template-dialog"
+import { CourseDocumentsDialog } from "@/components/admin/course-documents-dialog"
+import { DocumentType } from "@prisma/client"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -72,7 +74,7 @@ const initialState = {
     success: false,
 }
 
-export function CourseSettings({ courses }: { courses: Course[] }) {
+export function CourseSettings({ courses, allDocTypes }: { courses: Course[], allDocTypes: DocumentType[] }) {
     const [isDeleting, setIsDeleting] = useState<string | null>(null)
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [courseToDelete, setCourseToDelete] = useState<string | null>(null)
@@ -119,6 +121,7 @@ export function CourseSettings({ courses }: { courses: Course[] }) {
                                 <TableRow key={course.id}>
                                     <TableCell className="font-medium">{course.title}</TableCell>
                                     <TableCell className="text-right flex items-center justify-end gap-2">
+                                        <CourseDocumentsDialog course={course} allDocTypes={allDocTypes} />
                                         <ChecklistTemplateDialog course={course} />
                                         <EditCourseDialog course={course} />
                                         <Button
