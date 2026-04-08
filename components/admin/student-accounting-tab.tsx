@@ -9,12 +9,74 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
 import { useState, useEffect } from "react";
-import { addPayment, updateStudentFee, updatePaymentAmount } from "@/app/actions/accounting";
+import { addPayment, updateStudentFee, updatePaymentAmount, updatePaymentDate } from "@/app/actions/accounting";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Save, X, Edit2 } from "lucide-react";
 
 // ... existing imports ...
+
+function EditablePaymentDate({ paymentId, initialDate, forceEdit }: { paymentId: string, initialDate: string | Date, forceEdit: boolean }) {
+    const router = useRouter();
+    // Use yyyy-MM-dd format for the HTML date input
+    const initialDateStr = format(new Date(initialDate), "yyyy-MM-dd");
+    const [dateStr, setDateStr] = useState(initialDateStr);
+    const [isEditing, setIsEditing] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [hasChanged, setHasChanged] = useState(false);
+
+    useEffect(() => {
+        setDateStr(format(new Date(initialDate), "yyyy-MM-dd"));
+        setHasChanged(false);
+    }, [initialDate]);
+
+    useEffect(() => {
+        if (!forceEdit && hasChanged) {
+            handleSave();
+        }
+    }, [forceEdit]);
+
+    const isEffectiveEditing = isEditing || forceEdit;
+
+    async function handleSave() {
+        if (!hasChanged && dateStr === initialDateStr) return;
+
+        setLoading(true);
+        const res = await updatePaymentDate(paymentId, new Date(dateStr));
+        if (res.success) {
+            toast.success("Date saved");
+            setIsEditing(false);
+            setHasChanged(false);
+            router.refresh();
+        } else {
+            toast.error("Failed to update date");
+            setDateStr(initialDateStr);
+        }
+        setLoading(false);
+    }
+
+    const handleChange = (val: string) => {
+        setDateStr(val);
+        setHasChanged(true);
+    };
+
+    if (isEffectiveEditing) {
+        return (
+            <div className="flex items-center gap-2">
+                <Input
+                    type="date"
+                    className="h-8 w-36"
+                    value={dateStr}
+                    onChange={(e) => handleChange(e.target.value)}
+                />
+            </div>
+        )
+    }
+
+    return (
+        <span className="font-medium">{format(new Date(initialDate), "MMM d, yyyy")}</span>
+    )
+}
 
 function EditablePaymentAmount({ paymentId, initialAmount, forceEdit }: { paymentId: string, initialAmount: number, forceEdit: boolean }) {
     const router = useRouter();
@@ -241,7 +303,13 @@ export function StudentAccountingTab({ student }: { student: any }) {
                             <TableBody>
                                 {student.payments.map((payment: any) => (
                                     <TableRow key={payment.id}>
-                                        <TableCell>{format(new Date(payment.date), "MMM d, yyyy")}</TableCell>
+                                        <TableCell>
+                                            <EditablePaymentDate
+                                                paymentId={payment.id}
+                                                initialDate={payment.date}
+                                                forceEdit={isGlobalEditing}
+                                            />
+                                        </TableCell>
                                         <TableCell>
                                             <Badge variant="outline">{payment.method.replace("_", " ")}</Badge>
                                         </TableCell>

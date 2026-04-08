@@ -82,3 +82,31 @@ export async function updatePaymentAmount(paymentId: string, amount: number) {
         return { success: false, message: "Failed to update payment amount" };
     }
 }
+
+export async function updatePaymentDate(paymentId: string, newDate: Date) {
+    try {
+        console.log(`Updating payment ${paymentId} to date ${newDate}`);
+        const payment = await db.payment.findUnique({ where: { id: paymentId } });
+        if (!payment) throw new Error("Payment not found");
+
+        const updated = await db.payment.update({
+            where: { id: paymentId },
+            data: { date: newDate }
+        });
+
+        revalidatePath(`/admin/students/${payment.studentId}`);
+
+        await logActivity({
+            action: 'PAYMENT',
+            title: `Payment Date Updated`,
+            description: `Payment ID: ${paymentId} date updated to ${newDate.toISOString()}`,
+            userId: payment.studentId,
+            metadata: { paymentId, newDate }
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating payment date:", error);
+        return { success: false, message: "Failed to update payment date" };
+    }
+}
