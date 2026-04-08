@@ -20,11 +20,16 @@ export default clerkMiddleware(async (auth, req) => {
     // Rate Limiting Logic for API routes (or all routes if preferred)
     // Applying to all routes for simplicity, but could target specific paths
     if (ratelimit && !req.nextUrl.pathname.startsWith("/_next")) {
-        const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1"
-        const result = await ratelimit.limit(ip)
+        try {
+            const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1"
+            const result = await ratelimit.limit(ip)
 
-        if (!result.success) {
-            return new Response("Too Many Requests", { status: 429 })
+            if (!result.success) {
+                return new Response("Too Many Requests", { status: 429 })
+            }
+        } catch (error) {
+            console.error("Rate limit error:", error);
+            // If rate limiting fails, let the request pass instead of throwing 500
         }
     }
 
