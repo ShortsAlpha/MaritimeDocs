@@ -12,21 +12,20 @@ import { useState, useEffect } from "react";
 import { addPayment, updateStudentFee, updatePaymentAmount, updatePaymentDate } from "@/app/actions/accounting";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, Save, X, Edit2 } from "lucide-react";
-
-// ... existing imports ...
+import { Loader2, Save, X, Edit2, CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 
 function EditablePaymentDate({ paymentId, initialDate, forceEdit }: { paymentId: string, initialDate: string | Date, forceEdit: boolean }) {
     const router = useRouter();
-    // Use yyyy-MM-dd format for the HTML date input
-    const initialDateStr = format(new Date(initialDate), "yyyy-MM-dd");
-    const [dateStr, setDateStr] = useState(initialDateStr);
+    const [date, setDate] = useState<Date>(new Date(initialDate));
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
     const [hasChanged, setHasChanged] = useState(false);
 
     useEffect(() => {
-        setDateStr(format(new Date(initialDate), "yyyy-MM-dd"));
+        setDate(new Date(initialDate));
         setHasChanged(false);
     }, [initialDate]);
 
@@ -39,10 +38,10 @@ function EditablePaymentDate({ paymentId, initialDate, forceEdit }: { paymentId:
     const isEffectiveEditing = isEditing || forceEdit;
 
     async function handleSave() {
-        if (!hasChanged && dateStr === initialDateStr) return;
+        if (!hasChanged) return;
 
         setLoading(true);
-        const res = await updatePaymentDate(paymentId, new Date(dateStr));
+        const res = await updatePaymentDate(paymentId, date);
         if (res.success) {
             toast.success("Date saved");
             setIsEditing(false);
@@ -50,25 +49,43 @@ function EditablePaymentDate({ paymentId, initialDate, forceEdit }: { paymentId:
             router.refresh();
         } else {
             toast.error("Failed to update date");
-            setDateStr(initialDateStr);
+            setDate(new Date(initialDate));
         }
         setLoading(false);
     }
 
-    const handleChange = (val: string) => {
-        setDateStr(val);
-        setHasChanged(true);
-    };
+    const handleSelect = (selectedDate: Date | undefined) => {
+        if (selectedDate) {
+            setDate(selectedDate);
+            setHasChanged(true);
+        }
+    }
 
     if (isEffectiveEditing) {
         return (
             <div className="flex items-center gap-2">
-                <Input
-                    type="date"
-                    className="h-8 w-36"
-                    value={dateStr}
-                    onChange={(e) => handleChange(e.target.value)}
-                />
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                            variant={"outline"}
+                            className={cn(
+                                "h-8 w-36 justify-start text-left font-normal px-2 text-xs",
+                                !date && "text-muted-foreground"
+                            )}
+                        >
+                            <CalendarIcon className="mr-2 h-3 w-3" />
+                            {date ? format(date, "MMM d, yyyy") : <span>Pick a date</span>}
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={handleSelect}
+                            initialFocus
+                        />
+                    </PopoverContent>
+                </Popover>
             </div>
         )
     }
