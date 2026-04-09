@@ -131,7 +131,9 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
                         {/* Mobile View */}
                         <div className="md:hidden space-y-2">
                             {categoryTypes.map((type) => {
-                                const uploadedDoc = student.documents.find(
+                                // Important: We sort documents so that the latest version is always shown if multiple exist
+                                const sortedDocs = [...student.documents].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                                const uploadedDoc = sortedDocs.find(
                                     (d) => d.documentTypeId === type.id
                                 );
 
@@ -209,7 +211,8 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
                                 </TableHeader>
                                 <TableBody>
                                     {categoryTypes.map((type) => {
-                                        const uploadedDoc = student.documents.find(
+                                        const sortedDocs = [...student.documents].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                                        const uploadedDoc = sortedDocs.find(
                                             (d) => d.documentTypeId === type.id
                                         );
 

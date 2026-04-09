@@ -7,7 +7,7 @@ import { r2, deleteFileFromR2, renameFolderInR2, R2_BUCKET_NAME } from "@/lib/r2
 import { PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { slugify } from "@/lib/utils"
-import { addMonths } from "date-fns"
+import { addMonths, addYears } from "date-fns"
 import { getCurrentUserBranch, getBranchStoragePrefix } from "@/lib/branch"
 
 // ... existing code ...
@@ -195,9 +195,20 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
         let additionalData: any = {}
         // Handle manual date updates (string -> Date)
         if (data.certificateIssueDate) {
-            additionalData.certificateIssueDate = new Date(data.certificateIssueDate)
-        }
-        if (data.certificateExpiryDate) {
+            const newIssueDate = new Date(data.certificateIssueDate);
+            additionalData.certificateIssueDate = newIssueDate;
+            
+            const oldIssueStr = currentStudent?.certificateIssueDate?.toISOString().split('T')[0];
+            const newIssueStr = newIssueDate.toISOString().split('T')[0];
+
+            // If issue date was changed or it's newly set, auto-calculate 5 years later
+            if (oldIssueStr !== newIssueStr) {
+                additionalData.certificateExpiryDate = addYears(newIssueDate, 5);
+            } else if (data.certificateExpiryDate) {
+                // Otherwise respect properly submitted expiry date if no issue date changes occurred
+                additionalData.certificateExpiryDate = new Date(data.certificateExpiryDate);
+            }
+        } else if (data.certificateExpiryDate) {
             additionalData.certificateExpiryDate = new Date(data.certificateExpiryDate)
         }
 
@@ -224,7 +235,7 @@ export async function updateStudent(id: string, prevState: any, formData: FormDa
             if (!hasManualDates && !hasExistingDates) {
                 const now = new Date()
                 additionalData.certificateIssueDate = now
-                additionalData.certificateExpiryDate = addMonths(now, 13) // 1 year 1 month
+                additionalData.certificateExpiryDate = addYears(now, 5) // 5 years expiry exactly
             }
         }
 

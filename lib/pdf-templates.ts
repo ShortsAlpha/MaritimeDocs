@@ -16,6 +16,7 @@ export const CourseTemplateRegistry: Record<string, PdfTemplateDef> = {
             if (!student.fullName) errors.push("Full Name is missing.");
             if (!student.dateOfBirth) errors.push("Date of Birth is missing.");
             if (!student.nationality) errors.push("Nationality is missing.");
+            if (!student.passportNumber) errors.push("Passport Number is missing.");
             if (!student.certificateIssueDate) errors.push("Certificate Issue Date is missing.");
             return errors;
         }

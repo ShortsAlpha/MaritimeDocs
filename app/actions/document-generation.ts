@@ -115,19 +115,20 @@ export async function saveGeneratedDocument(studentId: string, courseId: string)
 
         // Lock in the TM record if applicable
         if (processedStudent.__courseEventId) {
+            const certTypeToUse = processedStudent.__certificateType || templateDef.id;
             await db.studentCertificate.upsert({
                 where: {
                     studentId_courseEventId_certificateType: {
                         studentId: student.id,
                         courseEventId: processedStudent.__courseEventId,
-                        certificateType: templateDef.id
+                        certificateType: certTypeToUse
                     }
                 },
                 update: {}, // Once generated, usually we don't update it to avoid jumping numbers
                 create: {
                     studentId: student.id,
                     courseEventId: processedStudent.__courseEventId,
-                    certificateType: templateDef.id,
+                    certificateType: certTypeToUse,
                     certificateNo: processedStudent.studentNumber,
                     issueDate: processedStudent.certificateIssueDate,
                     expiryDate: processedStudent.certificateExpiryDate,
@@ -149,6 +150,26 @@ export async function saveGeneratedDocument(studentId: string, courseId: string)
                 data: {
                     title: templateTitle,
                     category: 'CERTIFICATE',
+                    isRequired: false
+                }
+            });
+        }
+
+        // Ensure this DocumentType is mapped to the Course so the frontend UI tab displays it
+        const existingMapping = await db.courseDocument.findUnique({
+            where: {
+                courseId_documentTypeId: {
+                    courseId: course.id,
+                    documentTypeId: docType.id
+                }
+            }
+        });
+
+        if (!existingMapping) {
+            await db.courseDocument.create({
+                data: {
+                    courseId: course.id,
+                    documentTypeId: docType.id,
                     isRequired: false
                 }
             });

@@ -12,15 +12,18 @@ export const TemplateFillers: Record<string, (pdfDoc: PDFDocument, student: any,
         // Load local fonts
         const fontRegularPath = path.join(process.cwd(), 'public', 'fonts', 'Roboto-Regular.ttf');
         const fontBoldPath = path.join(process.cwd(), 'public', 'fonts', 'Roboto-Bold.ttf');
-        
+
         const regularBytes = fs.readFileSync(fontRegularPath);
         const boldBytes = fs.readFileSync(fontBoldPath);
-        
+
         const fontRegular = await pdfDoc.embedFont(regularBytes);
         const fontBold = await pdfDoc.embedFont(boldBytes);
-        
+
         const pages = pdfDoc.getPages();
         let pageCount = 1;
+
+        // Define abbreviations for each page (1-indexed mapping implicitly based on loop iteration)
+        const COURSE_PREFIXES = ["PST", "FF", "PSSR", "FA", "SA"];
 
         for (const page of pages) {
             const { width, height } = page.getSize();
@@ -39,7 +42,11 @@ export const TemplateFillers: Record<string, (pdfDoc: PDFDocument, student: any,
             });
 
             // 2. Top Right Fields
-            const certNo = student.studentNumber || `STCW-${Math.floor(Math.random() * 100000)}`;
+            // Use the globally generated M-YY suffix and array prefix for this page
+            const seqSuffix = student.studentNumber || `M26${Math.floor(Math.random() * 1000).toString().padStart(4, '0')}`;
+            const prefix = COURSE_PREFIXES[pageCount - 1] || "STCW";
+            const certNo = `${prefix}-${seqSuffix}`;
+
             page.drawText(certNo, {
                 x: width - 120,
                 y: height - 98,
@@ -58,6 +65,7 @@ export const TemplateFillers: Record<string, (pdfDoc: PDFDocument, student: any,
                 });
             }
 
+            // Exactly 5 Years expiry printed ONLY on page 1 and page 2
             if (pageCount <= 2 && student.certificateExpiryDate) {
                 page.drawText(format(new Date(student.certificateExpiryDate), 'dd MMM yyyy'), {
                     x: width - 120,
@@ -81,30 +89,48 @@ export const TemplateFillers: Record<string, (pdfDoc: PDFDocument, student: any,
             });
 
             // 4. DOB and Passport
-            const dobStr = student.dateOfBirth ? format(new Date(student.dateOfBirth), 'dd MMM yyyy') : "N/A";
+            const dobStr = student.dateOfBirth ? format(new Date(student.dateOfBirth), 'dd.MM.yyyy') : "N/A";
             const passStr = student.passportNumber || student.tcNo || "N/A";
 
+            // Initial positions (Page 1)
             let dobX = width / 2 - 40;
-            let passX = width / 2 + 185;
+            let dobY = height - 344;
 
-            // Apply page-specific offsets
-            if (pageCount === 2) {
-                dobX -= 5;
-                passX -= 20;
+            let passX = width / 2 + 185;
+            let passY = height - 344;
+
+            // =========================================================================
+            // SAYFA SAYFA PIXEL AYARLAMA BÖLÜMÜ / PIXEL ADJUSTMENT PER PAGE
+            // X ekseni (Sağ ve Sol): Sayıyı büyütürseniz (+) SAĞA kayar, küçültürseniz (-) SOLA kayar.
+            // Y ekseni (Aşağı ve Yukarı): Sayıyı büyütürseniz (+) YUKARI kayar, küçültürseniz (-) AŞAĞI kayar.
+            // =========================================================================
+            if (pageCount === 1) {
+                // 1. Sayfa ayarları (gerekirse buraya ekleyebilirsiniz)
+                // dobX += 0;
+                // dobY += 0;
+            } else if (pageCount === 2) {
+                dobX -= 10;
+                dobY -= 2;
+                passX -= 45;
+                passY -= 2;
             } else if (pageCount === 3) {
-                dobX += 10;
-                passX -= 55;
+                dobX -= 17;
+                dobY -= 0;
+                passX -= 50;
             } else if (pageCount === 4) {
-                dobX -= 15;
+                dobX -= 20;
+                dobY += 4;
                 passX -= 35;
+                passY += 4;
             } else if (pageCount === 5) {
-                dobX -= 0;
-                passX -= 35;
+                dobX -= 8;
+                passX -= 30;
             }
+            // =========================================================================
 
             page.drawText(dobStr, {
                 x: dobX,
-                y: height - 344,
+                y: dobY,
                 size: 12,
                 font: fontRegular,
                 color: textColor,
@@ -112,7 +138,7 @@ export const TemplateFillers: Record<string, (pdfDoc: PDFDocument, student: any,
 
             page.drawText(passStr, {
                 x: passX,
-                y: height - 344,
+                y: passY,
                 size: 12,
                 font: fontRegular,
                 color: textColor,
