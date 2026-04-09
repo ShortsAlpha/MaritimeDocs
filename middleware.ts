@@ -1,6 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { Ratelimit } from "@upstash/ratelimit"
 import { Redis } from "@upstash/redis"
+import { NextResponse } from 'next/server'
 
 const isProtectedRoute = createRouteMatcher(['/admin(.*)'])
 const isPublicAuthRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)'])
@@ -18,14 +19,13 @@ export default clerkMiddleware(async (auth, req) => {
     const { userId } = await auth()
 
     // Rate Limiting Logic for API routes (or all routes if preferred)
-    // Applying to all routes for simplicity, but could target specific paths
     if (ratelimit && !req.nextUrl.pathname.startsWith("/_next")) {
         try {
             const ip = req.headers.get("x-forwarded-for") ?? "127.0.0.1"
             const result = await ratelimit.limit(ip)
 
             if (!result.success) {
-                return new Response("Too Many Requests", { status: 429 })
+                return new NextResponse("Too Many Requests", { status: 429 })
             }
         } catch (error) {
             console.error("Rate limit error:", error);
@@ -35,12 +35,12 @@ export default clerkMiddleware(async (auth, req) => {
 
     // If user is hit the landing page but already logged in, redirect to admin automatically
     if (userId && req.nextUrl.pathname === '/') {
-        return Response.redirect(new URL('/admin', req.url))
+        return NextResponse.redirect(new URL('/admin', req.url))
     }
 
     // If user is logged in and trying to access sign-in/sign-up, redirect to admin
     if (userId && isPublicAuthRoute(req)) {
-        return Response.redirect(new URL('/admin', req.url))
+        return NextResponse.redirect(new URL('/admin', req.url))
     }
 
     if (isProtectedRoute(req)) {
@@ -49,6 +49,8 @@ export default clerkMiddleware(async (auth, req) => {
             return redirectToSignIn()
         }
     }
+    
+    return NextResponse.next();
 })
 
 export const config = {

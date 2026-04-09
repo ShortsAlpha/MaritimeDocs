@@ -9,10 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
 import { useState, useEffect } from "react";
-import { addPayment, updateStudentFee, updatePaymentAmount, updatePaymentDate } from "@/app/actions/accounting";
+import { addPayment, updateStudentFee, updatePaymentAmount, updatePaymentDate, deletePayment } from "@/app/actions/accounting";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, Save, X, Edit2, CalendarIcon } from "lucide-react";
+import { Loader2, Save, X, Edit2, CalendarIcon, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -188,6 +188,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 function AddPaymentDialog({ studentId }: { studentId: string }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [date, setDate] = useState<Date>(new Date());
+
+    useEffect(() => {
+        if (open) setDate(new Date());
+    }, [open]);
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -198,7 +203,8 @@ function AddPaymentDialog({ studentId }: { studentId: string }) {
             studentId,
             Number(formData.get("amount")),
             formData.get("method") as any,
-            formData.get("note") as string
+            formData.get("note") as string,
+            date
         );
 
         setLoading(false);
@@ -218,6 +224,32 @@ function AddPaymentDialog({ studentId }: { studentId: string }) {
                     <div className="space-y-2">
                         <Label>Amount (€)</Label>
                         <Input name="amount" type="number" step="0.01" required placeholder="0.00" />
+                    </div>
+                    <div className="space-y-2 flex flex-col">
+                        <Label>Date</Label>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant={"outline"}
+                                    className={cn(
+                                        "w-full justify-start text-left font-normal",
+                                        !date && "text-muted-foreground"
+                                    )}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {date ? format(date, "PPP") : <span>Pick a date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                    mode="single"
+                                    selected={date}
+                                    onSelect={(d) => d && setDate(d)}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
                     </div>
                     <div className="space-y-2">
                         <Label>Payment Method</Label>
@@ -275,11 +307,26 @@ function TotalFeeEditor({ studentId, initialFee }: { studentId: string, initialF
 }
 
 export function StudentAccountingTab({ student }: { student: any }) {
+    const router = useRouter();
     const totalFee = Number(student.totalFee);
     const totalPaid = student.payments.reduce((sum: number, p: any) => sum + Number(p.amount), 0);
     const balance = totalFee - totalPaid;
 
     const [isGlobalEditing, setIsGlobalEditing] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+
+    async function handleDeletePayment(paymentId: string) {
+        if (!confirm("Are you sure you want to delete this payment?")) return;
+        setDeletingId(paymentId);
+        const res = await deletePayment(paymentId);
+        if (res.success) {
+            toast.success("Payment deleted successfully");
+            router.refresh();
+        } else {
+            toast.error(res.message);
+        }
+        setDeletingId(null);
+    }
 
     return (
         <div className="grid gap-6 md:grid-cols-3">
@@ -315,6 +362,7 @@ export function StudentAccountingTab({ student }: { student: any }) {
                                     <TableHead>Method</TableHead>
                                     <TableHead>Note</TableHead>
                                     <TableHead className="text-right">Amount</TableHead>
+                                    {isGlobalEditing && <TableHead className="w-[50px]"></TableHead>}
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -338,6 +386,19 @@ export function StudentAccountingTab({ student }: { student: any }) {
                                                 forceEdit={isGlobalEditing}
                                             />
                                         </TableCell>
+                                        {isGlobalEditing && (
+                                            <TableCell className="text-right">
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    className="h-8 w-8 text-destructive hover:bg-destructive/10"
+                                                    onClick={() => handleDeletePayment(payment.id)}
+                                                    disabled={deletingId === payment.id}
+                                                >
+                                                    {deletingId === payment.id ?  <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                                                </Button>
+                                            </TableCell>
+                                        )}
                                     </TableRow>
                                 ))}
                                 {student.payments.length === 0 && (

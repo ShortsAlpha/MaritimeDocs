@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { logActivity } from "@/lib/logger";
 import { getCurrentUserBranch } from "@/lib/branch";
 
-export async function addPayment(studentId: string, amount: number, method: PaymentMethod, note?: string) {
+export async function addPayment(studentId: string, amount: number, method: PaymentMethod, note?: string, date?: Date) {
     try {
         const branch = await getCurrentUserBranch();
 
@@ -16,6 +16,7 @@ export async function addPayment(studentId: string, amount: number, method: Paym
                 amount,
                 method,
                 note,
+                date: date || new Date(),
                 currency: branch?.currency || 'EUR',
                 branchId: branch?.branchId || null,
             }
@@ -108,5 +109,32 @@ export async function updatePaymentDate(paymentId: string, newDate: Date) {
     } catch (error) {
         console.error("Error updating payment date:", error);
         return { success: false, message: "Failed to update payment date" };
+    }
+}
+
+export async function deletePayment(paymentId: string) {
+    try {
+        console.log(`Deleting payment ${paymentId}`);
+        const payment = await db.payment.findUnique({ where: { id: paymentId } });
+        if (!payment) throw new Error("Payment not found");
+
+        await db.payment.delete({
+            where: { id: paymentId }
+        });
+
+        revalidatePath(`/admin/students/${payment.studentId}`);
+
+        await logActivity({
+            action: 'PAYMENT',
+            title: `Payment Deleted`,
+            description: `Payment ID: ${paymentId} deleted. Amount was €${payment.amount.toString()}`,
+            userId: payment.studentId,
+            metadata: { paymentId, amount: payment.amount }
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting payment:", error);
+        return { success: false, message: "Failed to delete payment" };
     }
 }
