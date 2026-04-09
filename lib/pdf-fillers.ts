@@ -9,6 +9,11 @@ export const TemplateFillers: Record<string, (pdfDoc: PDFDocument, student: any,
         // Register fontkit
         pdfDoc.registerFontkit(fontkit);
 
+        // Update PDF Metadata to override original PowerPoint export name
+        pdfDoc.setTitle(`${student.fullName} - STCW Basic Safety Training`);
+        pdfDoc.setAuthor("Xone Superyacht Academy");
+        pdfDoc.setSubject("Certificate of Proficiency");
+
         // Load local fonts
         const fontRegularPath = path.join(process.cwd(), 'public', 'fonts', 'Roboto-Regular.ttf');
         const fontBoldPath = path.join(process.cwd(), 'public', 'fonts', 'Roboto-Bold.ttf');

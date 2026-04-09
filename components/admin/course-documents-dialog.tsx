@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { FileText, Loader2, Plus, X, Search } from "lucide-react"
 import { getCourseRequiredDocs, toggleCourseDocument } from "@/app/actions/courses"
 import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 
 interface CourseDocumentsDialogProps {
@@ -86,8 +85,8 @@ export function CourseDocumentsDialog({ course, allDocTypes }: CourseDocumentsDi
                             Loading configuration...
                         </div>
                     ) : (
-                        <ScrollArea className="h-[400px]">
-                            <div className="p-3 space-y-2">
+                        <div className="h-[400px] overflow-y-auto overflow-x-hidden">
+                            <div className="p-3 space-y-2 max-w-full">
                                 {filteredDocs.length === 0 ? (
                                     <div className="text-center py-8 text-muted-foreground">
                                         No documents found matching your search.
@@ -104,7 +103,7 @@ export function CourseDocumentsDialog({ course, allDocTypes }: CourseDocumentsDi
                                                         : "bg-card border-border hover:border-slate-300 dark:hover:border-slate-700"
                                                 }`}
                                             >
-                                                <div className="flex flex-col gap-1 min-w-0 pr-4">
+                                                <div className="flex flex-col gap-1 min-w-0 flex-1 pr-4">
                                                     <div className="flex items-center gap-2">
                                                         <span className="font-medium text-sm text-foreground truncate">
                                                             {doc.title}
@@ -123,7 +122,7 @@ export function CourseDocumentsDialog({ course, allDocTypes }: CourseDocumentsDi
                                                 <Button 
                                                     size="sm" 
                                                     variant={isLinked ? "outline" : "default"}
-                                                    className={`shrink-0 min-w[80px] h-8 ${isLinked ? 'text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 dark:border-red-900/50 dark:hover:bg-red-900/30' : ''}`}
+                                                    className={`shrink-0 min-w-[80px] h-8 ${isLinked ? 'text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 dark:border-red-900/50 dark:hover:bg-red-900/30' : ''}`}
                                                     onClick={() => handleToggle(doc.id)}
                                                     disabled={isPending}
                                                 >
@@ -144,7 +143,7 @@ export function CourseDocumentsDialog({ course, allDocTypes }: CourseDocumentsDi
                                     })
                                 )}
                             </div>
-                        </ScrollArea>
+                        </div>
                     )}
                 </div>
 
