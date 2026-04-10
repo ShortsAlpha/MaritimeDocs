@@ -88,6 +88,16 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
         setLoadingPreview(false);
     }
 
+    async function handleDownload(doc: StudentDocument) {
+        toast.info("Generating secure download link...");
+        const res = await getDocumentPreviewUrl(doc.id);
+        if (res.success && res.url) {
+            window.open(res.url, "_blank", "noopener,noreferrer");
+        } else {
+            toast.error(res.message || "Failed to generate download link");
+        }
+    }
+
     async function handleDelete(docId: string) {
         if (!confirm("Are you sure you want to delete this document?")) return;
         setDeletingId(docId);
@@ -172,6 +182,15 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
                                                         onClick={() => handlePreview(uploadedDoc)}
                                                     >
                                                         <Eye className="h-3.5 w-3.5" />
+                                                    </Button>
+
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-7 w-7"
+                                                        onClick={() => handleDownload(uploadedDoc)}
+                                                    >
+                                                        <Download className="h-3.5 w-3.5" />
                                                     </Button>
 
                                                     <Button
@@ -265,11 +284,13 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
                                                                     ) : (
                                                                         <Eye className="h-4 w-4" />
                                                                     )}
-                                                                </Button>
-                                                                <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                                                                    <a href={uploadedDoc.fileUrl} target="_blank" rel="noopener noreferrer">
-                                                                        <Download className="h-4 w-4" />
-                                                                    </a>
+                                                                <Button 
+                                                                    variant="ghost" 
+                                                                    size="icon" 
+                                                                    className="h-8 w-8" 
+                                                                    onClick={() => handleDownload(uploadedDoc)}
+                                                                >
+                                                                    <Download className="h-4 w-4" />
                                                                 </Button>
                                                                 <Button
                                                                     variant="ghost"

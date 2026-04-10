@@ -28,7 +28,7 @@ export const TemplateFillers: Record<string, (pdfDoc: PDFDocument, student: any,
         let pageCount = 1;
 
         // Define abbreviations for each page (1-indexed mapping implicitly based on loop iteration)
-        const COURSE_PREFIXES = ["PST", "FF", "PSSR", "FA", "SA"];
+        const COURSE_PREFIXES = ["PST", "FF", "FA", "PSSR", "SA"];
 
         for (const page of pages) {
             const { width, height } = page.getSize();
