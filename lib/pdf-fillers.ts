@@ -83,8 +83,16 @@ export const TemplateFillers: Record<string, (pdfDoc: PDFDocument, student: any,
 
             // 3. Student Name (Big, Orange, Centered)
             const studentName = student.fullName.toUpperCase();
-            const nameSize = 24;
-            const nameWidth = fontBold.widthOfTextAtSize(studentName, nameSize);
+            let nameSize = 24;
+            let nameWidth = fontBold.widthOfTextAtSize(studentName, nameSize);
+            
+            // Auto-scale font size down if the name is too long and might overlap the left orange seal
+            const maxNameWidth = 460;
+            while (nameWidth > maxNameWidth && nameSize > 10) {
+                nameSize -= 0.5;
+                nameWidth = fontBold.widthOfTextAtSize(studentName, nameSize);
+            }
+
             page.drawText(studentName, {
                 x: (width / 2) - (nameWidth / 2) + 40,
                 y: height - 305,
