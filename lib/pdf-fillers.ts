@@ -87,7 +87,7 @@ export const TemplateFillers: Record<string, (pdfDoc: PDFDocument, student: any,
             let nameWidth = fontBold.widthOfTextAtSize(studentName, nameSize);
             
             // Auto-scale font size down if the name is too long and might overlap the left orange seal
-            const maxNameWidth = 460;
+            const maxNameWidth = 340;
             while (nameWidth > maxNameWidth && nameSize > 10) {
                 nameSize -= 0.5;
                 nameWidth = fontBold.widthOfTextAtSize(studentName, nameSize);
