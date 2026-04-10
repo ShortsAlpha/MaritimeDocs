@@ -284,6 +284,7 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
                                                                     ) : (
                                                                         <Eye className="h-4 w-4" />
                                                                     )}
+                                                                </Button>
                                                                 <Button 
                                                                     variant="ghost" 
                                                                     size="icon" 
