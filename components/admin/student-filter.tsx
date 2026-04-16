@@ -99,6 +99,7 @@ export function StudentFilter({ courses = [], nationalities = [], intakes = [] }
                                         <SelectItem value="DOCS_REQ_SENT">Docs Request Sent</SelectItem>
                                         <SelectItem value="DOCS_PENDING">Docs Pending</SelectItem>
                                         <SelectItem value="LECTURE_NOTES_SENT">Lecture Notes Sent</SelectItem>
+                                        <SelectItem value="PAYMENT_REMINDER_SENT">Payment Reminder Sent</SelectItem>
                                         <SelectItem value="PAYMENT_COMPLETED">Payment Completed</SelectItem>
                                         <SelectItem value="COURSE_ONGOING">Course Ongoing</SelectItem>
                                         <SelectItem value="COURSE_COMPLETED">Course Completed</SelectItem>

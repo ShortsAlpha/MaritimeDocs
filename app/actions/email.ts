@@ -428,6 +428,11 @@ export async function sendPaymentReminderEmail(studentId: string) {
             throw new Error(error.message);
         }
 
+        await db.student.update({
+            where: { id: studentId },
+            data: { status: "PAYMENT_REMINDER_SENT" }
+        });
+
         await logActivity({
             action: 'EMAIL',
             title: `Sent Payment Reminder Email`,

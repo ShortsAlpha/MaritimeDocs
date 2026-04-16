@@ -51,6 +51,7 @@ export function StudentStatusSelect({ studentId, currentStatus, balance }: Props
         REGISTERED: { label: "Registered", color: "bg-blue-500" },
         DOCS_REQ_SENT: { label: "Docs Requested", color: "bg-yellow-500" },
         LECTURE_NOTES_SENT: { label: "Notes Sent", color: "bg-indigo-500" },
+        PAYMENT_REMINDER_SENT: { label: "Payment Reminder Sent", color: "bg-pink-500" },
         PAYMENT_COMPLETED: { label: "Payment Done", color: "bg-green-600" },
         COURSE_ONGOING: { label: "Course Ongoing", color: "bg-sky-500" },
         EXAM_PHASE: { label: "In Exam", color: "bg-purple-600" },
