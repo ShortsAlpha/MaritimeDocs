@@ -10,10 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { CalendarIcon } from "lucide-react";
 
 export function StudentRemarksTab({ studentId, remarks }: { studentId: string, remarks: any[] }) {
     const [note, setNote] = useState("");
-    const [dateStr, setDateStr] = useState(format(new Date(), "yyyy-MM-dd"));
+    const [date, setDate] = useState<Date>(new Date());
     const [isPending, startTransition] = useTransition();
     const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -23,11 +27,11 @@ export function StudentRemarksTab({ studentId, remarks }: { studentId: string, r
             return;
         }
         startTransition(async () => {
-            const res = await addStudentRemark(studentId, note, dateStr);
+            const res = await addStudentRemark(studentId, note, date.toISOString());
             if (res.success) {
                 toast.success("Remark added");
                 setNote("");
-                setDateStr(format(new Date(), "yyyy-MM-dd"));
+                setDate(new Date());
             } else {
                 toast.error(res.message);
             }
@@ -73,13 +77,29 @@ export function StudentRemarksTab({ studentId, remarks }: { studentId: string, r
                                     <label className="text-xs font-semibold uppercase text-muted-foreground flex items-center gap-1.5">
                                         <CalendarDays className="h-3.5 w-3.5" /> Date
                                     </label>
-                                    <Input 
-                                        type="date"
-                                        value={dateStr}
-                                        onChange={(e) => setDateStr(e.target.value)}
-                                        className="bg-background"
-                                        disabled={isPending}
-                                    />
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant={"outline"}
+                                                className={cn(
+                                                    "w-full justify-start text-left font-normal bg-background",
+                                                    !date && "text-muted-foreground"
+                                                )}
+                                                disabled={isPending}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {date ? format(date, "PPP") : <span>Pick a date</span>}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0" align="start">
+                                            <Calendar
+                                                mode="single"
+                                                selected={date}
+                                                onSelect={(d) => d && setDate(d)}
+                                                initialFocus
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
                                 </div>
                                 <Button 
                                     onClick={handleAdd} 

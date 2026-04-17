@@ -24,8 +24,8 @@ const getEmailTemplate = (title: string, content: string, baseUrl: string, cta?:
         <style>
             body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f5; margin: 0; padding: 0; }
             .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-            .header { background: #000000; padding: 32px 24px; text-align: center; }
-            .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px; }
+            .header { background: #ffffff; padding: 32px 24px; text-align: center; border-bottom: 1px solid #e4e4e7; }
+            .header h1 { color: #18181b; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.5px; }
             .content { padding: 40px 32px; color: #3f3f46; line-height: 1.6; font-size: 16px; }
             .content h2 { color: #18181b; margin-top: 0; font-size: 20px; font-weight: 600; }
             .button-container { margin: 32px 0; text-align: center; }
@@ -49,7 +49,7 @@ const getEmailTemplate = (title: string, content: string, baseUrl: string, cta?:
                             <img src="${baseUrl}/logo.png" alt="Xone" height="40" style="display: block; max-height: 40px; width: auto;" />
                         </td>
                         <td>
-                            <span style="color: #ffffff; font-size: 20px; font-weight: 600; letter-spacing: -0.5px;">Xone Maritime Academy</span>
+                            <span style="color: #18181b; font-size: 20px; font-weight: 600; letter-spacing: -0.5px;">Xone Maritime Academy</span>
                         </td>
                     </tr>
                 </table>
@@ -130,10 +130,18 @@ export async function sendStudentWelcomeEmail(studentId: string, courseId?: stri
 
 
         // Resolve Base URL dynamically using env instead of headers() which throws in Server Actions
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://student.xoneacademy.com';
+        let baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://student.xoneacademy.com';
+        if (baseUrl.endsWith('/')) {
+            baseUrl = baseUrl.slice(0, -1);
+        }
 
         const uploadLink = `${baseUrl}/upload/${token}`;
         console.log(`Attempting to send welcome email to: ${student.email}`);
+
+        // If localhost, Gmail will block images. Warn in console.
+        if (baseUrl.includes('localhost')) {
+            console.warn("WARNING: Emails sent from localhost will have broken images in Gmail. Please use a public URL or Ngrok.");
+        }
 
         // Send Email
         const { data, error } = await resend.emails.send({
