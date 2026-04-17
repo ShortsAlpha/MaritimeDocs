@@ -59,8 +59,80 @@ export async function updateCourseChecklistTemplate(id: string, template: any) {
             where: { id },
             data: { checklistTemplate: template }
         })
+
+        // Cascade template changes to all events of this course
+        const events = await db.courseEvent.findMany({
+            where: { courseId: id },
+            include: { checklist: true }
+        })
+
+        if (events.length > 0) {
+            // Flatten new template into items
+            const newTemplateItems: { phase: string, label: string, order: number }[] = []
+            let order = 0
+            if (Array.isArray(template)) {
+                for (const phase of template) {
+                    if (Array.isArray(phase.items) && phase.items.length > 0) {
+                        for (const item of phase.items) {
+                            newTemplateItems.push({
+                                phase: phase.title || "General",
+                                label: typeof item === 'string' ? item : String(item),
+                                order: order++
+                            })
+                        }
+                    } else if (phase.title && phase.title.trim() !== '') {
+                        newTemplateItems.push({
+                            phase: "General",
+                            label: phase.title,
+                            order: order++
+                        })
+                    }
+                }
+            }
+
+            for (const event of events) {
+                const hasCompletedItems = event.checklist.some(item => item.isCompleted)
+
+                if (event.checklist.length === 0 || !hasCompletedItems) {
+                    // Safe to completely overwrite if it's empty or nothing is checked off yet
+                    if (event.checklist.length > 0) {
+                        await db.eventChecklistItem.deleteMany({
+                            where: { courseEventId: event.id }
+                        })
+                    }
+
+                    if (newTemplateItems.length > 0) {
+                        await db.eventChecklistItem.createMany({
+                            data: newTemplateItems.map(item => ({
+                                courseEventId: event.id,
+                                label: item.label,
+                                phase: item.phase,
+                                order: item.order
+                            }))
+                        })
+                    }
+                } else {
+                    // Has completed items: Append only missing ones to prevent data loss
+                    const existingLabels = new Set(event.checklist.map(i => `${i.phase}::${i.label}`))
+                    const itemsToAdd = newTemplateItems.filter(item => !existingLabels.has(`${item.phase}::${item.label}`))
+                    
+                    if (itemsToAdd.length > 0) {
+                        await db.eventChecklistItem.createMany({
+                            data: itemsToAdd.map(item => ({
+                                courseEventId: event.id,
+                                label: item.label,
+                                phase: item.phase,
+                                order: item.order 
+                            }))
+                        })
+                    }
+                }
+            }
+        }
+
         revalidatePath("/admin/settings")
-        return { success: true, message: "Checklist template updated" }
+        revalidatePath("/admin/calendar")
+        return { success: true, message: "Checklist template updated and synced to existing events" }
     } catch (error) {
         console.error("Template Update Error:", error)
         return { success: false, message: "Failed to update template" }

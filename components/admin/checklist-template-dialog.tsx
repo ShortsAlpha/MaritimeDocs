@@ -127,82 +127,64 @@ export function ChecklistTemplateDialog({ course }: { course: Course }) {
             const newPhases: ChecklistPhase[] = []
             let currentPhase: ChecklistPhase | null = null
 
-            // Skip header row if it looks like a header (e.g. contains "Phase" or "Item")
-            let startIndex = 0
-            if (data.length > 0 && (String(data[0][0]).toLowerCase().includes("phase") || String(data[0][1]).toLowerCase().includes("item"))) {
-                startIndex = 1
-            }
-
-            // Heuristic to determine column mapping
-            // Check first 20 rows for data distribution
-            let hasColC = false
-            for (let i = 0; i < Math.min(data.length, 20); i++) {
-                if (data[i] && data[i][2]) {
-                    hasColC = true
-                    break
+            // Find the Items column by checking which column has the most long text entries
+            let colCounts: Record<number, number> = {}
+            data.forEach((row) => {
+                if (Array.isArray(row)) {
+                    row.forEach((cell, idx) => {
+                        if (cell && String(cell).trim().length > 5) {
+                            colCounts[idx] = (colCounts[idx] || 0) + 1
+                        }
+                    })
+                }
+            })
+            
+            let itemColIdx = -1
+            let maxCount = 0
+            for (const [idx, count] of Object.entries(colCounts)) {
+                if (count > maxCount) {
+                    maxCount = count
+                    itemColIdx = parseInt(idx)
                 }
             }
 
-            for (let i = startIndex; i < data.length; i++) {
+            // Phase column is usually the one immediately preceding the Items column
+            let phaseColIdx = itemColIdx > 0 ? itemColIdx - 1 : 0
+
+            for (let i = 0; i < data.length; i++) {
                 const row = data[i]
+                if (!row || !Array.isArray(row)) continue
 
-                let phaseName = ""
-                let itemName = ""
+                let phaseName = row[phaseColIdx] ? String(row[phaseColIdx]).trim() : ""
+                let itemName = row[itemColIdx] ? String(row[itemColIdx]).trim() : ""
 
-                if (hasColC) {
-                    // Mode: Phase in Col B (1), Item in Col C (2)
-                    // Col A is usually empty or irrelevant
-                    const colB = row[1] ? String(row[1]).trim() : ""
-                    const colC = row[2] ? String(row[2]).trim() : ""
+                // Skip headers or irrelevant words
+                if (itemName.toLowerCase() === "item" || itemName.toLowerCase() === "course place & date") {
+                    continue
+                }
 
-                    if (colB) phaseName = colB
-                    if (colC) itemName = colC
-                } else {
-                    // Legacy Mode: Phase in Col A (0), Item in Col B (1)
-                    const colA = row[0] ? String(row[0]).trim() : ""
-                    const colB = row[1] ? String(row[1]).trim() : ""
-
-                    if (colA) phaseName = colA // Or if single col uppercase...
-                    if (colB) itemName = colB
-
-                    // Single column fallback (only A present)
-                    if (!colB && colA) {
-                        // Check for ALL CAPS Header
-                        const isUpperCase = colA.length > 3 && colA === colA.toUpperCase() && /[A-Z]/.test(colA)
-                        if (isUpperCase) {
-                            phaseName = colA
-                            itemName = ""
-                        } else {
-                            // Treat as item if we have a phase
-                            if (currentPhase) {
-                                itemName = colA
-                                phaseName = ""
-                            } else {
-                                phaseName = colA
-                                itemName = ""
-                            }
-                        }
-                    }
-                    // Single column fallback (only B present - indented)
-                    if (!colA && colB) {
-                        const isUpperCase = colB.length > 3 && colB === colB.toUpperCase() && /[A-Z]/.test(colB)
-                        if (isUpperCase) {
-                            phaseName = colB
-                            itemName = ""
-                        } else {
-                            itemName = colB
-                            phaseName = ""
-                        }
+                // If identical (happens if itemColIdx === phaseColIdx = 0), avoid treating both as same
+                if (phaseColIdx === itemColIdx) {
+                    const isUpper = phaseName.length > 3 && phaseName === phaseName.toUpperCase() && /[A-Z]/.test(phaseName)
+                    if (isUpper) {
+                        itemName = ""
+                    } else {
+                        phaseName = ""
                     }
                 }
 
                 if (!phaseName && !itemName) continue
 
+                // Check for uppercase override even in itemName column (sometimes merged improperly)
+                if (itemName && !phaseName && itemName.length > 3 && itemName === itemName.toUpperCase() && /[A-Z]/.test(itemName)) {
+                    phaseName = itemName
+                    itemName = ""
+                }
+
                 // Logic to update state
                 // 1. Update Phase if detected
                 if (phaseName) {
-                    const cleanPhaseName = phaseName.replace(/[\r\n]+/g, " ").trim() // Handle wrapped text in merged cells
-                    // Check if phase already exists (or is the current one)
+                    const cleanPhaseName = phaseName.replace(/[\r\n]+/g, " ").trim()
                     if (!currentPhase || currentPhase.title !== cleanPhaseName) {
                         const existing = newPhases.find(p => p.title === cleanPhaseName)
                         if (existing) {
@@ -216,6 +198,14 @@ export function ChecklistTemplateDialog({ course }: { course: Course }) {
                             newPhases.push(currentPhase)
                         }
                     }
+                } else if (!currentPhase && itemName) {
+                    // Fallback: If the very first row is an Item with no Phase, create a generic phase
+                    currentPhase = {
+                        id: crypto.randomUUID(),
+                        title: "General",
+                        items: []
+                    }
+                    newPhases.push(currentPhase)
                 }
 
                 // 2. Add Item if detected
@@ -249,7 +239,7 @@ export function ChecklistTemplateDialog({ course }: { course: Course }) {
                     <ListChecks className="h-4 w-4" />
                 </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl h-[80vh] flex flex-col">
+            <DialogContent className="sm:max-w-6xl w-[95vw] h-[80vh] flex flex-col">
                 <DialogHeader>
                     <DialogTitle>Edit Checklist: {course.title}</DialogTitle>
                     <DialogDescription>

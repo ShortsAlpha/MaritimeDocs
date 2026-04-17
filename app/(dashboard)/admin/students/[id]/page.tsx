@@ -11,6 +11,8 @@ import { DeleteStudentButton } from "@/components/admin/delete-student-button";
 import { EditableField } from "@/components/admin/editable-field";
 import { StudentCoursesEdit } from "@/components/admin/student-courses-edit";
 import { StudentStatusSelect } from "@/components/admin/student-status-select";
+import { StudentIntakeSelect } from "@/components/admin/student-intake-select";
+import { getCurrentUserBranch, shouldFilterByBranch } from "@/lib/branch";
 
 
 // Sub-components will be imported from separate files in next steps
@@ -73,6 +75,13 @@ export default async function StudentDetailPage({
     const balance = totalFee - totalPaid;
 
     const courses = await db.course.findMany({ orderBy: { title: 'asc' } });
+    
+    // Intake data for selection
+    const branch = await getCurrentUserBranch();
+    const intakes = await db.intake.findMany({
+        where: shouldFilterByBranch(branch) ? { branchId: branch!.branchId } : {},
+        orderBy: { startDate: 'desc' }
+    });
 
     return (
         <div className="space-y-4 md:space-y-6 w-full max-w-full overflow-hidden">
@@ -190,9 +199,13 @@ export default async function StudentDetailPage({
                                             <Calendar className="h-4 w-4 text-primary" />
                                         </div>
                                         <div className="flex-1">
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-medium text-muted-foreground">Intake Period</span>
-                                                <span className="text-sm font-semibold">{student.intake?.name || "No Intake Assigned"}</span>
+                                            <div className="flex flex-col items-start min-w-[200px]">
+                                                <span className="text-sm font-medium text-muted-foreground pb-1">Intake Period</span>
+                                                <StudentIntakeSelect 
+                                                    studentId={student.id} 
+                                                    currentIntakeId={student.intake?.id} 
+                                                    intakes={intakes} 
+                                                />
                                             </div>
                                         </div>
                                     </div>

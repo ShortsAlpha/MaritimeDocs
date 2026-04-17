@@ -46,7 +46,6 @@ function EditablePaymentDate({ paymentId, initialDate, forceEdit }: { paymentId:
             toast.success("Date saved");
             setIsEditing(false);
             setHasChanged(false);
-            router.refresh();
         } else {
             toast.error("Failed to update date");
             setDate(new Date(initialDate));
@@ -91,7 +90,7 @@ function EditablePaymentDate({ paymentId, initialDate, forceEdit }: { paymentId:
     }
 
     return (
-        <span className="font-medium">{format(new Date(initialDate), "MMM d, yyyy")}</span>
+        <span className="font-medium">{format(new Date(date), "MMM d, yyyy")}</span>
     )
 }
 
@@ -137,7 +136,6 @@ function EditablePaymentAmount({ paymentId, initialAmount, forceEdit }: { paymen
             toast.success("Payment saved automatically");
             setIsEditing(false);
             setHasChanged(false);
-            router.refresh();
         } else {
             toast.error("Failed to update");
             setAmount(initialAmount.toString());
@@ -174,10 +172,10 @@ function EditablePaymentAmount({ paymentId, initialAmount, forceEdit }: { paymen
         )
     }
 
-    // Displays the persisted value (initialAmount) to ensure no confusion about unsaved state
+    // Displays the optimistically updated local value so the UI feels instant
     return (
         <div className="flex items-center justify-end gap-2 group">
-            <span className="font-medium">€{Number(initialAmount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            <span className="font-medium">€{Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
         </div>
     )
 }

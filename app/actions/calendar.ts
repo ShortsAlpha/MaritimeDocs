@@ -65,7 +65,7 @@ export async function createCourseEvent(prevState: any, formData: FormData) {
                     if (parsed.length > 0 && typeof parsed[0] === 'object' && 'items' in parsed[0]) {
                         // It is ChecklistPhase[]
                         for (const phase of parsed) {
-                            if (Array.isArray(phase.items)) {
+                            if (Array.isArray(phase.items) && phase.items.length > 0) {
                                 for (const item of phase.items) {
                                     checklistItemsToCreate.push({
                                         label: typeof item === 'string' ? item : String(item),
@@ -73,6 +73,13 @@ export async function createCourseEvent(prevState: any, formData: FormData) {
                                         order: globalOrder++
                                     })
                                 }
+                            } else if (phase.title && phase.title.trim() !== '') {
+                                // The user created a phase but no items inside it. Treat the phase itself as an item so it doesn't get lost.
+                                checklistItemsToCreate.push({
+                                    label: phase.title,
+                                    phase: "General",
+                                    order: globalOrder++
+                                })
                             }
                         }
                     } else {

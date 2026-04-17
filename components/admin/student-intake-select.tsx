@@ -52,7 +52,7 @@ export function StudentIntakeSelect({ studentId, currentIntakeId, intakes }: Pro
 
     return (
         <Select value={intakeId || "no_intake"} onValueChange={handleChange}>
-            <SelectTrigger className="w-auto h-auto p-0 border-0 shadow-none bg-transparent hover:bg-transparent text-sm font-medium focus:ring-0 focus:outline-none data-[placeholder]:text-muted-foreground text-left">
+            <SelectTrigger className="w-auto h-8 px-3 py-1 bg-muted/60 hover:bg-muted rounded-md border-0 shadow-none text-sm font-semibold focus:ring-0 focus:outline-none data-[placeholder]:text-muted-foreground text-left">
                 <SelectValue placeholder="Select intake" />
             </SelectTrigger>
             <SelectContent>

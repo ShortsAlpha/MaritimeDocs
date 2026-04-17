@@ -390,10 +390,17 @@ export async function getSignedProfilePhotoUrl(storedUrl: string | null) {
         const bucket = R2_BUCKET_NAME;
 
         let key = "";
-        if (storedUrl.startsWith(publicUrl)) {
-            key = storedUrl.replace(publicUrl + "/", "");
-        } else if (storedUrl.includes("/students/")) {
-            key = storedUrl.substring(storedUrl.indexOf("students/"));
+        try {
+            const urlObj = new URL(storedUrl);
+            key = urlObj.pathname;
+            if (key.startsWith('/')) key = key.substring(1);
+        } catch {
+            if (storedUrl.startsWith(publicUrl)) {
+                const prefix = publicUrl.endsWith('/') ? publicUrl : publicUrl + '/';
+                key = storedUrl.replace(prefix, "");
+            } else if (storedUrl.includes("/students/")) {
+                key = storedUrl.substring(storedUrl.indexOf("students/"));
+            }
         }
 
         if (!key || !bucket) return storedUrl;

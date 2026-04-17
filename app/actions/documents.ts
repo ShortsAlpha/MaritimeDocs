@@ -27,10 +27,26 @@ export async function getDocumentPreviewUrl(docId: string) {
         let key = "";
         const publicUrl = process.env.R2_PUBLIC_URL || "";
 
-        if (doc.fileUrl.startsWith(publicUrl)) {
-            key = doc.fileUrl.replace(publicUrl + "/", "");
-        } else {
-            if (doc.fileUrl.includes("students/")) {
+        try {
+            // Robust key extraction using URL parsing
+            const fileUrlObj = new URL(doc.fileUrl);
+            key = fileUrlObj.pathname;
+            
+            // Remove leading slash which pathname includes
+            if (key.startsWith('/')) {
+                key = key.substring(1);
+            }
+            
+            // If we are using Cloudflare R2 workers, sometimes the path is just the key.
+            // If the key has some prefix from the host we need to strip, we should be careful.
+            // But usually, URL.pathname without the leading slash IS the exact S3 key!
+        } catch (e) {
+            // Fallback for relative or malformed URLs
+            if (doc.fileUrl.startsWith(publicUrl)) {
+                // Handle possible double slashes
+                const prefix = publicUrl.endsWith('/') ? publicUrl : publicUrl + '/';
+                key = doc.fileUrl.replace(prefix, "");
+            } else if (doc.fileUrl.includes("students/")) {
                 key = doc.fileUrl.substring(doc.fileUrl.indexOf("students/"));
             }
         }
@@ -288,9 +304,20 @@ export async function deleteStudentDocument(docId: string) {
             // URL: process.env.R2_PUBLIC_URL + "/" + key
             // Key: students/{studentId}/documents/...
 
-            const publicUrl = process.env.R2_PUBLIC_URL || "";
-            if (doc.fileUrl.startsWith(publicUrl)) {
-                const key = doc.fileUrl.replace(publicUrl + "/", "");
+            let key = "";
+            try {
+                const urlObj = new URL(doc.fileUrl);
+                key = urlObj.pathname;
+                if (key.startsWith('/')) key = key.substring(1);
+            } catch {
+                const publicUrl = process.env.R2_PUBLIC_URL || "";
+                if (doc.fileUrl.startsWith(publicUrl)) {
+                    const prefix = publicUrl.endsWith('/') ? publicUrl : publicUrl + '/';
+                    key = doc.fileUrl.replace(prefix, "");
+                }
+            }
+
+            if (key) {
                 await deleteFileFromR2(key);
             }
         } catch (r2Error) {
