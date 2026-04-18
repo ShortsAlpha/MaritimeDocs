@@ -39,33 +39,39 @@ const SOURCES = [
 
 function RatingField({ name, label }: { name: string, label: string }) {
     return (
-        <div className="space-y-3 bg-muted/20 p-4 rounded-lg">
-            <Label className="text-base font-medium">{label} <span className="text-red-500">*</span></Label>
-            <RadioGroup
-                name={name}
-                className="flex flex-wrap gap-2 sm:gap-4"
-                required
-                onInvalid={(e: any) => e.target.setCustomValidity("Please select a rating.")}
-                onInput={(e: any) => e.target.setCustomValidity("")}
-            >
-                {[1, 2, 3, 4, 5].map((val) => (
-                    <div key={val} className="flex items-center">
-                        <RadioGroupItem value={val.toString()} id={`${name}-${val}`} className="peer sr-only" />
-                        <Label
-                            htmlFor={`${name}-${val}`}
-                            className={cn(
-                                "flex flex-col items-center justify-center w-full min-w-[60px] cursor-pointer p-2 rounded-md border-2 border-muted transition-all hover:border-primary",
-                                "peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 peer-data-[state=checked]:text-primary"
-                            )}
-                        >
-                            <span className="text-xl font-bold">{val}</span>
-                            <span className="text-[10px] uppercase text-muted-foreground font-semibold">
-                                {val === 5 ? "Excellent" : val === 1 ? "Poor" : val === 3 ? "Good" : ""}
-                            </span>
-                        </Label>
-                    </div>
-                ))}
-            </RadioGroup>
+        <div className="space-y-4 bg-card border border-border/50 shadow-sm p-5 sm:p-6 rounded-2xl hover:shadow-md hover:border-primary/20 transition-all">
+            <Label className="text-base sm:text-lg font-medium leading-relaxed text-foreground">
+                {label} <span className="text-destructive">*</span>
+            </Label>
+            <div className="pt-2">
+                <RadioGroup
+                    name={name}
+                    className="flex justify-between items-center gap-2 sm:gap-3"
+                    required
+                    onInvalid={(e: any) => e.target.setCustomValidity("Please select a rating.")}
+                    onInput={(e: any) => e.target.setCustomValidity("")}
+                >
+                    {[1, 2, 3, 4, 5].map((val) => (
+                        <div key={val} className="flex-1">
+                            <RadioGroupItem value={val.toString()} id={`${name}-${val}`} className="peer sr-only" />
+                            <Label
+                                htmlFor={`${name}-${val}`}
+                                className={cn(
+                                    "flex flex-col items-center justify-center w-full h-12 sm:h-14 cursor-pointer rounded-xl border-2 border-transparent bg-muted/40 transition-all hover:bg-muted/80 hover:border-primary/40",
+                                    "peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground peer-data-[state=checked]:shadow-lg peer-data-[state=checked]:scale-[1.02]"
+                                )}
+                            >
+                                <span className="text-lg sm:text-xl font-bold">{val}</span>
+                            </Label>
+                        </div>
+                    ))}
+                </RadioGroup>
+                <div className="flex justify-between mt-3 px-1 text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase opacity-80">
+                    <span className="text-left w-20">1 - Poor</span>
+                    <span className="text-center w-20">3 - Good</span>
+                    <span className="text-right w-20">5 - Excellent</span>
+                </div>
+            </div>
         </div>
     );
 }
@@ -116,67 +122,82 @@ export function FeedbackForm({ token: authToken, initialSubmitted = false }: Fee
         <form action={handleSubmit} className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
             <input type="hidden" name="token" value={authToken} />
 
-            <div className="space-y-4">
-                <h3 className="text-lg font-semibold border-b pb-2">1. General Information</h3>
+            <div className="space-y-6">
+                <div className="space-y-1">
+                    <h3 className="text-xl font-bold tracking-tight text-foreground">1. General Information</h3>
+                    <p className="text-sm text-muted-foreground">Help us understand where our students come from.</p>
+                </div>
 
-                <div className="space-y-3">
-                    <Label className="text-base">How did you hear of Xone Maritime?</Label>
-                    <RadioGroup name="source" className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="space-y-4 bg-card border border-border/50 shadow-sm p-5 sm:p-6 rounded-2xl">
+                    <Label className="text-base font-medium">How did you hear of Xone Maritime? <span className="text-destructive">*</span></Label>
+                    <RadioGroup name="source" className="grid grid-cols-1 sm:grid-cols-2 gap-3" required>
                         {SOURCES.map((source) => (
-                            <div key={source.value} className="flex items-center space-x-2 border rounded-md p-3 hover:bg-muted/50 transition-colors">
-                                <RadioGroupItem value={source.value} id={`src-${source.value}`} />
-                                <Label htmlFor={`src-${source.value}`} className="flex-1 cursor-pointer font-normal">{source.label}</Label>
+                            <div key={source.value}>
+                                <RadioGroupItem value={source.value} id={`src-${source.value}`} className="peer sr-only" />
+                                <Label 
+                                    htmlFor={`src-${source.value}`} 
+                                    className="flex h-full items-center pl-4 pr-4 py-4 border-2 rounded-xl cursor-pointer bg-muted/20 text-muted-foreground font-medium transition-all hover:bg-muted/50 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 peer-data-[state=checked]:text-primary peer-data-[state=checked]:[&_.radio-circle]:border-primary peer-data-[state=checked]:[&_.radio-dot]:scale-100"
+                                >
+                                    <div className="radio-circle flex w-5 h-5 shrink-0 items-center justify-center rounded-full border-2 border-muted-foreground/40 mr-3 transition-colors">
+                                        <div className="radio-dot w-3 h-3 rounded-full bg-primary scale-0 transition-transform translate-x-0 translate-y-0" />
+                                    </div>
+                                    <span className="flex-1">{source.label}</span>
+                                </Label>
                             </div>
                         ))}
                     </RadioGroup>
                 </div>
             </div>
 
-            <div className="space-y-4">
-                <h3 className="text-lg font-semibold border-b pb-2">2. Course Ratings</h3>
-                <p className="text-sm text-muted-foreground">Please rate the following aspects from 1 (Poor) to 5 (Excellent).</p>
+            <div className="space-y-6 pt-4">
+                <div className="space-y-1">
+                    <h3 className="text-xl font-bold tracking-tight text-foreground">2. Course Ratings</h3>
+                    <p className="text-sm text-muted-foreground">Please rate the following aspects from 1 (Poor) to 5 (Excellent).</p>
+                </div>
 
-                <div className="grid gap-6">
+                <div className="grid gap-6 sm:gap-8">
                     {RATING_QUESTIONS.map((q) => (
                         <RatingField key={q.key} name={q.key} label={q.label} />
                     ))}
                 </div>
             </div>
 
-            <div className="space-y-4">
-                <h3 className="text-lg font-semibold border-b pb-2">3. Conclusion</h3>
+            <div className="space-y-6 pt-4">
+                <div className="space-y-1">
+                    <h3 className="text-xl font-bold tracking-tight text-foreground">3. Conclusion</h3>
+                    <p className="text-sm text-muted-foreground">Final thoughts on your experience.</p>
+                </div>
 
-                <div className="space-y-3 bg-neutral-100/50 dark:bg-neutral-900/20 p-4 rounded-lg border border-neutral-200 dark:border-neutral-800">
-                    <Label className="text-base font-medium">Will you recommend us to your friends? <span className="text-red-500">*</span></Label>
+                <div className="space-y-4 bg-card border border-border/50 shadow-sm p-5 sm:p-6 rounded-2xl">
+                    <Label className="text-base font-medium">Will you recommend us to your friends? <span className="text-destructive">*</span></Label>
                     <RadioGroup
                         name="recommend"
-                        className="flex flex-col sm:flex-row gap-4 pt-2"
+                        className="grid grid-cols-3 gap-3 pt-2"
                         required
                         onInvalid={(e: any) => e.target.setCustomValidity("Please select an option.")}
                         onInput={(e: any) => e.target.setCustomValidity("")}
                     >
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="YES" id="rec-yes" />
-                            <Label htmlFor="rec-yes">Yes</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="NO" id="rec-no" />
-                            <Label htmlFor="rec-no">No</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="MAYBE" id="rec-maybe" />
-                            <Label htmlFor="rec-maybe">Maybe</Label>
-                        </div>
+                        {["YES", "NO", "MAYBE"].map((opt) => (
+                            <div key={opt} className="relative">
+                                <RadioGroupItem value={opt} id={`rec-${opt}`} className="peer sr-only" />
+                                <Label
+                                    htmlFor={`rec-${opt}`}
+                                    className="flex flex-col items-center justify-center p-3 h-14 border-2 rounded-xl cursor-pointer bg-muted/20 text-muted-foreground font-medium transition-all hover:bg-muted/50 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 peer-data-[state=checked]:text-primary"
+                                >
+                                    {opt === "YES" ? "Yes" : opt === "NO" ? "No" : "Maybe"}
+                                </Label>
+                            </div>
+                        ))}
                     </RadioGroup>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-3 bg-card border border-border/50 shadow-sm p-5 sm:p-6 rounded-2xl">
                     <Label htmlFor="comment" className="text-base font-medium">Any other comments?</Label>
                     <Textarea
                         name="comment"
                         id="comment"
                         placeholder="Tell us what you liked or how we can improve..."
-                        className="min-h-[100px]"
+                        className="min-h-[120px] resize-y bg-muted/20 focus:bg-background transition-colors text-base p-4 rounded-xl"
                     />
                 </div>
             </div>
