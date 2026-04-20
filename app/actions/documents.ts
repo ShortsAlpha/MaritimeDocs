@@ -53,6 +53,10 @@ export async function getDocumentPreviewUrl(docId: string) {
 
         if (!key) return { success: false, message: "Invalid file key" };
 
+        // VERY IMPORTANT: Decode URL encoded strings (like %20 to spaces) 
+        // because S3 expects the raw key string, not the URL encoded one.
+        key = decodeURIComponent(key);
+
         const command = new GetObjectCommand({
             Bucket: R2_BUCKET_NAME,
             Key: key,
