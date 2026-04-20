@@ -54,22 +54,80 @@ export async function getDocumentPreviewUrl(docId: string) {
 
         if (!key) return { success: false, message: "Invalid file key" };
 
-        // VERY IMPORTANT: Decode URL encoded strings (like %20 to spaces) 
-        // because S3 expects the raw key string, not the URL encoded one.
         key = decodeURIComponent(key);
 
-        const command = new GetObjectCommand({
-            Bucket: R2_BUCKET_NAME,
-            Key: key,
-            ResponseContentDisposition: 'inline' // Forces browser to display
-        });
+        try {
+            // First, try to generate signed url assuming the key is completely correct
+            // S3 getSignedUrl doesn't actually check if the object exists. It just generates the signature.
+            // Oh wait, if getSignedUrl doesn't check if it exists, WHERE does NoSuchKey come from?
+            // NoSuchKey comes from the BROWSER when the user opens the signed URL!
+            // To prevent the browser from getting NoSuchKey, I must manually verify it using HeadObjectCommand first!
 
-        // 1 hour expiry
-        const signedUrl = await getSignedUrl(r2, command, { expiresIn: 3600 });
+            const { HeadObjectCommand, ListObjectsV2Command } = await import("@aws-sdk/client-s3");
+            
+            try {
+                await r2.send(new HeadObjectCommand({ Bucket: R2_BUCKET_NAME, Key: key }));
+            } catch (headError: any) {
+                if (headError.name === "NotFound" || headError.name === "NoSuchKey") {
+                    console.log(`[R2] Key not found: ${key}. Attempting fuzzy folder search...`);
+                    // The exact key from DB failed. 
+                    // This happens due to broken data migrations (e.g., spaces converted to _ in DB but not in S3)
+                    // Let's do a fallback search in the same folder.
+                    
+                    const folderPath = key.substring(0, key.lastIndexOf('/') + 1); // e.g., students/kavindu.../documents/
+                    
+                    const listRes = await r2.send(new ListObjectsV2Command({
+                        Bucket: R2_BUCKET_NAME,
+                        Prefix: folderPath
+                    }));
+                    
+                    if (listRes.Contents && doc.title) {
+                        // Find a file whose key ends with the document title (ignoring URL encoding differences)
+                        const sanitizedDbTitle = doc.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+                        
+                        const matchedObj = listRes.Contents.find(obj => {
+                            if (!obj.Key) return false;
+                            const S3FileName = obj.Key.split('/').pop() || "";
+                            const sanitizedS3Title = S3FileName.toLowerCase().replace(/[^a-z0-9]/g, '');
+                            // Check if the S3 filename closely matches the DB title
+                            return sanitizedS3Title.includes(sanitizedDbTitle) || sanitizedDbTitle.includes(sanitizedS3Title);
+                        });
 
-        return { success: true, url: signedUrl };
+                        if (matchedObj && matchedObj.Key) {
+                            console.log(`[R2] Fuzzy Match Found! Remapped ${key} to ${matchedObj.Key}`);
+                            key = matchedObj.Key; 
+                            
+                            // Optionally async update the DB to fix it forever so it doesn't do ListObjects next time
+                            db.studentDocument.update({
+                                where: { id: doc.id },
+                                data: { fileUrl: `${process.env.R2_PUBLIC_URL}/${key}` }
+                            }).catch(e => console.error("Auto DB repair failed", e));
+                        } else {
+                            throw new Error("File truly missing from S3 storage.");
+                        }
+                    } else {
+                        throw new Error("Folder missing or title unknown.");
+                    }
+                } else {
+                    throw headError;
+                }
+            }
+
+            const command = new GetObjectCommand({
+                Bucket: R2_BUCKET_NAME,
+                Key: key,
+                ResponseContentDisposition: 'inline'
+            });
+
+            const signedUrl = await getSignedUrl(r2, command, { expiresIn: 3600 });
+            return { success: true, url: signedUrl };
+
+        } catch (error) {
+            console.error("Preview URL Error:", error);
+            return { success: false, message: "File not found in storage. It may have been deleted or corrupted." };
+        }
     } catch (error) {
-        console.error("Preview URL Error:", error);
+        console.error("Master Preview Error:", error);
         return { success: false, message: "Failed to generate preview" };
     }
 }
