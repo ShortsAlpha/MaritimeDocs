@@ -13,7 +13,7 @@ export function getNextWorkingDay(date: Date): Date {
         nextDate = addDays(nextDate, 1);
         dayOfWeek = getDay(nextDate);
     }
-    
+
     return nextDate;
 }
 
@@ -22,7 +22,7 @@ export function getNextWorkingDay(date: Date): Date {
  * and the next available sequence number for that event.
  */
 export async function getOrGenerateTMCertificateNumber(studentId: string, courseEventId: string, certificateType: string, eventStartDate: Date): Promise<string> {
-    
+
     const existing = await db.studentCertificate.findUnique({
         where: {
             studentId_courseEventId_certificateType: {
@@ -34,7 +34,7 @@ export async function getOrGenerateTMCertificateNumber(studentId: string, course
     });
 
     if (existing && existing.certificateNo) {
-        return existing.certificateNo; 
+        return existing.certificateNo;
     }
 
     const year = eventStartDate.getFullYear().toString().slice(-2);
@@ -80,13 +80,13 @@ export async function applyTMMetadataToStudent(student: any, course: any, templa
     } else {
         throw new Error("Cannot calculate certificate limits: Student must either have a 'Certificate Issue Date' saved in their profile or be enrolled in a Calendar Event.");
     }
-    
+
     const issueDate = baseDate;
-    
+
     // Check if we already have a generated sequence for this student + event
     let suffix = "";
     const certificateType = "stcw-basic-safety-group"; // Logical grouping type
-    
+
     // The grouping event ID. If no event exists, we use a generic placeholder like "no-event"
     // so the database unique constraints don't crash when passing null.
     const effectiveEventId = courseEvent ? courseEvent.id : "no-event";
@@ -127,14 +127,14 @@ export async function applyTMMetadataToStudent(student: any, course: any, templa
     // 3. Mutate the memory object
     student.certificateIssueDate = issueDate;
     student.certificateExpiryDate = expiryDate;
-    
+
     // Pass just the suffix (e.g. M260001). The pdf-filler will prepend PST-, FF- per page.
-    student.studentNumber = suffix; 
+    student.studentNumber = suffix;
 
     // We also attach courseEventId invisibly so saveGeneratedDocument can pick it up
     student.__courseEventId = effectiveEventId;
     // Inject custom cert type so the upsert logic uses our grouping
-    student.__certificateType = certificateType; 
+    student.__certificateType = certificateType;
 
     return student;
 }

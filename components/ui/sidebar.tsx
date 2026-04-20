@@ -96,6 +96,24 @@ const SidebarProvider = React.forwardRef<
                 : setOpen((open) => !open)
         }, [isMobile, setOpen, setOpenMobile])
 
+        // Add auto-collapse for laptop/smaller screens (MacBooks etc)
+        React.useEffect(() => {
+            const mql = window.matchMedia("(max-width: 1400px)")
+            const onChange = (e: MediaQueryListEvent) => {
+                if (e.matches) {
+                    setOpen(false)
+                }
+            }
+            mql.addEventListener("change", onChange)
+            
+            // Auto collapse on initial load if screen is small
+            if (mql.matches) {
+                setOpen(false)
+            }
+
+            return () => mql.removeEventListener("change", onChange)
+        }, [setOpen])
+
         // Adds a keyboard shortcut to toggle the sidebar.
         React.useEffect(() => {
             const handleKeyDown = (event: KeyboardEvent) => {

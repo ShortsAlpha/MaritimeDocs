@@ -12,7 +12,7 @@ import {
     SidebarMenuItem,
     SidebarFooter,
 } from "@/components/ui/sidebar"
-import { LayoutDashboard, Users, Settings, Calendar, FileBarChart, BookOpen, Inbox, ClipboardCheck } from "lucide-react"
+import { LayoutDashboard, Users, Presentation, Settings, Calendar, FileBarChart, BookOpen, Inbox, ClipboardCheck } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -20,7 +20,7 @@ import { usePathname } from "next/navigation"
 const adminRoutes = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/students", label: "Students", icon: Users },
-    { href: "/admin/instructors", label: "Instructors", icon: Users },
+    { href: "/admin/instructors", label: "Instructors", icon: Presentation },
     { href: "/admin/calendar", label: "Calendar", icon: Calendar },
     { href: "/admin/workbook", label: "Workbook", icon: BookOpen },
     { href: "/admin/attendance", label: "Attendance", icon: ClipboardCheck },

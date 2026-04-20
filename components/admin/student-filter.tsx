@@ -97,15 +97,14 @@ export function StudentFilter({ courses = [], nationalities = [], intakes = [] }
                                         <SelectItem value="all">All Statuses</SelectItem>
                                         <SelectItem value="REGISTERED">Registered</SelectItem>
                                         <SelectItem value="DOCS_REQ_SENT">Docs Request Sent</SelectItem>
-                                        <SelectItem value="DOCS_PENDING">Docs Pending</SelectItem>
                                         <SelectItem value="LECTURE_NOTES_SENT">Lecture Notes Sent</SelectItem>
                                         <SelectItem value="PAYMENT_REMINDER_SENT">Payment Reminder Sent</SelectItem>
                                         <SelectItem value="PAYMENT_COMPLETED">Payment Completed</SelectItem>
                                         <SelectItem value="COURSE_ONGOING">Course Ongoing</SelectItem>
+                                        <SelectItem value="EXAM_PHASE">In Exam</SelectItem>
                                         <SelectItem value="COURSE_COMPLETED">Course Completed</SelectItem>
                                         <SelectItem value="CERTIFICATE_APPLIED">Certificate Applied</SelectItem>
                                         <SelectItem value="CERTIFICATE_SHIPPED">Certificate Shipped</SelectItem>
-                                        <SelectItem value="CANCELLED">Cancelled</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -131,7 +130,7 @@ export function StudentFilter({ courses = [], nationalities = [], intakes = [] }
                                     <SelectTrigger id="course" className="w-full">
                                         <SelectValue placeholder="Select course" />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent position="popper" className="max-h-[300px]">
                                         <SelectItem value="all">All Courses</SelectItem>
                                         {courses.map((course) => (
                                             <SelectItem key={course.id} value={course.title}>
@@ -147,7 +146,7 @@ export function StudentFilter({ courses = [], nationalities = [], intakes = [] }
                                     <SelectTrigger id="nationality" className="w-full">
                                         <SelectValue placeholder="Select country" />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent position="popper" className="max-h-[300px]">
                                         <SelectItem value="all">All Countries</SelectItem>
                                         {nationalities.map((nat) => (
                                             <SelectItem key={nat} value={nat}>

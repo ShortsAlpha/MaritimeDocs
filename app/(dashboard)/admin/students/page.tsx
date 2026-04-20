@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { db } from "@/lib/db";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -10,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { StudentFilter } from "@/components/admin/student-filter";
 import { SortableHeader } from "@/components/admin/sortable-header";
 import { StudentSearch } from "@/components/admin/student-search";
+import { StudentActiveFilters } from "@/components/admin/student-active-filters";
 import { Prisma, StudentStatus } from "@prisma/client";
 import { Eye } from "lucide-react";
 import { getCurrentUserBranch, shouldFilterByBranch } from "@/lib/branch";
@@ -57,6 +59,9 @@ export default async function AdminStudentsPage(props: Props) {
         where.OR = [
             { fullName: { contains: query, mode: 'insensitive' } },
             { studentNumber: { contains: query, mode: 'insensitive' } },
+            { email: { contains: query, mode: 'insensitive' } },
+            { phone: { contains: query, mode: 'insensitive' } },
+            { passportNumber: { contains: query, mode: 'insensitive' } },
         ];
     }
 
@@ -66,18 +71,23 @@ export default async function AdminStudentsPage(props: Props) {
     if (nationalityFilter && nationalityFilter !== 'all') {
         where.nationality = nationalityFilter;
     }
-    if (statusFilter && statusFilter !== 'all') {
+    const validStatuses = [
+        'REGISTERED', 'DOCS_REQ_SENT', 'LECTURE_NOTES_SENT', 
+        'PAYMENT_REMINDER_SENT', 'PAYMENT_COMPLETED', 'COURSE_ONGOING', 
+        'EXAM_PHASE', 'COURSE_COMPLETED', 'CERTIFICATE_APPLIED', 'CERTIFICATE_SHIPPED'
+    ];
+    if (statusFilter && statusFilter !== 'all' && validStatuses.includes(statusFilter)) {
         where.status = statusFilter as StudentStatus;
     }
     if (intakeFilter && intakeFilter !== 'all') {
         where.intakeId = intakeFilter;
     }
 
-    // Fetch students with their payments to calculate balance
-    // Fetch students with their payments to calculate balance
+    const isMemorySort = sort === 'balance' || sort === 'course';
+
     // Fetch all data concurrently
     const [
-        students,
+        fetchedStudents,
         totalCount,
         courses,
         intakes,
@@ -89,9 +99,9 @@ export default async function AdminStudentsPage(props: Props) {
                 payments: true,
                 courses: { select: { title: true } } 
             },
-            orderBy,
-            skip,
-            take: pageSize
+            orderBy: isMemorySort ? undefined : orderBy,
+            skip: isMemorySort ? undefined : skip,
+            take: isMemorySort ? undefined : pageSize
         }),
         db.student.count({ where }),
         db.course.findMany({ orderBy: { title: 'asc' } }),
@@ -106,19 +116,44 @@ export default async function AdminStudentsPage(props: Props) {
         })
     ]);
 
+    let students = fetchedStudents;
+
+    if (isMemorySort) {
+        students = [...fetchedStudents].sort((a, b) => {
+            if (sort === 'balance') {
+                const aBalance = Number(a.totalFee) - a.payments.reduce((sum: number, p: any) => sum + Number(p.amount), 0);
+                const bBalance = Number(b.totalFee) - b.payments.reduce((sum: number, p: any) => sum + Number(p.amount), 0);
+                return order === 'desc' ? bBalance - aBalance : aBalance - bBalance;
+            } else if (sort === 'course') {
+                const aCourse = a.courses?.[0]?.title || '';
+                const bCourse = b.courses?.[0]?.title || '';
+                return order === 'desc' ? bCourse.localeCompare(aCourse) : aCourse.localeCompare(bCourse);
+            }
+            return 0;
+        });
+
+        // Apply pagination in memory
+        students = students.slice(skip, skip + pageSize);
+    }
+
     const nationalities = nationalitiesArray.map(g => g.nationality).filter(Boolean) as string[];
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <h1 className="text-2xl font-bold">Student Management</h1>
-                <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-                    <StudentSearch />
-                    <div className="flex items-center gap-2">
-                        <StudentFilter courses={courses} nationalities={nationalities} intakes={intakes} />
-                        <CreateStudentDialog courses={courses} intakes={intakes} />
+            <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <h1 className="text-2xl font-bold">Student Management</h1>
+                    <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                        <StudentSearch />
+                        <div className="flex items-center gap-2">
+                            <StudentFilter courses={courses} nationalities={nationalities} intakes={intakes} />
+                            <CreateStudentDialog courses={courses} intakes={intakes} />
+                        </div>
                     </div>
                 </div>
+                <Suspense fallback={null}>
+                    <StudentActiveFilters />
+                </Suspense>
             </div>
 
             <Card>
@@ -210,7 +245,13 @@ export default async function AdminStudentsPage(props: Props) {
                                         />
                                     </TableHead>
                                     <TableHead>
-                                        Course(s)
+                                        <SortableHeader
+                                            column="course"
+                                            currentSort={sort}
+                                            currentOrder={order}
+                                            label="Course(s)"
+                                            searchParams={searchParams}
+                                        />
                                     </TableHead>
                                     <TableHead>
                                         <SortableHeader
@@ -222,7 +263,15 @@ export default async function AdminStudentsPage(props: Props) {
                                         />
                                     </TableHead>
 
-                                    <TableHead>Balance</TableHead>
+                                    <TableHead>
+                                        <SortableHeader
+                                            column="balance"
+                                            currentSort={sort}
+                                            currentOrder={order}
+                                            label="Balance"
+                                            searchParams={searchParams}
+                                        />
+                                    </TableHead>
                                     <TableHead className="text-right">Action</TableHead>
                                 </TableRow>
                             </TableHeader>
