@@ -37,9 +37,10 @@ export async function getDocumentPreviewUrl(docId: string) {
                 key = key.substring(1);
             }
             
-            // If we are using Cloudflare R2 workers, sometimes the path is just the key.
-            // If the key has some prefix from the host we need to strip, we should be careful.
-            // But usually, URL.pathname without the leading slash IS the exact S3 key!
+            // Clean up legacy garbage path prefixes in the DB (like hq/hq/)
+            if (key.includes('students/')) {
+                key = key.substring(key.indexOf('students/'));
+            }
         } catch (e) {
             // Fallback for relative or malformed URLs
             if (doc.fileUrl.startsWith(publicUrl)) {
@@ -408,13 +409,6 @@ export async function deleteStudentDocument(docId: string) {
 
         // Delete from R2
         try {
-            // Extract key from URL or just try to delete if we stored the key. 
-            // Since we store full URL, we need to parse it or just rely on DB delete + orphan cleanup (if we had it).
-            // NOTE: The current upload uses a specific key structure. 
-            // We'll try to extract the key from the fileUrl if it matches our R2_PUBLIC_URL pattern.
-            // URL: process.env.R2_PUBLIC_URL + "/" + key
-            // Key: students/{studentId}/documents/...
-
             let key = "";
             try {
                 const urlObj = new URL(doc.fileUrl);
@@ -428,8 +422,13 @@ export async function deleteStudentDocument(docId: string) {
                 }
             }
 
+            if (key.includes('students/')) {
+                key = key.substring(key.indexOf('students/'));
+            }
+
             if (key) {
-                await deleteFileFromR2(key);
+                // Decode URI component just like in getDocumentPreviewUrl
+                await deleteFileFromR2(decodeURIComponent(key));
             }
         } catch (r2Error) {
             console.error("Failed to delete from R2, proceeding with DB delete:", r2Error);
