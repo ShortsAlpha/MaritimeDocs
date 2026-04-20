@@ -36,11 +36,6 @@ export async function getDocumentPreviewUrl(docId: string) {
             if (key.startsWith('/')) {
                 key = key.substring(1);
             }
-            
-            // Clean up legacy garbage path prefixes in the DB (like hq/hq/)
-            if (key.includes('students/')) {
-                key = key.substring(key.indexOf('students/'));
-            }
         } catch (e) {
             // Fallback for relative or malformed URLs
             if (doc.fileUrl.startsWith(publicUrl)) {
