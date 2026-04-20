@@ -63,12 +63,32 @@ export async function getDocumentPreviewUrl(docId: string) {
                     // This happens due to broken data migrations (e.g., spaces converted to _ in DB but not in S3)
                     // Let's do a fallback search in the same folder.
                     
-                    const folderPath = key.substring(0, key.lastIndexOf('/') + 1); // e.g., students/kavindu.../documents/
+                    let folderPath = key.substring(0, key.lastIndexOf('/') + 1); // e.g., students/kavindu.../documents/
                     
-                    const listRes = await r2.send(new ListObjectsV2Command({
+                    let listRes = await r2.send(new ListObjectsV2Command({
                         Bucket: R2_BUCKET_NAME,
                         Prefix: folderPath
                     }));
+
+                    if (!listRes.Contents || listRes.Contents.length === 0) {
+                        // DB Path is critically corrupted (e.g. hq/hq/ or spelling errors in folder name like deegalla vs deegallu)
+                        const match = key.match(/students\/([^_/]+)/); // Extract first name
+                        if (match && match[1]) {
+                            const firstName = match[1];
+                            console.log(`[R2] Deep folder corruption detected. Broadening search for: ${firstName}...`);
+                            listRes = await r2.send(new ListObjectsV2Command({
+                                Bucket: R2_BUCKET_NAME,
+                                Prefix: `hq/students/${firstName}`
+                            }));
+                            
+                            if (!listRes.Contents || listRes.Contents.length === 0) {
+                                listRes = await r2.send(new ListObjectsV2Command({
+                                    Bucket: R2_BUCKET_NAME,
+                                    Prefix: `students/${firstName}`
+                                }));
+                            }
+                        }
+                    }
                     
                     if (listRes.Contents && doc.title) {
                         // Find a file whose key ends with the document title (ignoring URL encoding differences)
