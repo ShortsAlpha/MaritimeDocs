@@ -57,12 +57,6 @@ export async function getDocumentPreviewUrl(docId: string) {
         key = decodeURIComponent(key);
 
         try {
-            // First, try to generate signed url assuming the key is completely correct
-            // S3 getSignedUrl doesn't actually check if the object exists. It just generates the signature.
-            // Oh wait, if getSignedUrl doesn't check if it exists, WHERE does NoSuchKey come from?
-            // NoSuchKey comes from the BROWSER when the user opens the signed URL!
-            // To prevent the browser from getting NoSuchKey, I must manually verify it using HeadObjectCommand first!
-
             const { HeadObjectCommand, ListObjectsV2Command } = await import("@aws-sdk/client-s3");
             
             try {
@@ -97,10 +91,12 @@ export async function getDocumentPreviewUrl(docId: string) {
                             console.log(`[R2] Fuzzy Match Found! Remapped ${key} to ${matchedObj.Key}`);
                             key = matchedObj.Key; 
                             
+                            const safeKeyUrl = key.split('/').map(segment => encodeURIComponent(segment)).join('/');
+                            
                             // Optionally async update the DB to fix it forever so it doesn't do ListObjects next time
                             db.studentDocument.update({
                                 where: { id: doc.id },
-                                data: { fileUrl: `${process.env.R2_PUBLIC_URL}/${key}` }
+                                data: { fileUrl: `${process.env.R2_PUBLIC_URL}/${safeKeyUrl}` }
                             }).catch(e => console.error("Auto DB repair failed", e));
                         } else {
                             throw new Error("File truly missing from S3 storage.");
@@ -478,10 +474,6 @@ export async function deleteStudentDocument(docId: string) {
                     const prefix = publicUrl.endsWith('/') ? publicUrl : publicUrl + '/';
                     key = doc.fileUrl.replace(prefix, "");
                 }
-            }
-
-            if (key.includes('students/')) {
-                key = key.substring(key.indexOf('students/'));
             }
 
             if (key) {
