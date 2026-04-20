@@ -27,7 +27,7 @@ import { format } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { deleteStudentDocument, getDocumentPreviewUrl, uploadStudentDocumentByAdmin } from "@/app/actions/documents";
+import { deleteStudentDocument, getDocumentPreviewUrl, generatePresignedUploadUrl, saveAdminDocumentRecord } from "@/app/actions/documents";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
@@ -447,24 +447,58 @@ function AdminUploadDialog({
 
     async function handleUpload() {
         if (!file) return;
-        setUploading(true);
 
-        const formData = new FormData();
-        formData.append("studentId", studentId);
-        formData.append("documentTypeId", documentTypeId);
-        formData.append("file", file);
-
-        const res = await uploadStudentDocumentByAdmin(formData);
-
-        if (res.success) {
-            toast.success("Document uploaded successfully");
-            onSuccess();
-            onOpenChange(false);
-            setFile(null); // Reset file
-        } else {
-            toast.error(res.message || "Upload failed");
+        // 20MB Limit for direct uploads
+        if (file.size > 20 * 1024 * 1024) {
+            toast.error("File is too large (Max 20MB).");
+            return;
         }
-        setUploading(false);
+
+        setUploading(true);
+        try {
+            // 1. Get Presigned URL
+            const urlRes = await generatePresignedUploadUrl(`students/${studentId}/documents/admin-upload`, file.name, file.type);
+            if (!urlRes.success || !urlRes.signedUrl || !urlRes.publicUrl) {
+                throw new Error(urlRes.message || "Failed to get upload authorization");
+            }
+
+            // 2. Upload directly to Cloudflare R2
+            const uploadRes = await fetch(urlRes.signedUrl, {
+                method: "PUT",
+                body: file,
+                headers: {
+                    "Content-Type": file.type,
+                },
+            });
+
+            if (!uploadRes.ok) {
+                throw new Error(`R2 Upload failed with status ${uploadRes.status}`);
+            }
+
+            // 3. Save Record in Database
+            const saveRes = await saveAdminDocumentRecord(
+                studentId,
+                documentTypeId,
+                urlRes.publicUrl,
+                file.type,
+                file.name,
+                file.size
+            );
+
+            if (saveRes.success) {
+                toast.success("Document uploaded successfully");
+                onSuccess();
+                onOpenChange(false);
+                setFile(null); // Reset file
+            } else {
+                throw new Error(saveRes.message || "Upload failed");
+            }
+        } catch (error: any) {
+            console.error("Admin upload error:", error);
+            toast.error("Upload failed! " + (error.message || "A network error occurred."));
+        } finally {
+            setUploading(false);
+        }
     }
 
     return (

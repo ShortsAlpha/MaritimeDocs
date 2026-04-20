@@ -1,6 +1,6 @@
 'use client';
 
-import { uploadPendingDocument } from "@/app/actions/documents";
+import { generatePresignedUploadUrl, saveStudentDocumentRecord } from "@/app/actions/documents";
 
 import { Input } from "@/components/ui/input";
 import { Loader2, UploadCloud } from "lucide-react";
@@ -17,30 +17,57 @@ export function UploadForm({ token, documentTypeId }: { token: string, documentT
         const file = event.target.files?.[0];
         if (!file) return;
 
-        // 10MB Limit
-        if (file.size > 10 * 1024 * 1024) {
-            toast.error("File is too large (Max 10MB). Please contact support if you have issues.");
+        // 20MB Limit for direct uploads
+        if (file.size > 20 * 1024 * 1024) {
+            toast.error("File is too large (Max 20MB). Please contact support if you have issues.");
             event.target.value = ""; // Clear input
             return;
         }
 
         setIsUploading(true);
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("token", token);
-        formData.append("documentTypeId", documentTypeId);
+        try {
+            // 1. Get Presigned URL
+            const urlRes = await generatePresignedUploadUrl(`students/temp-upload-${token.substring(0,6)}`, file.name, file.type);
+            if (!urlRes.success || !urlRes.signedUrl || !urlRes.publicUrl) {
+                throw new Error(urlRes.message || "Failed to get upload authorization");
+            }
 
-        const res = await uploadPendingDocument(formData);
+            // 2. Upload directly to Cloudflare R2
+            const uploadRes = await fetch(urlRes.signedUrl, {
+                method: "PUT",
+                body: file,
+                headers: {
+                    "Content-Type": file.type,
+                },
+            });
 
-        if (res.success) {
-            toast.success("Document uploaded successfully");
-            router.refresh();
-        } else {
-            toast.error(res.message || "Failed to upload document");
-            // Reset the form so they can try again if it failed
+            if (!uploadRes.ok) {
+                throw new Error(`R2 Upload failed with status ${uploadRes.status}`);
+            }
+
+            // 3. Save Record in Database
+            const saveRes = await saveStudentDocumentRecord(
+                token,
+                documentTypeId,
+                urlRes.publicUrl,
+                file.type,
+                file.name,
+                file.size
+            );
+
+            if (saveRes.success) {
+                toast.success("Document uploaded successfully! It is now in review.");
+                router.refresh();
+            } else {
+                throw new Error(saveRes.message || "Failed to save document record");
+            }
+        } catch (error: any) {
+            console.error("Upload error:", error);
+            toast.error("Upload failed! " + (error.message || "A network error occurred. Please try again."), { duration: 5000 });
             if (formRef.current) formRef.current.reset();
+        } finally {
+            setIsUploading(false);
         }
-        setIsUploading(false);
     }
 
     return (

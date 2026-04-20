@@ -134,6 +134,113 @@ export async function uploadPendingDocument(formData: FormData) {
     }
 }
 
+export async function generatePresignedUploadUrl(prefix: string, fileName: string, fileType: string) {
+    try {
+        const safeName = fileName.replace(/[^a-zA-Z0-9.-]/g, "_");
+        const key = `${prefix}/${Date.now()}-${safeName}`;
+
+        const command = new PutObjectCommand({
+            Bucket: R2_BUCKET_NAME,
+            Key: key,
+            ContentType: fileType,
+        });
+
+        // Generate signed URL valid for 30 minutes
+        const signedUrl = await getSignedUrl(r2, command, { expiresIn: 1800 });
+        const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
+
+        return { success: true, signedUrl, key, publicUrl };
+    } catch (error) {
+        console.error("Presigned URL error:", error);
+        return { success: false, message: "Failed to generate upload URL" };
+    }
+}
+
+export async function saveStudentDocumentRecord(
+    token: string,
+    documentTypeId: string,
+    fileUrl: string,
+    fileType: string,
+    title: string,
+    fileSize: number
+) {
+    try {
+        const student = await db.student.findUnique({ where: { uploadToken: token } });
+        if (!student) throw new Error("Invalid token");
+        if (student.uploadTokenExpiry && student.uploadTokenExpiry < new Date()) {
+            throw new Error("Token expired");
+        }
+
+        await db.studentDocument.create({
+            data: {
+                studentId: student.id,
+                documentTypeId,
+                fileUrl,
+                fileType: fileType.split('/')[1] || 'file',
+                title,
+                status: 'PENDING'
+            }
+        });
+
+        await logActivity({
+            action: 'UPLOAD',
+            title: `Student uploaded: ${title}`,
+            userId: student.id,
+            userEmail: student.email || "Unknown",
+            metadata: { fileUrl, size: fileSize }
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error("Save Student Doc Error:", error);
+        return { success: false, message: "Failed to save document record" };
+    }
+}
+
+export async function saveAdminDocumentRecord(
+    studentId: string,
+    documentTypeId: string,
+    fileUrl: string,
+    fileType: string,
+    title: string,
+    fileSize: number
+) {
+    try {
+        const user = await currentUser();
+        if (!user) return { success: false, message: "Unauthorized" };
+
+        const student = await db.student.findUnique({ where: { id: studentId } });
+        if (!student) throw new Error("Student not found");
+
+        await db.studentDocument.create({
+            data: {
+                studentId,
+                documentTypeId,
+                fileUrl,
+                fileType: fileType.split('/')[1] || 'file',
+                title,
+                status: 'APPROVED'
+            }
+        });
+
+        revalidatePath(`/admin/students/${studentId}`);
+
+        await logActivity({
+            action: 'UPLOAD',
+            title: `Admin uploaded: ${title}`,
+            description: `Uploaded for student ${student.fullName}`,
+            userId: user.id,
+            userEmail: user.emailAddresses[0]?.emailAddress || "Admin",
+            metadata: { fileUrl, size: fileSize, studentId }
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error("Save Admin Doc Error:", error);
+        return { success: false, message: "Failed to save document record" };
+    }
+}
+
 export async function getStudentByToken(token: string) {
     const student = await db.student.findUnique({
         where: { uploadToken: token },
