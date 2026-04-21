@@ -1,4 +1,4 @@
-import { S3Client, DeleteObjectCommand, ListObjectsV2Command, CopyObjectCommand, HeadObjectCommand, ListObjectsV2CommandOutput, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, DeleteObjectCommand, ListObjectsV2Command, CopyObjectCommand, HeadObjectCommand, ListObjectsV2CommandOutput, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 
 export const R2_BUCKET_NAME = "student-management-system";
 
@@ -121,6 +121,22 @@ export async function getFileBufferFromR2(key: string): Promise<Buffer | null> {
         return null;
     } catch (error) {
         console.error(`Error downloading file ${key} from R2:`, error);
+        return null;
+    }
+}
+
+export async function uploadBufferToR2(buffer: Buffer, key: string, contentType: string = "application/pdf"): Promise<string | null> {
+    try {
+        await r2.send(new PutObjectCommand({
+            Bucket: R2_BUCKET_NAME,
+            Key: key,
+            Body: buffer,
+            ContentType: contentType,
+        }));
+        const publicUrl = process.env.R2_PUBLIC_URL || "";
+        return `${publicUrl}/${key}`;
+    } catch (error) {
+        console.error("R2 Upload Error:", error);
         return null;
     }
 }

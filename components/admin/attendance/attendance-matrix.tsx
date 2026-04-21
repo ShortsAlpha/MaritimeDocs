@@ -261,11 +261,11 @@ export function AttendanceMatrix() {
                                 <div key={student.id} className="flex border-b border-border/50 hover:bg-slate-50 dark:hover:bg-slate-800/40 text-sm group transition-colors duration-150">
                                     {/* Premium Student Name Cell */}
                                     <div className="w-[280px] shrink-0 sticky left-0 z-10 bg-card border-r border-border/60 flex items-center px-4 font-medium shadow-[4px_0_12px_-4px_rgba(0,0,0,0.05)] group-hover:bg-accent/50 group-hover:text-accent-foreground transition-colors duration-150">
-                                        <div className="flex items-center gap-3">
-                                            <div className="h-6 w-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                                        <div className="flex items-center gap-3 w-full overflow-hidden pr-2">
+                                            <div className="h-6 w-6 shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                                                 {rowIndex + 1}
                                             </div>
-                                            <span className="tracking-tight">{student.fullName}</span>
+                                            <span className="tracking-tight truncate block" title={student.fullName}>{student.fullName}</span>
                                         </div>
                                     </div>
 
