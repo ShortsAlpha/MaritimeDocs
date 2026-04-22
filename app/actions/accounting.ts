@@ -186,7 +186,7 @@ async function checkAndUpdatePaymentStatus(studentId: string) {
         const totalFee = Number(student.totalFee);
         const totalPaid = student.payments.reduce((sum, p) => sum + Number(p.amount), 0);
 
-        const earlyStatuses = [
+        const earlyStatuses: StudentStatus[] = [
             StudentStatus.REGISTERED, 
             StudentStatus.DOCS_REQ_SENT, 
             StudentStatus.LECTURE_NOTES_SENT, 
