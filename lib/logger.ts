@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import { headers } from "next/headers";
 
-export type LogAction = 'LOGIN' | 'UPLOAD' | 'VIEW' | 'DELETE' | 'CREATE' | 'UPDATE' | 'EMAIL' | 'PAYMENT';
+export type LogAction = 'LOGIN' | 'UPLOAD' | 'VIEW' | 'DELETE' | 'CREATE' | 'UPDATE' | 'EMAIL' | 'PAYMENT' | 'STATUS_UPDATE' | 'PAYMENT_REMINDER';
 
 interface LogOptions {
     action: LogAction;
