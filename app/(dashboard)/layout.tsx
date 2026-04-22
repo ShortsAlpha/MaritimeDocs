@@ -1,4 +1,5 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import UserProfile from "@/components/ui/user-profile";
 import { db } from "@/lib/db";
 import { AppSidebar } from "@/components/app-sidebar";
@@ -31,14 +32,18 @@ export default async function DashboardLayout({
                     id: clerkUser.id,
                     email: clerkUser.emailAddresses[0]?.emailAddress || '',
                     name: `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim(),
-                    role: 'SUPER_ADMIN',
+                    role: 'PENDING',
                     branchId: hqBranch?.id || null,
                 }
             });
         }
     }
 
-    const role = user?.role || "STAFF";
+    const role = user?.role || "PENDING";
+
+    if (role === 'PENDING') {
+        redirect('/pending');
+    }
 
     return (
         <SidebarProvider className="h-svh overflow-hidden">

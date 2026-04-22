@@ -36,13 +36,14 @@ enum Role {
   SUPER_ADMIN   // Malta HQ — can access all branches
   BRANCH_ADMIN  // Branch manager — manages own branch
   STAFF         // Branch staff — sees own branch only
+  PENDING       // Waiting for approval
 }
 
 model User {
   id        String   @id // Clerk user_id
   email     String   @unique
   name      String?
-  role      Role     @default(STAFF)
+  role      Role     @default(PENDING)
 
   branchId  String?
   branch    Branch?  @relation(fields: [branchId], references: [id])
@@ -93,6 +94,8 @@ model Student {
   totalFee    Decimal  @default(0) // Total course fee in EUR
   photoUrl    String?  // Profile Photo URL
   currency    String   @default("EUR")
+  paymentDeadline DateTime?
+  paymentReminderSent Boolean @default(false)
   
   // Magic Link for Uploads
   uploadToken       String?   @unique

@@ -47,3 +47,27 @@ export async function getBranches() {
         select: { id: true, code: true, name: true }
     })
 }
+
+import { clerkClient } from "@clerk/nextjs/server"
+
+export async function deleteUserAction(userId: string) {
+    const branch = await getCurrentUserBranch()
+    if (!branch || branch.role !== 'SUPER_ADMIN') {
+        return { success: false, error: 'Unauthorized' }
+    }
+
+    try {
+        const client = await clerkClient();
+        await client.users.deleteUser(userId);
+        
+        await db.user.delete({
+            where: { id: userId }
+        });
+
+        revalidatePath('/admin/settings');
+        return { success: true };
+    } catch (error: any) {
+        console.error('Failed to delete user:', error);
+        return { success: false, error: error?.errors?.[0]?.message || 'Failed to delete user' };
+    }
+}

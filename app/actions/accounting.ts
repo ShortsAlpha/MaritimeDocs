@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from "@/lib/db";
-import { PaymentMethod } from "@prisma/client";
+import { PaymentMethod, StudentStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { logActivity } from "@/lib/logger";
 import { getCurrentUserBranch } from "@/lib/branch";
@@ -34,6 +34,8 @@ export async function addPayment(studentId: string, amount: number, method: Paym
             metadata: { amount, method, note, currency: branch?.currency }
         });
 
+        await checkAndUpdatePaymentStatus(studentId);
+
         return { success: true };
     } catch (error) {
         return { success: false, message: "Failed to add payment" };
@@ -49,6 +51,7 @@ export async function updateStudentFee(studentId: string, totalFee: number) {
         });
 
         revalidatePath(`/admin/students/${studentId}`);
+        await checkAndUpdatePaymentStatus(studentId);
         return { success: true };
     } catch (error) {
         return { success: false, message: "Failed to update fee" };
@@ -76,6 +79,8 @@ export async function updatePaymentAmount(paymentId: string, amount: number) {
             userId: payment.studentId,
             metadata: { paymentId, newAmount: amount }
         });
+
+        await checkAndUpdatePaymentStatus(payment.studentId);
 
         return { success: true };
     } catch (error) {
@@ -132,9 +137,76 @@ export async function deletePayment(paymentId: string) {
             metadata: { paymentId, amount: payment.amount }
         });
 
+        await checkAndUpdatePaymentStatus(payment.studentId);
+
         return { success: true };
     } catch (error) {
         console.error("Error deleting payment:", error);
         return { success: false, message: "Failed to delete payment" };
+    }
+}
+
+export async function updateStudentPaymentDeadline(studentId: string, paymentDeadline: Date | null) {
+    try {
+        await db.student.update({
+            where: { id: studentId },
+            data: { 
+                paymentDeadline,
+                // Reset reminder sent if deadline is updated
+                paymentReminderSent: paymentDeadline ? false : undefined 
+            }
+        });
+
+        revalidatePath(`/admin/students/${studentId}`);
+
+        await logActivity({
+            action: 'PAYMENT',
+            title: `Payment Deadline Updated`,
+            description: paymentDeadline ? `Deadline set to ${paymentDeadline.toISOString()}` : `Deadline cleared`,
+            userId: studentId,
+            metadata: { paymentDeadline }
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating payment deadline:", error);
+        return { success: false, message: "Failed to update payment deadline" };
+    }
+}
+
+async function checkAndUpdatePaymentStatus(studentId: string) {
+    try {
+        const student = await db.student.findUnique({
+            where: { id: studentId },
+            include: { payments: true }
+        });
+
+        if (!student) return;
+
+        const totalFee = Number(student.totalFee);
+        const totalPaid = student.payments.reduce((sum, p) => sum + Number(p.amount), 0);
+
+        const earlyStatuses = [
+            StudentStatus.REGISTERED, 
+            StudentStatus.DOCS_REQ_SENT, 
+            StudentStatus.LECTURE_NOTES_SENT, 
+            StudentStatus.PAYMENT_REMINDER_SENT
+        ];
+
+        if (totalPaid >= totalFee && totalFee > 0 && earlyStatuses.includes(student.status)) {
+            await db.student.update({
+                where: { id: studentId },
+                data: { status: StudentStatus.PAYMENT_COMPLETED }
+            });
+            await logActivity({
+                action: 'STATUS_UPDATE',
+                title: 'Status Updated Automatically',
+                description: 'Payment fully completed, status set to PAYMENT_COMPLETED',
+                userId: studentId,
+                metadata: { totalFee, totalPaid }
+            });
+        }
+    } catch (error) {
+        console.error("Failed to check and update payment status:", error);
     }
 }

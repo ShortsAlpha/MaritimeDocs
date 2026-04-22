@@ -9,10 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
 import { useState, useEffect } from "react";
-import { addPayment, updateStudentFee, updatePaymentAmount, updatePaymentDate, deletePayment } from "@/app/actions/accounting";
+import { addPayment, updateStudentFee, updatePaymentAmount, updatePaymentDate, deletePayment, updateStudentPaymentDeadline } from "@/app/actions/accounting";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, Save, X, Edit2, CalendarIcon, Trash2 } from "lucide-react";
+import { Loader2, Save, X, Edit2, CalendarIcon, Trash2, Clock, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -304,6 +304,114 @@ function TotalFeeEditor({ studentId, initialFee }: { studentId: string, initialF
     )
 }
 
+function PaymentDeadlineEditor({ studentId, initialDeadline, paymentReminderSent, balance }: { studentId: string, initialDeadline: string | Date | null, paymentReminderSent: boolean, balance: number }) {
+    const [date, setDate] = useState<Date | undefined>(initialDeadline ? new Date(initialDeadline) : undefined);
+    const [loading, setLoading] = useState(false);
+    
+    // Check if changed
+    const initialTime = initialDeadline ? new Date(initialDeadline).getTime() : 0;
+    const currentTime = date ? date.getTime() : 0;
+    const hasChanged = initialTime !== currentTime;
+
+    async function handleSave() {
+        setLoading(true);
+        const res = await updateStudentPaymentDeadline(studentId, date || null);
+        if (res.success) {
+            toast.success("Payment deadline saved");
+        } else {
+            toast.error("Failed to update payment deadline");
+            setDate(initialDeadline ? new Date(initialDeadline) : undefined);
+        }
+        setLoading(false);
+    }
+
+    let reminderMessage = null;
+    if (balance > 0 && date && !hasChanged) {
+        if (paymentReminderSent) {
+            reminderMessage = (
+                <div className="flex items-center gap-1.5 text-xs text-green-600 mt-3 font-medium">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    Reminder email was sent automatically.
+                </div>
+            );
+        } else {
+            const reminderDate = new Date(date);
+            reminderDate.setDate(reminderDate.getDate() - 7);
+            const now = new Date();
+            now.setHours(0,0,0,0);
+            reminderDate.setHours(0,0,0,0);
+            const diffTime = reminderDate.getTime() - now.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays > 0) {
+                reminderMessage = (
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-3">
+                        <Clock className="w-3.5 h-3.5" />
+                        Auto-reminder will be sent in {diffDays} {diffDays === 1 ? 'day' : 'days'}.
+                    </div>
+                );
+            } else {
+                reminderMessage = (
+                    <div className="flex items-center gap-1.5 text-xs text-amber-600 mt-3 font-medium">
+                        <Clock className="w-3.5 h-3.5" />
+                        Auto-reminder is scheduled to be sent very soon.
+                    </div>
+                );
+            }
+        }
+    } else if (balance <= 0 && date && !hasChanged) {
+         reminderMessage = (
+             <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-3">
+                 <CheckCircle2 className="w-3.5 h-3.5" />
+                 Payment completed. No reminder needed.
+             </div>
+         );
+    }
+
+    return (
+        <div className="p-4 border rounded-lg bg-muted/20">
+            <div className="flex items-end gap-4">
+                <div className="space-y-2 flex-1 flex flex-col">
+                    <Label>Payment Deadline</Label>
+                    <div className="flex gap-2">
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                        "w-full justify-start text-left font-normal",
+                                        !date && "text-muted-foreground"
+                                    )}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {date ? format(date, "PPP") : <span>Pick a deadline date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                    mode="single"
+                                    selected={date}
+                                    onSelect={setDate}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                        {date && (
+                            <Button variant="ghost" size="icon" onClick={() => setDate(undefined)}>
+                                <X className="h-4 w-4" />
+                            </Button>
+                        )}
+                    </div>
+                </div>
+                <Button onClick={handleSave} disabled={loading || !hasChanged}>
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                </Button>
+            </div>
+            {reminderMessage}
+        </div>
+    )
+}
+
 export function StudentAccountingTab({ student }: { student: any }) {
     const router = useRouter();
     const totalFee = Number(student.totalFee);
@@ -419,6 +527,12 @@ export function StudentAccountingTab({ student }: { student: any }) {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <TotalFeeEditor studentId={student.id} initialFee={totalFee} />
+                        <PaymentDeadlineEditor 
+                            studentId={student.id} 
+                            initialDeadline={student.paymentDeadline} 
+                            paymentReminderSent={student.paymentReminderSent}
+                            balance={balance}
+                        />
 
                         <div className="space-y-2 pt-4 border-t">
                             <div className="flex justify-between text-sm">
