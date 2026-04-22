@@ -349,13 +349,16 @@ export function StudentDocsTab({ student, docTypes }: StudentDocsTabProps) {
     return (
         <div className="space-y-6">
             <Tabs defaultValue={defaultTab} className="w-full">
-                <TabsList className="flex flex-wrap h-auto w-full justify-start mb-2">
-                    {courses.map(course => (
-                        <TabsTrigger key={course.id} value={course.id} className="text-xs sm:text-sm">
-                            {course.title}
+            <TabsList className="flex w-full justify-start overflow-x-auto flex-nowrap mb-4 pb-1">
+                {courses.map(course => {
+                    const shortTitle = course.title.split(' - ')[0].split(' (')[0].trim();
+                    return (
+                        <TabsTrigger key={course.id} value={course.id} className="text-xs sm:text-sm whitespace-nowrap" title={course.title}>
+                            {shortTitle.length > 35 ? shortTitle.substring(0, 35) + '...' : shortTitle}
                         </TabsTrigger>
-                    ))}
-                </TabsList>
+                    );
+                })}
+            </TabsList>
 
                 {courses.length === 0 ? (
                     <div className="p-8 mt-4 text-center border border-dashed rounded-lg bg-muted/20 text-muted-foreground">

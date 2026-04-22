@@ -14,6 +14,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format, parse, isValid } from "date-fns"
 import { cn } from "@/lib/utils"
 
+import Select from "react-select"
+import countriesData from "@/official-names-of-countries-2026.json"
+
+const countryOptions = countriesData.map((c: any) => ({ value: c.country, label: c.country }))
+
 function SubmitButton() {
     const { pending } = useFormStatus()
     return (
@@ -42,13 +47,14 @@ export function EditableField({ studentId, label, name, value, displayValue, typ
     const [inputValue, setInputValue] = useState(
         type === "date" && value ? format(new Date(value), "dd.MM.yyyy") : ""
     )
-
-    // Re-sync input and date when modal opens to ensure fresh state if props change (optional, but good)
-    // Actually, when 'open' changes to true, we might want to reset? 
-    // For now we keep state persistent or re-init if needed.
+    
+    // For nationality
+    const initialNationality = type === "nationality" && value 
+        ? { value: value, label: value } 
+        : null;
+    const [selectedNationality, setSelectedNationality] = useState<any>(initialNationality)
 
     async function handleUpdate(formData: FormData) {
-        // We only send the field being updated
         const res = await updateStudent(studentId, null, formData)
         if (res.success) {
             toast.success("Updated successfully")
@@ -75,7 +81,7 @@ export function EditableField({ studentId, label, name, value, displayValue, typ
                         <Pencil className="h-3 w-3" />
                     </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className={type === "nationality" ? "overflow-visible" : ""}>
                     <DialogHeader>
                         <DialogTitle>Edit {label}</DialogTitle>
                     </DialogHeader>
@@ -97,16 +103,13 @@ export function EditableField({ studentId, label, name, value, displayValue, typ
                                             value={inputValue}
                                             onChange={(e) => {
                                                 const value = e.target.value
-                                                // Allow only numbers and dots
                                                 if (value.match(/[^0-9.]/)) return
-                                                // Limit length to 10 (dd.mm.yyyy)
                                                 if (value.length > 10) return
 
                                                 setInputValue(value)
 
                                                 if (value.length === 10) {
                                                     const parsed = parse(value, "dd.MM.yyyy", new Date())
-                                                    // Check strict validity
                                                     if (isValid(parsed) && value === format(parsed, "dd.MM.yyyy")) {
                                                         setDate(parsed)
                                                     } else {
@@ -148,6 +151,32 @@ export function EditableField({ studentId, label, name, value, displayValue, typ
                                         </Popover>
                                     </div>
                                     <input type="hidden" name={name} value={date ? format(date, "yyyy-MM-dd") : ""} />
+                                </>
+                            ) : type === "nationality" ? (
+                                <>
+                                    <Select
+                                        name="nationalitySelect"
+                                        options={countryOptions}
+                                        value={selectedNationality}
+                                        onChange={(newValue) => setSelectedNationality(newValue)}
+                                        placeholder="Select country..."
+                                        unstyled
+                                        classNames={{
+                                            control: ({ isFocused }) =>
+                                                `flex w-full min-h-10 items-center justify-between rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background placeholder:text-muted-foreground focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50`,
+                                            menu: () => "mt-1 rounded-md border bg-popover text-popover-foreground shadow-md z-50",
+                                            menuList: () => "p-1 max-h-[200px] overflow-auto",
+                                            option: ({ isFocused, isSelected }) =>
+                                                `relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none ${isFocused ? 'bg-accent text-accent-foreground' : ''} ${isSelected ? 'bg-accent/50 font-medium' : ''}`,
+                                            input: () => "text-sm text-foreground m-0 p-0",
+                                            placeholder: () => "text-muted-foreground text-sm",
+                                            clearIndicator: () => "text-muted-foreground hover:text-foreground cursor-pointer p-1",
+                                            dropdownIndicator: () => "text-muted-foreground hover:text-foreground cursor-pointer p-1",
+                                            noOptionsMessage: () => "text-muted-foreground text-sm py-2",
+                                            singleValue: () => "text-sm text-foreground",
+                                        }}
+                                    />
+                                    <input type="hidden" name={name} value={selectedNationality?.value || ""} />
                                 </>
                             ) : (
                                 <Input id={name} name={name} type={type} defaultValue={value || ""} />

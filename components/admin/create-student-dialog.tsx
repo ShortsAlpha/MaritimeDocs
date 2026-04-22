@@ -30,16 +30,25 @@ type Props = {
     intakes?: any[]
 }
 
+import countriesData from "@/official-names-of-countries-2026.json"
+
+const countryOptions = countriesData.map((c: any) => ({ value: c.country, label: c.country }))
+
 export function CreateStudentDialog({ courses = [], intakes = [] }: Props) {
     const [open, setOpen] = useState(false)
     const [dob, setDob] = useState<Date | undefined>(undefined)
     const [inputValue, setInputValue] = useState("")
     const [selectedCourses, setSelectedCourses] = useState<readonly any[]>([])
+    const [selectedNationality, setSelectedNationality] = useState<any>(null)
 
     async function handleSubmit(formData: FormData) {
         const res = await createStudent(null, formData)
         if (res.success) {
             setOpen(false)
+            setSelectedCourses([])
+            setSelectedNationality(null)
+            setDob(undefined)
+            setInputValue("")
         } else {
             console.error(res.message);
         }
@@ -113,7 +122,29 @@ export function CreateStudentDialog({ courses = [], intakes = [] }: Props) {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="nationality">Nationality</Label>
-                            <Input id="nationality" name="nationality" placeholder="e.g. Turkish" />
+                            <Select
+                                name="nationalitySelect"
+                                options={countryOptions}
+                                value={selectedNationality}
+                                onChange={(newValue) => setSelectedNationality(newValue)}
+                                placeholder="Select country..."
+                                unstyled
+                                classNames={{
+                                    control: ({ isFocused }) =>
+                                        `flex w-full min-h-10 items-center justify-between rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background placeholder:text-muted-foreground focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50`,
+                                    menu: () => "mt-1 rounded-md border bg-popover text-popover-foreground shadow-md z-50",
+                                    menuList: () => "p-1 max-h-[200px] overflow-auto",
+                                    option: ({ isFocused, isSelected }) =>
+                                        `relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none ${isFocused ? 'bg-accent text-accent-foreground' : ''} ${isSelected ? 'bg-accent/50 font-medium' : ''}`,
+                                    input: () => "text-sm text-foreground m-0 p-0",
+                                    placeholder: () => "text-muted-foreground text-sm",
+                                    clearIndicator: () => "text-muted-foreground hover:text-foreground cursor-pointer p-1",
+                                    dropdownIndicator: () => "text-muted-foreground hover:text-foreground cursor-pointer p-1",
+                                    noOptionsMessage: () => "text-muted-foreground text-sm py-2",
+                                    singleValue: () => "text-sm text-foreground",
+                                }}
+                            />
+                            <input type="hidden" name="nationality" value={selectedNationality?.value || ""} />
                         </div>
                     </div>
 

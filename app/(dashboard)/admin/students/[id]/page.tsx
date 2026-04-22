@@ -13,6 +13,7 @@ import { StudentCoursesEdit } from "@/components/admin/student-courses-edit";
 import { StudentStatusSelect } from "@/components/admin/student-status-select";
 import { StudentIntakeSelect } from "@/components/admin/student-intake-select";
 import { getCurrentUserBranch, shouldFilterByBranch } from "@/lib/branch";
+import { BackButton } from "@/components/admin/back-button";
 
 
 // Sub-components will be imported from separate files in next steps
@@ -88,11 +89,7 @@ export default async function StudentDetailPage({
             <div className="flex flex-col xl:flex-row gap-4 md:gap-6 max-w-full xl:items-start transition-all">
                 {/* Left Section: Back, Photo, Name */}
                 <div className="flex items-start gap-4 flex-1 w-full">
-                    <Link href="/admin/students">
-                        <Button variant="outline" size="icon" className="shrink-0 mt-2">
-                            <ArrowLeft className="h-4 w-4" />
-                        </Button>
-                    </Link>
+                    <BackButton fallbackUrl="/admin/students" />
 
                     <StudentPhotoUpload
                         studentId={student.id}
@@ -308,6 +305,7 @@ export default async function StudentDetailPage({
                                                 studentId={student.id}
                                                 label="Nationality"
                                                 name="nationality"
+                                                type="nationality"
                                                 value={student.nationality}
                                             />
                                         </div>

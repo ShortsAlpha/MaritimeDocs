@@ -1,0 +1,1415 @@
+[
+  {
+    "flagCode": "VA",
+    "country": "Vatican City",
+    "republicCountries_officialName": "Vatican City State",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "US",
+    "country": "United States",
+    "republicCountries_officialName": "United States of America",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "TZ",
+    "country": "Tanzania",
+    "republicCountries_officialName": "United Republic of Tanzania",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "MX",
+    "country": "Mexico",
+    "republicCountries_officialName": "United Mexican States",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "GB",
+    "country": "United Kingdom",
+    "republicCountries_officialName": "United Kingdom of Great Britain and Northern Ireland",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "AE",
+    "country": "United Arab Emirates",
+    "republicCountries_officialName": "United Arab Emirates",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "KM",
+    "country": "Comoros",
+    "republicCountries_officialName": "Union of the Comoros",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "UA",
+    "country": "Ukraine",
+    "republicCountries_officialName": "Ukraine",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "TV",
+    "country": "Tuvalu",
+    "republicCountries_officialName": "Tuvalu",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "TM",
+    "country": "Turkmenistan",
+    "republicCountries_officialName": "Turkmenistan",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "TK",
+    "country": "Tokelau",
+    "republicCountries_officialName": "Tokelau",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "TG",
+    "country": "Togo",
+    "republicCountries_officialName": "Togolese Republic",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "WF",
+    "country": "Wallis and Futuna",
+    "republicCountries_officialName": "Territory of the Wallis and Futuna Islands",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "SY",
+    "country": "Syria",
+    "republicCountries_officialName": "Syrian Arab Republic",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "CH",
+    "country": "Switzerland",
+    "republicCountries_officialName": "Swiss Confederation",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "OM",
+    "country": "Oman",
+    "republicCountries_officialName": "Sultanate of Oman",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "QA",
+    "country": "Qatar",
+    "republicCountries_officialName": "State of Qatar",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "PS",
+    "country": "Palestine",
+    "republicCountries_officialName": "State of Palestine",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "LY",
+    "country": "Libya",
+    "republicCountries_officialName": "State of Libya",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "KW",
+    "country": "Kuwait",
+    "republicCountries_officialName": "State of Kuwait",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "IL",
+    "country": "Israel",
+    "republicCountries_officialName": "State of Israel",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "ER",
+    "country": "Eritrea",
+    "republicCountries_officialName": "State of Eritrea",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "SB",
+    "country": "Solomon Islands",
+    "republicCountries_officialName": "Solomon Islands",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "VN",
+    "country": "Vietnam",
+    "republicCountries_officialName": "Socialist Republic of Viet Nam",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "SK",
+    "country": "Slovakia",
+    "republicCountries_officialName": "Slovak Republic",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "VC",
+    "country": "Saint Vincent and the Grenadines",
+    "republicCountries_officialName": "Saint Vincent and the Grenadines",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "LC",
+    "country": "Saint Lucia",
+    "republicCountries_officialName": "Saint Lucia",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "RU",
+    "country": "Russia",
+    "republicCountries_officialName": "Russian Federation",
+    "continent": [
+      "Asia",
+      "Europe"
+    ]
+  },
+  {
+    "flagCode": "RO",
+    "country": "Romania",
+    "republicCountries_officialName": "Romania",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "ZW",
+    "country": "Zimbabwe",
+    "republicCountries_officialName": "Republic of Zimbabwe",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "ZM",
+    "country": "Zambia",
+    "republicCountries_officialName": "Republic of Zambia",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "YE",
+    "country": "Yemen",
+    "republicCountries_officialName": "Republic of Yemen",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "VU",
+    "country": "Vanuatu",
+    "republicCountries_officialName": "Republic of Vanuatu",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "UZ",
+    "country": "Uzbekistan",
+    "republicCountries_officialName": "Republic of Uzbekistan",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "UG",
+    "country": "Uganda",
+    "republicCountries_officialName": "Republic of Uganda",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "TR",
+    "country": "Turkey",
+    "republicCountries_officialName": "Republic of Turkey",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "TN",
+    "country": "Tunisia",
+    "republicCountries_officialName": "Republic of Tunisia",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "TT",
+    "country": "Trinidad and Tobago",
+    "republicCountries_officialName": "Republic of Trinidad and Tobago",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "MM",
+    "country": "Myanmar",
+    "republicCountries_officialName": "Republic of the Union of Myanmar",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "SD",
+    "country": "Sudan",
+    "republicCountries_officialName": "Republic of the Sudan",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "PH",
+    "country": "Philippines",
+    "republicCountries_officialName": "Republic of the Philippines",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "MH",
+    "country": "Marshall Islands",
+    "republicCountries_officialName": "Republic of the Marshall Islands",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "GM",
+    "country": "Gambia",
+    "republicCountries_officialName": "Republic of the Gambia",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "CG",
+    "country": "Republic of the Congo",
+    "republicCountries_officialName": "Republic of the Congo",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "TJ",
+    "country": "Tajikistan",
+    "republicCountries_officialName": "Republic of Tajikistan",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "SR",
+    "country": "Suriname",
+    "republicCountries_officialName": "Republic of Suriname",
+    "continent": "South America"
+  },
+  {
+    "flagCode": "SS",
+    "country": "South Sudan",
+    "republicCountries_officialName": "Republic of South Sudan",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "ZA",
+    "country": "South Africa",
+    "republicCountries_officialName": "Republic of South Africa",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "SI",
+    "country": "Slovenia",
+    "republicCountries_officialName": "Republic of Slovenia",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "SG",
+    "country": "Singapore",
+    "republicCountries_officialName": "Republic of Singapore",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "SL",
+    "country": "Sierra Leone",
+    "republicCountries_officialName": "Republic of Sierra Leone",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "SC",
+    "country": "Seychelles",
+    "republicCountries_officialName": "Republic of Seychelles",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "RS",
+    "country": "Serbia",
+    "republicCountries_officialName": "Republic of Serbia",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "SN",
+    "country": "Senegal",
+    "republicCountries_officialName": "Republic of Senegal",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "SM",
+    "country": "San Marino",
+    "republicCountries_officialName": "Republic of San Marino",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "RW",
+    "country": "Rwanda",
+    "republicCountries_officialName": "Republic of Rwanda",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "PL",
+    "country": "Poland",
+    "republicCountries_officialName": "Republic of Poland",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "PE",
+    "country": "Peru",
+    "republicCountries_officialName": "Republic of Peru",
+    "continent": "South America"
+  },
+  {
+    "flagCode": "PY",
+    "country": "Paraguay",
+    "republicCountries_officialName": "Republic of Paraguay",
+    "continent": "South America"
+  },
+  {
+    "flagCode": "PA",
+    "country": "Panama",
+    "republicCountries_officialName": "Republic of Panama",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "PW",
+    "country": "Palau",
+    "republicCountries_officialName": "Republic of Palau",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "MK",
+    "country": "North Macedonia",
+    "republicCountries_officialName": "Republic of North Macedonia",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "NE",
+    "country": "Niger",
+    "republicCountries_officialName": "Republic of Niger",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "NI",
+    "country": "Nicaragua",
+    "republicCountries_officialName": "Republic of Nicaragua",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "NR",
+    "country": "Nauru",
+    "republicCountries_officialName": "Republic of Nauru",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "NA",
+    "country": "Namibia",
+    "republicCountries_officialName": "Republic of Namibia",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "MZ",
+    "country": "Mozambique",
+    "republicCountries_officialName": "Republic of Mozambique",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "MD",
+    "country": "Moldova",
+    "republicCountries_officialName": "Republic of Moldova",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "MU",
+    "country": "Mauritius",
+    "republicCountries_officialName": "Republic of Mauritius",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "MT",
+    "country": "Malta",
+    "republicCountries_officialName": "Republic of Malta",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "ML",
+    "country": "Mali",
+    "republicCountries_officialName": "Republic of Mali",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "MV",
+    "country": "Maldives",
+    "republicCountries_officialName": "Republic of Maldives",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "MW",
+    "country": "Malawi",
+    "republicCountries_officialName": "Republic of Malawi",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "MG",
+    "country": "Madagascar",
+    "republicCountries_officialName": "Republic of Madagascar",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "LT",
+    "country": "Lithuania",
+    "republicCountries_officialName": "Republic of Lithuania",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "LR",
+    "country": "Liberia",
+    "republicCountries_officialName": "Republic of Liberia",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "LV",
+    "country": "Latvia",
+    "republicCountries_officialName": "Republic of Latvia",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "KR",
+    "country": "South Korea",
+    "republicCountries_officialName": "Republic of Korea",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "KI",
+    "country": "Kiribati",
+    "republicCountries_officialName": "Republic of Kiribati",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "KE",
+    "country": "Kenya",
+    "republicCountries_officialName": "Republic of Kenya",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "KZ",
+    "country": "Kazakhstan",
+    "republicCountries_officialName": "Republic of Kazakhstan",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "IQ",
+    "country": "Iraq",
+    "republicCountries_officialName": "Republic of Iraq",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "ID",
+    "country": "Indonesia",
+    "republicCountries_officialName": "Republic of Indonesia",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "IN",
+    "country": "India",
+    "republicCountries_officialName": "Republic of India",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "IS",
+    "country": "Iceland",
+    "republicCountries_officialName": "Republic of Iceland",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "HN",
+    "country": "Honduras",
+    "republicCountries_officialName": "Republic of Honduras",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "HT",
+    "country": "Haiti",
+    "republicCountries_officialName": "Republic of Haiti",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "GW",
+    "country": "Guinea-Bissau",
+    "republicCountries_officialName": "Republic of Guinea-Bissau",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "GN",
+    "country": "Guinea",
+    "republicCountries_officialName": "Republic of Guinea",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "GT",
+    "country": "Guatemala",
+    "republicCountries_officialName": "Republic of Guatemala",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "GH",
+    "country": "Ghana",
+    "republicCountries_officialName": "Republic of Ghana",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "GE",
+    "country": "Georgia",
+    "republicCountries_officialName": "Republic of Georgia",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "FI",
+    "country": "Finland",
+    "republicCountries_officialName": "Republic of Finland",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "FJ",
+    "country": "Fiji",
+    "republicCountries_officialName": "Republic of Fiji",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "EE",
+    "country": "Estonia",
+    "republicCountries_officialName": "Republic of Estonia",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "GQ",
+    "country": "Equatorial Guinea",
+    "republicCountries_officialName": "Republic of Equatorial Guinea",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "SV",
+    "country": "El Salvador",
+    "republicCountries_officialName": "Republic of El Salvador",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "EC",
+    "country": "Ecuador",
+    "republicCountries_officialName": "Republic of Ecuador",
+    "continent": "South America"
+  },
+  {
+    "flagCode": "DJ",
+    "country": "Djibouti",
+    "republicCountries_officialName": "Republic of Djibouti",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "CY",
+    "country": "Cyprus",
+    "republicCountries_officialName": "Republic of Cyprus",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "CU",
+    "country": "Cuba",
+    "republicCountries_officialName": "Republic of Cuba",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "HR",
+    "country": "Croatia",
+    "republicCountries_officialName": "Republic of Croatia",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "CR",
+    "country": "Costa Rica",
+    "republicCountries_officialName": "Republic of Costa Rica",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "CO",
+    "country": "Colombia",
+    "republicCountries_officialName": "Republic of Colombia",
+    "continent": "South America"
+  },
+  {
+    "flagCode": "TW",
+    "country": "Taiwan",
+    "republicCountries_officialName": "Republic of China",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "CL",
+    "country": "Chile",
+    "republicCountries_officialName": "Republic of Chile",
+    "continent": "South America"
+  },
+  {
+    "flagCode": "TD",
+    "country": "Chad",
+    "republicCountries_officialName": "Republic of Chad",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "CM",
+    "country": "Cameroon",
+    "republicCountries_officialName": "Republic of Cameroon",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "CV",
+    "country": "Cape Verde",
+    "republicCountries_officialName": "Republic of Cabo Verde",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "BI",
+    "country": "Burundi",
+    "republicCountries_officialName": "Republic of Burundi",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "BG",
+    "country": "Bulgaria",
+    "republicCountries_officialName": "Republic of Bulgaria",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "BW",
+    "country": "Botswana",
+    "republicCountries_officialName": "Republic of Botswana",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "BJ",
+    "country": "Benin",
+    "republicCountries_officialName": "Republic of Benin",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "BY",
+    "country": "Belarus",
+    "republicCountries_officialName": "Republic of Belarus",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "AZ",
+    "country": "Azerbaijan",
+    "republicCountries_officialName": "Republic of Azerbaijan",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "AT",
+    "country": "Austria",
+    "republicCountries_officialName": "Republic of Austria",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "AM",
+    "country": "Armenia",
+    "republicCountries_officialName": "Republic of Armenia",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "AO",
+    "country": "Angola",
+    "republicCountries_officialName": "Republic of Angola",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "AL",
+    "country": "Albania",
+    "republicCountries_officialName": "Republic of Albania",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "MC",
+    "country": "Monaco",
+    "republicCountries_officialName": "Principality of Monaco",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "LI",
+    "country": "Liechtenstein",
+    "republicCountries_officialName": "Principality of Liechtenstein",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "AD",
+    "country": "Andorra",
+    "republicCountries_officialName": "Principality of Andorra",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "PT",
+    "country": "Portugal",
+    "republicCountries_officialName": "Portuguese Republic",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "BO",
+    "country": "Bolivia",
+    "republicCountries_officialName": "Plurinational State of Bolivia",
+    "continent": "South America"
+  },
+  {
+    "flagCode": "DZ",
+    "country": "Algeria",
+    "republicCountries_officialName": "Peoples Democratic Republic of Algeria",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "CN",
+    "country": "China",
+    "republicCountries_officialName": "People's Republic of China",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "BD",
+    "country": "Bangladesh",
+    "republicCountries_officialName": "People's Republic of Bangladesh",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "UY",
+    "country": "Uruguay",
+    "republicCountries_officialName": "Oriental Republic of Uruguay",
+    "continent": "South America"
+  },
+  {
+    "flagCode": "NU",
+    "country": "Niue",
+    "republicCountries_officialName": "Niue",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "NZ",
+    "country": "New Zealand",
+    "republicCountries_officialName": "New Zealand",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "NC",
+    "country": "New Caledonia",
+    "republicCountries_officialName": "New Caledonia",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "ME",
+    "country": "Montenegro",
+    "republicCountries_officialName": "Montenegro",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "MN",
+    "country": "Mongolia",
+    "republicCountries_officialName": "Mongolia",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "MY",
+    "country": "Malaysia",
+    "republicCountries_officialName": "Malaysia",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "MO",
+    "country": "Macau",
+    "republicCountries_officialName": "Macao Special Administrative Region of the People's Republic of China",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "LB",
+    "country": "Lebanon",
+    "republicCountries_officialName": "Lebanese Republic",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "LA",
+    "country": "Laos",
+    "republicCountries_officialName": "Lao People's Democratic Republic",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "KG",
+    "country": "Kyrgyzstan",
+    "republicCountries_officialName": "Kyrgyz Republic",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "TO",
+    "country": "Tonga",
+    "republicCountries_officialName": "Kingdom of Tonga",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "NL",
+    "country": "Netherlands",
+    "republicCountries_officialName": "Kingdom of the Netherlands",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "TH",
+    "country": "Thailand",
+    "republicCountries_officialName": "Kingdom of Thailand",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "SE",
+    "country": "Sweden",
+    "republicCountries_officialName": "Kingdom of Sweden",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "ES",
+    "country": "Spain",
+    "republicCountries_officialName": "Kingdom of Spain",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "SA",
+    "country": "Saudi Arabia",
+    "republicCountries_officialName": "Kingdom of Saudi Arabia",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "NO",
+    "country": "Norway",
+    "republicCountries_officialName": "Kingdom of Norway",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "MA",
+    "country": "Morocco",
+    "republicCountries_officialName": "Kingdom of Morocco",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "LS",
+    "country": "Lesotho",
+    "republicCountries_officialName": "Kingdom of Lesotho",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "SZ",
+    "country": "Eswatini",
+    "republicCountries_officialName": "Kingdom of Eswatini",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "DK",
+    "country": "Denmark",
+    "republicCountries_officialName": "Kingdom of Denmark",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "KH",
+    "country": "Cambodia",
+    "republicCountries_officialName": "Kingdom of Cambodia",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "BT",
+    "country": "Bhutan",
+    "republicCountries_officialName": "Kingdom of Bhutan",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "BE",
+    "country": "Belgium",
+    "republicCountries_officialName": "Kingdom of Belgium",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "BH",
+    "country": "Bahrain",
+    "republicCountries_officialName": "Kingdom of Bahrain",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "JP",
+    "country": "Japan",
+    "republicCountries_officialName": "Japan",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "JM",
+    "country": "Jamaica",
+    "republicCountries_officialName": "Jamaica",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "IT",
+    "country": "Italy",
+    "republicCountries_officialName": "Italian Republic/Republic of Italy",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "PK",
+    "country": "Pakistan",
+    "republicCountries_officialName": "Islamic Republic of Pakistan",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "MR",
+    "country": "Mauritania",
+    "republicCountries_officialName": "Islamic Republic of Mauritania",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "IR",
+    "country": "Iran",
+    "republicCountries_officialName": "Islamic Republic of Iran",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "AF",
+    "country": "Afghanistan",
+    "republicCountries_officialName": "Islamic Emirate of Afghanistan",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "IE",
+    "country": "Ireland",
+    "republicCountries_officialName": "Ireland",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "WS",
+    "country": "Samoa",
+    "republicCountries_officialName": "Independent State of Samoa",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "PG",
+    "country": "Papua New Guinea",
+    "republicCountries_officialName": "Independent State of Papua New Guinea",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "HU",
+    "country": "Hungary",
+    "republicCountries_officialName": "Hungary",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "HK",
+    "country": "Hong Kong",
+    "republicCountries_officialName": "Hong Kong Special Administrative Region of the People's Republic of China",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "GR",
+    "country": "Greece",
+    "republicCountries_officialName": "Hellenic Republic",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "JO",
+    "country": "Jordan",
+    "republicCountries_officialName": "Hashemite Kingdom of Jordan",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "GU",
+    "country": "Guam",
+    "republicCountries_officialName": "Guam",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "GD",
+    "country": "Grenada",
+    "republicCountries_officialName": "Grenada",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "LU",
+    "country": "Luxembourg",
+    "republicCountries_officialName": "Grand Duchy of Luxembourg",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "GA",
+    "country": "Gabon",
+    "republicCountries_officialName": "Gabonese Republic",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "FR",
+    "country": "France",
+    "republicCountries_officialName": "French Republic",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "PF",
+    "country": "French Polynesia",
+    "republicCountries_officialName": "French Polynesia",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "BR",
+    "country": "Brazil",
+    "republicCountries_officialName": "Federative Republic of Brazil",
+    "continent": "South America"
+  },
+  {
+    "flagCode": "KN",
+    "country": "Saint Kitts and Nevis",
+    "republicCountries_officialName": "Federation of Saint Kitts and Nevis",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "FM",
+    "country": "Micronesia",
+    "republicCountries_officialName": "Federated States of Micronesia",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "SO",
+    "country": "Somalia",
+    "republicCountries_officialName": "Federal Republic of Somalia",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "NG",
+    "country": "Nigeria",
+    "republicCountries_officialName": "Federal Republic of Nigeria",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "DE",
+    "country": "Germany",
+    "republicCountries_officialName": "Federal Republic of Germany",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "NP",
+    "country": "Nepal",
+    "republicCountries_officialName": "Federal Democratic Republic of Nepal",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "ET",
+    "country": "Ethiopia",
+    "republicCountries_officialName": "Federal Democratic Republic of Ethiopia",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "FO",
+    "country": "Faroe Islands",
+    "republicCountries_officialName": "Faroe Islands",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "CA",
+    "country": "Canada",
+    "republicCountries_officialName": "Dominion of Canada",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "DO",
+    "country": "Dominican Republic",
+    "republicCountries_officialName": "Dominican Republic",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "LK",
+    "country": "Sri Lanka",
+    "republicCountries_officialName": "Democratic Socialist Republic of Sri Lanka",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "TL",
+    "country": "Timor-Leste",
+    "republicCountries_officialName": "Democratic Republic of Timor-Leste",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "CD",
+    "country": "DR Congo",
+    "republicCountries_officialName": "Democratic Republic of the Congo",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "ST",
+    "country": "Sao Tome and Principe",
+    "republicCountries_officialName": "Democratic Republic of Sao Tome and Principe",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "KP",
+    "country": "North Korea",
+    "republicCountries_officialName": "Democratic People�s Republic of Korea",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "CI",
+    "country": "Ivory Coast",
+    "republicCountries_officialName": "C�te d'Ivoire",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "CZ",
+    "country": "Czechia",
+    "republicCountries_officialName": "Czechia",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "CK",
+    "country": "Cook Islands",
+    "republicCountries_officialName": "Cook Islands",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "MP",
+    "country": "Northern Mariana Islands",
+    "republicCountries_officialName": "Commonwealth of the Northern Mariana Islands",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "BS",
+    "country": "Bahamas",
+    "republicCountries_officialName": "Commonwealth of the Bahamas",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "DM",
+    "country": "Dominica",
+    "republicCountries_officialName": "Commonwealth of Dominica",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "AU",
+    "country": "Australia",
+    "republicCountries_officialName": "Commonwealth of Australia",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "GY",
+    "country": "Guyana",
+    "republicCountries_officialName": "Co-operative Republic of Guyana",
+    "continent": "South America"
+  },
+  {
+    "flagCode": "CF",
+    "country": "Central African Republic",
+    "republicCountries_officialName": "Central African Republic",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "BF",
+    "country": "Burkina Faso",
+    "republicCountries_officialName": "Burkina Faso",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "BN",
+    "country": "Brunei",
+    "republicCountries_officialName": "Brunei Darussalam",
+    "continent": "Asia"
+  },
+  {
+    "flagCode": "BA",
+    "country": "Bosnia and Herzegovina",
+    "republicCountries_officialName": "Bosnia and Herzegovina",
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "VE",
+    "country": "Venezuela",
+    "republicCountries_officialName": "Bolivarian Republic of Venezuela",
+    "continent": "South America"
+  },
+  {
+    "flagCode": "BM",
+    "country": "Bermuda",
+    "republicCountries_officialName": "Bermuda",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "BZ",
+    "country": "Belize",
+    "republicCountries_officialName": "Belize",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "BB",
+    "country": "Barbados",
+    "republicCountries_officialName": "Barbados",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "AR",
+    "country": "Argentina",
+    "republicCountries_officialName": "Argentine Republic",
+    "continent": "South America"
+  },
+  {
+    "flagCode": "EG",
+    "country": "Egypt",
+    "republicCountries_officialName": "Arab Republic of Egypt",
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "AG",
+    "country": "Antigua and Barbuda",
+    "republicCountries_officialName": "Antigua and Barbuda",
+    "continent": "North America"
+  },
+  {
+    "flagCode": "AS",
+    "country": "American Samoa",
+    "republicCountries_officialName": "American Samoa",
+    "continent": "Oceania"
+  },
+  {
+    "flagCode": "PR",
+    "country": "Puerto Rico",
+    "republicCountries_officialName": null,
+    "continent": "North America"
+  },
+  {
+    "flagCode": "RE",
+    "country": "Reunion",
+    "republicCountries_officialName": null,
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "EH",
+    "country": "Western Sahara",
+    "republicCountries_officialName": null,
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "GP",
+    "country": "Guadeloupe",
+    "republicCountries_officialName": null,
+    "continent": "North America"
+  },
+  {
+    "flagCode": "YT",
+    "country": "Mayotte",
+    "republicCountries_officialName": null,
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "MQ",
+    "country": "Martinique",
+    "republicCountries_officialName": null,
+    "continent": "North America"
+  },
+  {
+    "flagCode": "GF",
+    "country": "French Guiana",
+    "republicCountries_officialName": null,
+    "continent": "South America"
+  },
+  {
+    "flagCode": "CW",
+    "country": "Curacao",
+    "republicCountries_officialName": null,
+    "continent": "North America"
+  },
+  {
+    "flagCode": "AW",
+    "country": "Aruba",
+    "republicCountries_officialName": null,
+    "continent": "North America"
+  },
+  {
+    "flagCode": "JE",
+    "country": "Jersey",
+    "republicCountries_officialName": null,
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "IM",
+    "country": "Isle of Man",
+    "republicCountries_officialName": null,
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "VI",
+    "country": "United States Virgin Islands",
+    "republicCountries_officialName": null,
+    "continent": "North America"
+  },
+  {
+    "flagCode": "KY",
+    "country": "Cayman Islands",
+    "republicCountries_officialName": null,
+    "continent": "North America"
+  },
+  {
+    "flagCode": "GG",
+    "country": "Guernsey",
+    "republicCountries_officialName": null,
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "GL",
+    "country": "Greenland",
+    "republicCountries_officialName": null,
+    "continent": "North America"
+  },
+  {
+    "flagCode": "TC",
+    "country": "Turks and Caicos Islands",
+    "republicCountries_officialName": null,
+    "continent": "North America"
+  },
+  {
+    "flagCode": "SX",
+    "country": "Sint Maarten",
+    "republicCountries_officialName": null,
+    "continent": "North America"
+  },
+  {
+    "flagCode": "GI",
+    "country": "Gibraltar",
+    "republicCountries_officialName": null,
+    "continent": "Europe"
+  },
+  {
+    "flagCode": "VG",
+    "country": "British Virgin Islands",
+    "republicCountries_officialName": null,
+    "continent": "North America"
+  },
+  {
+    "flagCode": "MF",
+    "country": "Saint Martin",
+    "republicCountries_officialName": null,
+    "continent": "North America"
+  },
+  {
+    "flagCode": "AI",
+    "country": "Anguilla",
+    "republicCountries_officialName": null,
+    "continent": "North America"
+  },
+  {
+    "flagCode": "BL",
+    "country": "Saint Barthelemy",
+    "republicCountries_officialName": null,
+    "continent": "North America"
+  },
+  {
+    "flagCode": "PM",
+    "country": "Saint Pierre and Miquelon",
+    "republicCountries_officialName": null,
+    "continent": "North America"
+  },
+  {
+    "flagCode": "SH",
+    "country": "Saint Helena Ascension and Tristan da Cunha",
+    "republicCountries_officialName": null,
+    "continent": "Africa"
+  },
+  {
+    "flagCode": "MS",
+    "country": "Montserrat",
+    "republicCountries_officialName": null,
+    "continent": "North America"
+  },
+  {
+    "flagCode": "FK",
+    "country": "Falkland Islands",
+    "republicCountries_officialName": null,
+    "continent": "South America"
+  }
+]

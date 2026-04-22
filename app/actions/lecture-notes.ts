@@ -20,7 +20,8 @@ const courseToR2FolderMap: Record<string, string> = {
     "MASTER OF YACHTS 200 GT LIMITED": "200 GT MOY IYT Limited",
     "MASTER OF YACHTS 200 GT UNLIMITED": "200 GT MOY IYT Unlimited",
     "MASTER ON YACHTS LESS THAN 200 GT (MALTA FLAG STATE)": "200 Gt TM Lecture Notes",
-    "STCW BASIC SAFETY TRAINING CERTIFICATE": "Basic Safety Training"
+    "STCW BASIC SAFETY TRAINING CERTIFICATE": "Basic Safety Training",
+    "OOW ON YACHTS LESS THAN 3000GT": "Lecture Notes OOW 3000 Gt Master 500 GT TM"
 };
 
 export async function checkCloudLectureNotes(courseTitle: string) {
