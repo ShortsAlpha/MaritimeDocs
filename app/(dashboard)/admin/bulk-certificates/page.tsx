@@ -132,14 +132,14 @@ export default function BulkCertificatesPage() {
                 // Word tables sometimes flatten text. Let's make it robust by checking joined row text
                 const rowText = row.join(" ").toLowerCase()
                 
-                if (rowText.includes("identification") || rowText.includes("passport") || rowText.includes("seaman") || rowText.includes("surname")) {
+                if (rowText.includes("identification") || rowText.includes("passport") || rowText.includes("seaman") || rowText.includes("surname") || rowText.includes("full name") || rowText.includes("student name") || rowText.includes("student number")) {
                     headerRowIndex = r
                     for (let c = 0; c < row.length; c++) {
                         const v = String(row[c] || "").trim().toLowerCase()
                         if (v === "surname" || v.includes("surname")) colMap.surname = c
-                        else if (v === "name" || v.includes("name")) colMap.name = c
+                        else if (v === "name" || v.includes("name") || v.includes("full name") || v.includes("student name")) colMap.name = c
                         if (v.includes("date of birth") || v.includes("dob")) colMap.dob = c
-                        if (v.includes("identification") || v.includes("passport") || v.includes("seaman")) colMap.identification = c
+                        if (v.includes("identification") || v.includes("passport") || v.includes("seaman") || v.includes("student number") || v.includes("student no")) colMap.identification = c
                         if (v.includes("certificate no")) colMap.certNo = c
                         if (v.includes("mark")) colMap.mark = c
                         if (v.includes("pass") || v.includes("fail")) colMap.passFail = c

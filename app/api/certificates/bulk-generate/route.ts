@@ -64,7 +64,15 @@ export async function POST(req: Request) {
             const studentData = dbStudent || {
                 fullName: `${st.name} ${st.surname}`.trim(),
                 passportNumber: identification,
-                dateOfBirth: st.dob ? new Date(st.dob.split(/[./-]/).reverse().join('-')) : null,
+                dateOfBirth: (function() {
+                    if (!st.dob) return null;
+                    const parts = st.dob.split(/[./-]/);
+                    if (parts.length === 3) {
+                        if (parts[0].length === 4) return new Date(parts.join('-'));
+                        return new Date(parts.reverse().join('-'));
+                    }
+                    return new Date(st.dob);
+                })(),
                 certificateIssueDate: new Date(),
                 certificateExpiryDate: new Date(new Date().setFullYear(new Date().getFullYear() + 5)),
             }
