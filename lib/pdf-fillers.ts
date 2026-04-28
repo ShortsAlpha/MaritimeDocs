@@ -1,6 +1,6 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import fs from 'fs';
 import path from 'path';
 
@@ -60,7 +60,7 @@ export const TemplateFillers: Record<string, (pdfDoc: PDFDocument, student: any,
                 color: blackColor,
             });
 
-            if (student.certificateIssueDate) {
+            if (student.certificateIssueDate && isValid(new Date(student.certificateIssueDate))) {
                 page.drawText(format(new Date(student.certificateIssueDate), 'dd MMM yyyy'), {
                     x: width - 120,
                     y: height - 113,
@@ -71,7 +71,7 @@ export const TemplateFillers: Record<string, (pdfDoc: PDFDocument, student: any,
             }
 
             // Exactly 5 Years expiry printed ONLY on page 1 and page 2
-            if (pageCount <= 2 && student.certificateExpiryDate) {
+            if (pageCount <= 2 && student.certificateExpiryDate && isValid(new Date(student.certificateExpiryDate))) {
                 page.drawText(format(new Date(student.certificateExpiryDate), 'dd MMM yyyy'), {
                     x: width - 120,
                     y: height - 128,
@@ -102,7 +102,8 @@ export const TemplateFillers: Record<string, (pdfDoc: PDFDocument, student: any,
             });
 
             // 4. DOB and Passport
-            const dobStr = student.dateOfBirth ? format(new Date(student.dateOfBirth), 'dd.MM.yyyy') : "N/A";
+            const dobDate = student.dateOfBirth ? new Date(student.dateOfBirth) : null;
+            const dobStr = (dobDate && isValid(dobDate)) ? format(dobDate, 'dd.MM.yyyy') : "N/A";
             const passStr = student.passportNumber || student.tcNo || "N/A";
 
             // Initial positions (Page 1)
@@ -224,7 +225,8 @@ export const TemplateFillers: Record<string, (pdfDoc: PDFDocument, student: any,
             color: white, 
         });
         
-        const dobStr = student.dateOfBirth ? format(new Date(student.dateOfBirth), 'dd.MM.yyyy') : "N/A"
+        const dobDate = student.dateOfBirth ? new Date(student.dateOfBirth) : null;
+        const dobStr = (dobDate && isValid(dobDate)) ? format(dobDate, 'dd.MM.yyyy') : "N/A"
         const idStr = student.passportNumber || student.tcNo || "N/A"
         
         page.drawText(`: ${student.fullName.toUpperCase()}`, { x: 185, y: height - 347, size: 10, font: helvetica, color: black })

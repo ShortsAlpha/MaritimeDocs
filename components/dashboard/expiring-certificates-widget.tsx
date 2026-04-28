@@ -51,7 +51,7 @@ export function ExpiringCertificatesWidget({ students }: ExpiringCertificatesWid
                                         <div className="flex items-center gap-1">
                                             <Calendar className="h-3 w-3" />
                                             <span>
-                                                Expires: {expiryDate ? format(expiryDate, "MMM d, yyyy") : 'N/A'}
+                                                Expires: {(expiryDate && Number.isFinite(expiryDate.getTime())) ? format(expiryDate, "MMM d, yyyy") : 'N/A'}
                                             </span>
                                         </div>
                                     </div>
