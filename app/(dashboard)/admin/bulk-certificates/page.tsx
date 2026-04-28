@@ -26,7 +26,7 @@ export default function BulkCertificatesPage() {
     const [students, setStudents] = useState<ParsedStudent[]>([])
     const [isParsing, setIsParsing] = useState(false)
     const [isGenerating, setIsGenerating] = useState(false)
-    const [generatedDocs, setGeneratedDocs] = useState<{ studentId: string, url: string, base64: string, isMissingDb: boolean }[]>([])
+    const [generatedDocs, setGeneratedDocs] = useState<{ studentId: string, url: string, base64: string, isMissingDb: boolean, fileExt?: string }[]>([])
     const [debugInfo, setDebugInfo] = useState<string>("")
 
     const updateStudent = (index: number, field: keyof ParsedStudent, value: string) => {
@@ -104,24 +104,34 @@ export default function BulkCertificatesPage() {
             }
             
             let parsedCourseTitle = ""
+            let parsedInstructor = ""
             for (let r = 0; r < json.length; r++) {
                 const row = json[r] || []
                 for (let c = 0; c < row.length; c++) {
-                    const cell = String(row[c] || "").trim()
-                    if (cell.toLowerCase().includes("title of training course")) {
-                        // finding the value in the next columns
+                    const cell = String(row[c] || "").trim().toLowerCase().replace(/\s+/g, ' ')
+                    
+                    if (!parsedCourseTitle && cell.includes("title of training course")) {
                         for (let nextC = c + 1; nextC < row.length; nextC++) {
-                            if (row[nextC]) {
+                            if (row[nextC] && String(row[nextC]).trim() !== "") {
                                 parsedCourseTitle = String(row[nextC]).trim()
                                 break
                             }
                         }
                     }
+                    
+                    if (!parsedInstructor && (cell.includes("instructor") || cell.includes("assessor"))) {
+                        for (let nextC = c + 1; nextC < row.length; nextC++) {
+                            if (row[nextC] && String(row[nextC]).trim() !== "") {
+                                parsedInstructor = String(row[nextC]).trim()
+                                break
+                            }
+                        }
+                    }
                 }
-                if (parsedCourseTitle) break
             }
 
             setCourseTitle(parsedCourseTitle || "Unknown Course")
+            if (parsedInstructor) setInstructorName(parsedInstructor)
 
             let headerRowIndex = -1
             let colMap: any = {}
@@ -241,7 +251,8 @@ export default function BulkCertificatesPage() {
                 const doc = generatedDocs[i]
                 const st = students[i]
                 
-                const filename = `${st.name}_${st.surname}_Certificate.pdf`.replace(/\s+/g, '_')
+                const ext = doc.fileExt || "pdf"
+                const filename = `${st.name}_${st.surname}_Certificate.${ext}`.replace(/\s+/g, '_')
                 
                 if (doc.base64) {
                     // Bypass R2 CORS/Auth by converting Server's Base64 directly into Blob
@@ -251,7 +262,8 @@ export default function BulkCertificatesPage() {
                     for (let j = 0; j < byteString.length; j++) {
                         ia[j] = byteString.charCodeAt(j)
                     }
-                    const blob = new Blob([ab], { type: "application/pdf" })
+                    const mime = ext === "docx" ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : "application/pdf"
+                    const blob = new Blob([ab], { type: mime })
                     folder.file(filename, blob)
                     addedCount++
                 } else if (doc.url) {
@@ -467,8 +479,8 @@ export default function BulkCertificatesPage() {
                                                                 )}
                                                                 
                                                                 <a 
-                                                                    href={generated.base64 ? `data:application/pdf;base64,${generated.base64}` : generated.url}
-                                                                    download={`${st.name}_${st.surname}_Certificate.pdf`.replace(/\s+/g, '_')}
+                                                                    href={generated.base64 ? `data:${generated.fileExt === 'docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : 'application/pdf'};base64,${generated.base64}` : generated.url}
+                                                                    download={`${st.name}_${st.surname}_Certificate.${generated.fileExt || 'pdf'}`.replace(/\s+/g, '_')}
                                                                     className="flex items-center justify-center h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                                                     title="Download Certificate"
                                                                 >
