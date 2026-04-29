@@ -31,37 +31,74 @@ export async function generateDocumentPreview(studentId: string, courseId: strin
         const templateDef = getTemplateForCourse(course.title);
         if (!templateDef) return { success: false, message: "Template definition not found for this course" };
 
-        // 1. Fetch template buffer from R2
-        const getCommand = new GetObjectCommand({
-            Bucket: R2_BUCKET_NAME,
-            Key: templateDef.r2Key
-        });
-
-        // Try getting it directly via S3 SDK. If public, fetch works too, but SDK is surer.
-        const response = await r2.send(getCommand);
-        if (!response.Body) return { success: false, message: "Empty template fetched from R2" };
-
-        const bytes = await response.Body.transformToByteArray();
-
-        // 2. Load with pdf-lib
-        const pdfDoc = await PDFDocument.load(bytes);
-
-        // 3. Fill the template (Safe from client bundle)
-        const filler = TemplateFillers[templateDef.id];
-        if (filler) {
-            const { applyTMMetadataToStudent } = await import("@/lib/transport-malta");
-            const processedStudent = await applyTMMetadataToStudent(student, course, templateDef.id);
-            await filler(pdfDoc, processedStudent, course);
+        // 1. Fetch template buffer
+        let bytes: Uint8Array;
+        if (templateDef.type === "pdf") {
+            const getCommand = new GetObjectCommand({
+                Bucket: R2_BUCKET_NAME,
+                Key: templateDef.r2Key
+            });
+            const response = await r2.send(getCommand);
+            if (!response.Body) return { success: false, message: "Empty template fetched from R2" };
+            bytes = await response.Body.transformToByteArray();
+        } else {
+            const fs = await import("fs");
+            const path = await import("path");
+            const templatePath = path.join(process.cwd(), "public/templates", templateDef.localFile || "");
+            if (!fs.existsSync(templatePath)) return { success: false, message: "DOCX template not found locally" };
+            bytes = new Uint8Array(fs.readFileSync(templatePath));
         }
 
-        // 4. Save to base64
-        const pdfBase64 = await pdfDoc.saveAsBase64({ dataUri: false });
+        // 2. Process based on type
+        if (templateDef.type === "pdf") {
+            const pdfDoc = await PDFDocument.load(bytes);
+            const filler = TemplateFillers[templateDef.id];
+            if (filler) {
+                const { applyTMMetadataToStudent } = await import("@/lib/transport-malta");
+                const processedStudent = await applyTMMetadataToStudent(student, course, templateDef.id);
+                await filler(pdfDoc, processedStudent, course);
+            }
+            const pdfBase64 = await pdfDoc.saveAsBase64({ dataUri: false });
+            return { 
+                success: true, 
+                base64: pdfBase64,
+                templateTitle: templateDef.title,
+                fileExt: "pdf"
+            };
+        } else {
+            const PizZip = (await import("pizzip")).default;
+            const Docxtemplater = (await import("docxtemplater")).default;
+            const { format, isValid } = await import("date-fns");
+            const zip = new PizZip(Buffer.from(bytes));
+            const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
 
-        return { 
-            success: true, 
-            base64: pdfBase64,
-            templateTitle: templateDef.title
-        };
+            const dobObj = student.dateOfBirth;
+            const dobFormatted = (dobObj && isValid(dobObj)) ? format(dobObj, 'dd.MM.yyyy') : "N/A";
+            const issueDateObj = student.certificateIssueDate;
+            const issueDateFormatted = (issueDateObj && isValid(issueDateObj)) ? format(issueDateObj, 'dd.MM.yyyy') : "N/A";
+            const expiryDateObj = student.certificateExpiryDate;
+            const expiryDateFormatted = (expiryDateObj && isValid(expiryDateObj)) ? format(expiryDateObj, 'dd.MM.yyyy') : "N/A";
+
+            doc.render({
+                fullName: student.fullName.toUpperCase(),
+                dob: dobFormatted,
+                passportNumber: student.passportNumber || "N/A",
+                certNo: student.studentNumber || "N/A",
+                courseTitle: templateDef.title,
+                courseRegulations: templateDef.docRegulations || "",
+                instructorName: "INSTRUCTOR NAME", 
+                issueDate: issueDateFormatted,
+                expiryDate: expiryDateFormatted
+            });
+
+            const buf = doc.getZip().generate({ type: "nodebuffer", compression: "DEFLATE" });
+            return { 
+                success: true, 
+                base64: buf.toString('base64'),
+                templateTitle: templateDef.title,
+                fileExt: "docx"
+            };
+        }
 
     } catch (error: any) {
         console.error("Preview Generation Error:", error);
@@ -92,25 +129,67 @@ export async function saveGeneratedDocument(studentId: string, courseId: string)
 
         const templateTitle = templateDef.title;
 
-        // 1. Fetch template buffer from R2
-        const getCommand = new GetObjectCommand({
-            Bucket: R2_BUCKET_NAME,
-            Key: templateDef.r2Key
-        });
+        // 1. Fetch template buffer
+        let bytes: Uint8Array;
+        if (templateDef.type === "pdf") {
+            const getCommand = new GetObjectCommand({
+                Bucket: R2_BUCKET_NAME,
+                Key: templateDef.r2Key
+            });
+            const response = await r2.send(getCommand);
+            if (!response.Body) return { success: false, message: "Empty template fetched from R2" };
+            bytes = await response.Body.transformToByteArray();
+        } else {
+            const fs = await import("fs");
+            const path = await import("path");
+            const templatePath = path.join(process.cwd(), "public/templates", templateDef.localFile || "");
+            if (!fs.existsSync(templatePath)) return { success: false, message: "DOCX template not found locally" };
+            bytes = new Uint8Array(fs.readFileSync(templatePath));
+        }
 
-        const response = await r2.send(getCommand);
-        if (!response.Body) return { success: false, message: "Empty template fetched from R2" };
-
-        const bytes = await response.Body.transformToByteArray();
-
-        // 2. Load with pdf-lib and Fill
+        // 2. Process based on type
+        let buffer: Buffer;
+        let fileExt = templateDef.type;
+        let mimeType = templateDef.type === "pdf" ? "application/pdf" : "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        
         const { applyTMMetadataToStudent } = await import("@/lib/transport-malta");
         const processedStudent = await applyTMMetadataToStudent(student, course, templateDef.id);
 
-        const pdfDoc = await PDFDocument.load(bytes);
-        const filler = TemplateFillers[templateDef.id];
-        if (filler) {
-            await filler(pdfDoc, processedStudent, course);
+        if (templateDef.type === "pdf") {
+            const pdfDoc = await PDFDocument.load(bytes);
+            const filler = TemplateFillers[templateDef.id];
+            if (filler) {
+                await filler(pdfDoc, processedStudent, course);
+            }
+            const finalPdfBytes = await pdfDoc.save();
+            buffer = Buffer.from(finalPdfBytes);
+        } else {
+            const PizZip = (await import("pizzip")).default;
+            const Docxtemplater = (await import("docxtemplater")).default;
+            const { format, isValid } = await import("date-fns");
+            const zip = new PizZip(Buffer.from(bytes));
+            const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+
+            const dobObj = processedStudent.dateOfBirth;
+            const dobFormatted = (dobObj && isValid(dobObj)) ? format(dobObj, 'dd.MM.yyyy') : "N/A";
+            const issueDateObj = processedStudent.certificateIssueDate;
+            const issueDateFormatted = (issueDateObj && isValid(issueDateObj)) ? format(issueDateObj, 'dd.MM.yyyy') : "N/A";
+            const expiryDateObj = processedStudent.certificateExpiryDate;
+            const expiryDateFormatted = (expiryDateObj && isValid(expiryDateObj)) ? format(expiryDateObj, 'dd.MM.yyyy') : "N/A";
+
+            doc.render({
+                fullName: processedStudent.fullName.toUpperCase(),
+                dob: dobFormatted,
+                passportNumber: processedStudent.passportNumber || "N/A",
+                certNo: processedStudent.studentNumber || "N/A",
+                courseTitle: templateDef.title,
+                courseRegulations: templateDef.docRegulations || "",
+                instructorName: "INSTRUCTOR NAME", 
+                issueDate: issueDateFormatted,
+                expiryDate: expiryDateFormatted
+            });
+
+            buffer = doc.getZip().generate({ type: "nodebuffer", compression: "DEFLATE" });
         }
 
         // Lock in the TM record if applicable
@@ -135,10 +214,6 @@ export async function saveGeneratedDocument(studentId: string, courseId: string)
                 }
             });
         }
-
-        // 3. Save directly to Unit8Array buffer
-        const finalPdfBytes = await pdfDoc.save();
-        const buffer = Buffer.from(finalPdfBytes);
 
         // 4. Find or create the DocumentType for this certificate
         let docType = await db.documentType.findFirst({
@@ -176,13 +251,13 @@ export async function saveGeneratedDocument(studentId: string, courseId: string)
         }
 
         const safeTitle = templateTitle.replace(/[^a-zA-Z0-9.-]/g, "_");
-        const key = `students/${student.id}/documents/generated/${Date.now()}-${safeTitle}.pdf`;
+        const key = `students/${student.id}/documents/generated/${Date.now()}-${safeTitle}.${fileExt}`;
 
         await r2.send(new PutObjectCommand({
             Bucket: R2_BUCKET_NAME,
             Key: key,
             Body: buffer,
-            ContentType: "application/pdf",
+            ContentType: mimeType,
         }));
 
         const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
@@ -192,7 +267,7 @@ export async function saveGeneratedDocument(studentId: string, courseId: string)
                 studentId,
                 documentTypeId: docType.id,
                 fileUrl: publicUrl,
-                fileType: "pdf",
+                fileType: fileExt,
                 title: `${student.fullName} - ${templateTitle}`,
                 status: "APPROVED" 
             }

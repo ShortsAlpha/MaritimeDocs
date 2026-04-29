@@ -6,63 +6,11 @@ import path from "path"
 import PizZip from "pizzip"
 import Docxtemplater from "docxtemplater"
 import { format, isValid } from "date-fns"
-
-function getCourseDetails(title: string): { docTitle: string, docRegulations: string } {
-    const t = (title || "").toLowerCase().replace(/[^a-z0-9]/g, '');
-    const matches = (aliases: string[]) => aliases.some(alias => t.includes(alias.toLowerCase().replace(/[^a-z0-9]/g, '')));
-
-    if (matches(["medical", "first aid"])) {
-        return {
-            docTitle: "Proficiency in Medical First Aid – IMO Model 1.14",
-            docRegulations: "STCW 1978 / 2010 as amended. Code A VI-4 – 4.1 IMO Model course 1.14" 
-        };
-    }
-    if (matches(["efficient deck", "edh"])) {
-        return {
-            docTitle: "Efficient Deck Hand – E.D.H.",
-            docRegulations: "Merchant Shipping Directorate of the Authority for Transport in Malta\nSubsidiary Legislation 234.17 Merchant Shipping (Training and Certification) Regulations 1 st July, 2013*\nLegal Notice 153 Of 2013."
-        };
-    }
-    if (matches(["fire fighting"])) {
-        return {
-            docTitle: "Advanced Fire Fighting – IMO Model 2.03",
-            docRegulations: "STCW 1978 / 2010 as amended Code A VI/3 IMO Model course 2.03"
-        };
-    }
-    if (matches(["leadership", "teamwork", "helm"])) {
-        return {
-            docTitle: "Leadership and Teamwork (Operational)",
-            docRegulations: "STCW 1978 / 2010 as amended. Code A-II/1, A-III/1"
-        };
-    }
-    if (matches(["gmdss", "general operator"])) {
-        return {
-            docTitle: "General Operator’s Certificate for the GMDSS Training",
-            docRegulations: "Maltese Radiocommunications Regulations (Subsidiary Legislation 399.35\nRadio Regulations 2012\nSection  A-IV/2 of the STCW code"
-        };
-    }
-    if (matches(["radar", "arpa"])) {
-        return {
-            docTitle: "RADAR Plotting and Navigation / Use of ARPA– IMO Model 1.07",
-            docRegulations: "RADAR Plotting and Navigation / Use of ARPA Operational Level – IMO Model 1.07"
-        };
-    }
-    if (matches(["ecdis", "electronic chart display"])) {
-        return {
-            docTitle: "Operational use of Electronic Chart Display System (ECDIS) – IMO Model 1.27",
-            docRegulations: "STCW 1995 / 2010 as amended Section A-II/1 Reg.II/1,II/2, II/3, IMO Model course 1.27"
-        };
-    }
-    if (matches(["survival craft", "rescue boat"])) {
-        return {
-            docTitle: "Proficiency in Survival Craft and Rescue Boats other than Fast Rescue Boats",
-            docRegulations: "STCW 1978 / 2010 as amended, in accordance with sec. A-VI/2.1"
-        };
-    }
-
-    // Fallback if no match
-    return { docTitle: title || "UNKNOWN COURSE", docRegulations: "" };
-}
+import { getTemplateForCourse } from "@/lib/pdf-templates"
+import { TemplateFillers } from "@/lib/pdf-fillers"
+import { PDFDocument } from "pdf-lib"
+import { r2, R2_BUCKET_NAME } from "@/lib/r2"
+import { GetObjectCommand } from "@aws-sdk/client-s3"
 
 export async function POST(req: Request) {
     try {
@@ -73,33 +21,28 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Invalid payload" }, { status: 400 })
         }
 
-        // Dynamically find the newest template that includes "medical first aid"
-        const templatesDir = path.join(process.cwd(), "public/templates")
-        let templateFileName = "public/templates/medical.docx"
-        if (fs.existsSync(templatesDir)) {
-            const files = fs.readdirSync(templatesDir)
-            let latestFile = ""
-            let latestTime = 0
-            for (const f of files) {
-                if (f.toLowerCase().includes("medical first aid") && f.endsWith(".docx")) {
-                    const stats = fs.statSync(path.join(templatesDir, f))
-                    if (stats.mtimeMs > latestTime) {
-                        latestTime = stats.mtimeMs
-                        latestFile = f
-                    }
-                }
-            }
-            if (latestFile) {
-                templateFileName = `public/templates/${latestFile}`
-            }
+        const templateDef = getTemplateForCourse(courseTitle)
+        if (!templateDef) {
+            return NextResponse.json({ error: `Template definition not found for course: ${courseTitle}` }, { status: 400 })
         }
 
-        const templatePath = path.join(process.cwd(), templateFileName)
-        if (!fs.existsSync(templatePath)) {
-            return NextResponse.json({ error: `Template file ${templateFileName} not found` }, { status: 500 })
+        let templateBuffer: Buffer;
+        if (templateDef.type === "pdf") {
+            const getCommand = new GetObjectCommand({
+                Bucket: R2_BUCKET_NAME,
+                Key: templateDef.r2Key
+            })
+            const response = await r2.send(getCommand)
+            if (!response.Body) return NextResponse.json({ error: "Empty template fetched from R2" }, { status: 500 })
+            const bytes = await response.Body.transformToByteArray()
+            templateBuffer = Buffer.from(bytes)
+        } else {
+            const templatePath = path.join(process.cwd(), "public/templates", templateDef.localFile || "")
+            if (!fs.existsSync(templatePath)) {
+                return NextResponse.json({ error: `Template file ${templateDef.localFile} not found` }, { status: 500 })
+            }
+            templateBuffer = fs.readFileSync(templatePath)
         }
-
-        const templateBuffer = fs.readFileSync(templatePath)
 
         const results = []
 
@@ -174,95 +117,71 @@ export async function POST(req: Request) {
             const expiryDateFormatted = (expiryDateObj && isValid(expiryDateObj)) ? format(expiryDateObj, 'dd.MM.yyyy') : "N/A"
 
             // Retrieve custom mapped titles and regulations based on system course title
-            const { docTitle, docRegulations } = getCourseDetails(courseTitle);
+            const docTitle = templateDef.title
+            const docRegulations = templateDef.docRegulations || ""
 
-            // 1) Open document and fill
-            const zip = new PizZip(templateBuffer);
-            const doc = new Docxtemplater(zip, {
-                paragraphLoop: true,
-                linebreaks: true,
-            });
-
-            doc.render({
-                fullName: studentData.fullName.toUpperCase(),
-                dob: dobFormatted,
-                passportNumber: studentData.passportNumber || "N/A",
-                certNo: st.certNo || "N/A",
-                courseTitle: docTitle,
-                courseRegulations: docRegulations,
-                instructorName: instructorName || "INSTRUCTOR NAME",
-                issueDate: issueDateFormatted,
-                expiryDate: expiryDateFormatted
-            });
-
-            const buf = doc.getZip().generate({
-                type: "nodebuffer",
-                compression: "DEFLATE",
-            });
-
-            // 2) Upload to R2
-            const r2FileName = `certificates/${Date.now()}-${st.surname}-${st.name}.docx`.replace(/\s+/g, "_")
-            const fileUrl = await uploadBufferToR2(
-                buf,
-                r2FileName
-            )
-
-            // 3) Optionally save to DB if found
-            // DISABLED FOR TESTING: We will re-enable this when processing official documents
-            /*
-            if (dbStudent && fileUrl) {
-                // Find or create 'CERTIFICATE' document type
-                let docType = await db.documentType.findFirst({
-                    where: { category: "CERTIFICATE" }
-                })
-                if (!docType) {
-                    docType = await db.documentType.create({
-                        data: {
-                            title: "Course Certificate",
-                            category: "CERTIFICATE",
-                            isRequired: false
-                        }
-                    })
+            if (templateDef.type === "pdf") {
+                // 1) Open PDF and Fill
+                const pdfDoc = await PDFDocument.load(templateBuffer)
+                const fillerFn = TemplateFillers[templateDef.id]
+                
+                if (fillerFn) {
+                    await fillerFn(pdfDoc, studentData, { title: docTitle, ...customData })
                 }
+                const finalPdfBytes = await pdfDoc.save()
+                const buf = Buffer.from(finalPdfBytes)
 
-                await db.studentDocument.create({
-                    data: {
-                        title: `${courseTitle} Certificate`,
-                        fileUrl: fileUrl,
-                        fileType: "pdf",
-                        studentId: dbStudent.id,
-                        documentTypeId: docType.id,
-                    }
+                const r2FileName = `certificates/${Date.now()}-${st.surname}-${st.name}.pdf`.replace(/\s+/g, "_")
+                const fileUrl = await uploadBufferToR2(buf, r2FileName)
+
+                results.push({
+                    studentId: dbStudent?.id || null,
+                    url: fileUrl,
+                    base64: buf.toString('base64'),
+                    isMissingDb,
+                    fileExt: "pdf"
                 })
 
-                await db.studentCertificate.upsert({
-                    where: {
-                        studentId_courseEventId_certificateType: {
-                            studentId: dbStudent.id,
-                            courseEventId: "BULK_GENERATED", // simple marker
-                            certificateType: templateId
-                        }
-                    },
-                    update: {},
-                    create: {
-                        studentId: dbStudent.id,
-                        courseEventId: null,
-                        certificateType: templateId,
-                        certificateNo: st.certNo || `${Date.now()}`,
-                        issueDate: new Date(),
-                        expiryDate: studentData.certificateExpiryDate,
-                    }
+            } else {
+                // 1) Open document and fill
+                const zip = new PizZip(templateBuffer);
+                const doc = new Docxtemplater(zip, {
+                    paragraphLoop: true,
+                    linebreaks: true,
+                });
+
+                doc.render({
+                    fullName: studentData.fullName.toUpperCase(),
+                    dob: dobFormatted,
+                    passportNumber: studentData.passportNumber || "N/A",
+                    certNo: st.certNo || "N/A",
+                    courseTitle: docTitle,
+                    courseRegulations: docRegulations,
+                    instructorName: instructorName || "INSTRUCTOR NAME",
+                    issueDate: issueDateFormatted,
+                    expiryDate: expiryDateFormatted
+                });
+
+                const buf = doc.getZip().generate({
+                    type: "nodebuffer",
+                    compression: "DEFLATE",
+                });
+
+                // 2) Upload to R2
+                const r2FileName = `certificates/${Date.now()}-${st.surname}-${st.name}.docx`.replace(/\s+/g, "_")
+                const fileUrl = await uploadBufferToR2(
+                    buf,
+                    r2FileName
+                )
+
+                results.push({
+                    studentId: dbStudent?.id || null,
+                    url: fileUrl,
+                    base64: buf.toString('base64'),
+                    isMissingDb,
+                    fileExt: "docx"
                 })
             }
-            */
-
-            results.push({
-                studentId: dbStudent?.id || null,
-                url: fileUrl,
-                base64: buf.toString('base64'),
-                isMissingDb,
-                fileExt: "docx"
-            })
         }
 
         return NextResponse.json({ success: true, results })
