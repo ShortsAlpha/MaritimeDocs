@@ -16,6 +16,9 @@ export default async function AdminCalendarPage() {
                 instructor: true,
                 checklist: {
                     orderBy: { id: 'asc' }
+                },
+                eventNotes: {
+                    orderBy: { createdAt: 'desc' }
                 }
             }
         }),

@@ -24,6 +24,7 @@ export function DocumentGeneratorDialog({ student, courses }: { student: any; co
     const [isGenerating, setIsGenerating] = useState(false);
     const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
     const [rawBase64, setRawBase64] = useState<string | null>(null);
+    const [fileExt, setFileExt] = useState<string>("pdf");
     const [isSaving, setIsSaving] = useState(false);
 
     // Reset when modal opens
@@ -78,7 +79,14 @@ export function DocumentGeneratorDialog({ student, courses }: { student: any; co
                     byteNumbers[i] = byteCharacters.charCodeAt(i);
                 }
                 const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: 'application/pdf' });
+                const ext = res.fileExt || "pdf";
+                setFileExt(ext);
+                
+                const mime = ext === "docx" 
+                    ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+                    : "application/pdf";
+                    
+                const blob = new Blob([byteArray], { type: mime });
                 const blobUrl = URL.createObjectURL(blob);
 
                 setPdfBlobUrl(blobUrl);
@@ -99,7 +107,7 @@ export function DocumentGeneratorDialog({ student, courses }: { student: any; co
         
         const a = document.createElement("a");
         a.href = pdfBlobUrl;
-        const fileName = `${student.fullName.replace(/\s+/g, '_')}_${template.title.replace(/\s+/g, '_')}.pdf`;
+        const fileName = `${student.fullName.replace(/\s+/g, '_')}_${template.title.replace(/\s+/g, '_')}.${fileExt}`;
         a.download = fileName;
         document.body.appendChild(a);
         a.click();
@@ -197,7 +205,7 @@ export function DocumentGeneratorDialog({ student, courses }: { student: any; co
                                                 className="w-full sm:w-auto"
                                             >
                                                 {isGenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileText className="h-4 w-4 mr-2" />}
-                                                Generate PDF
+                                                Generate Document
                                             </Button>
                                             <p className="text-xs text-muted-foreground mt-3">
                                                 This will fetch your blank {template.title} template and place user details on it securely.
@@ -226,12 +234,12 @@ export function DocumentGeneratorDialog({ student, courses }: { student: any; co
                                         <Save className="h-5 w-5" />
                                         Document Generated Successfully!
                                     </h3>
-                                    <p className="text-sm text-muted-foreground">You can preview the PDF below, download it, or save it directly to the student's documents.</p>
+                                    <p className="text-sm text-muted-foreground">You can preview the document below, download it, or save it directly to the student's profile.</p>
                                 </div>
                                 <div className="flex gap-2">
                                     <Button variant="outline" onClick={handleDownload}>
                                         <Download className="h-4 w-4 mr-2" />
-                                        Download PDF
+                                        Download {fileExt.toUpperCase()}
                                     </Button>
                                     <Button onClick={handleSaveToProfile} disabled={isSaving}>
                                         {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
@@ -239,14 +247,25 @@ export function DocumentGeneratorDialog({ student, courses }: { student: any; co
                                     </Button>
                                 </div>
                             </div>
-                            <div className="flex-1 bg-muted rounded-xl border overflow-hidden relative shadow-inner">
-                                <iframe 
-                                    src={pdfBlobUrl} 
-                                    className="w-full h-full border-0 absolute inset-0" 
-                                    title="PDF Preview"
-                                    style={{ backgroundColor: 'transparent' }}
-                                />
-                            </div>
+                            
+                            {fileExt === "pdf" ? (
+                                <div className="flex-1 bg-muted rounded-xl border overflow-hidden relative shadow-inner">
+                                    <iframe 
+                                        src={pdfBlobUrl} 
+                                        className="w-full h-full border-0 absolute inset-0" 
+                                        title="PDF Preview"
+                                        style={{ backgroundColor: 'transparent' }}
+                                    />
+                                </div>
+                            ) : (
+                                <div className="flex-1 bg-muted rounded-xl border flex flex-col items-center justify-center p-10 text-center shadow-inner">
+                                    <FileText className="h-16 w-16 text-blue-500 mb-4" />
+                                    <h4 className="text-xl font-bold text-slate-700 dark:text-slate-200 mb-2">Word Document Ready</h4>
+                                    <p className="text-slate-500 max-w-md">
+                                        Word documents (.docx) cannot be previewed directly inside the browser. You can download it to view/edit, or save it directly to the student's profile below!
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

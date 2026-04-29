@@ -50,12 +50,13 @@ export async function generateDocumentPreview(studentId: string, courseId: strin
         }
 
         // 2. Process based on type
+        const { applyTMMetadataToStudent } = await import("@/lib/transport-malta");
+        const processedStudent = await applyTMMetadataToStudent(student, course, templateDef.id);
+
         if (templateDef.type === "pdf") {
             const pdfDoc = await PDFDocument.load(bytes);
             const filler = TemplateFillers[templateDef.id];
             if (filler) {
-                const { applyTMMetadataToStudent } = await import("@/lib/transport-malta");
-                const processedStudent = await applyTMMetadataToStudent(student, course, templateDef.id);
                 await filler(pdfDoc, processedStudent, course);
             }
             const pdfBase64 = await pdfDoc.saveAsBase64({ dataUri: false });
@@ -72,18 +73,18 @@ export async function generateDocumentPreview(studentId: string, courseId: strin
             const zip = new PizZip(Buffer.from(bytes));
             const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
 
-            const dobObj = student.dateOfBirth;
+            const dobObj = processedStudent.dateOfBirth;
             const dobFormatted = (dobObj && isValid(dobObj)) ? format(dobObj, 'dd.MM.yyyy') : "N/A";
-            const issueDateObj = student.certificateIssueDate;
+            const issueDateObj = processedStudent.certificateIssueDate;
             const issueDateFormatted = (issueDateObj && isValid(issueDateObj)) ? format(issueDateObj, 'dd.MM.yyyy') : "N/A";
-            const expiryDateObj = student.certificateExpiryDate;
+            const expiryDateObj = processedStudent.certificateExpiryDate;
             const expiryDateFormatted = (expiryDateObj && isValid(expiryDateObj)) ? format(expiryDateObj, 'dd.MM.yyyy') : "N/A";
 
             doc.render({
-                fullName: student.fullName.toUpperCase(),
+                fullName: processedStudent.fullName.toUpperCase(),
                 dob: dobFormatted,
-                passportNumber: student.passportNumber || "N/A",
-                certNo: student.studentNumber || "N/A",
+                passportNumber: processedStudent.passportNumber || "N/A",
+                certNo: processedStudent.studentNumber || "N/A",
                 courseTitle: templateDef.title,
                 courseRegulations: templateDef.docRegulations || "",
                 instructorName: "INSTRUCTOR NAME", 

@@ -59,7 +59,7 @@ export async function getOrGenerateTMCertificateNumber(studentId: string, course
 const MONTH_LETTERS = ['J', 'F', 'M', 'A', 'Y', 'U', 'L', 'G', 'S', 'O', 'N', 'D']; // Fallback letters
 
 export async function applyTMMetadataToStudent(student: any, course: any, templateId: string) {
-    if (templateId !== "stcw-basic-safety") return student; // Specific logic branch for STCW
+    if (templateId !== "stcw-basic-safety" && templateId !== "master-of-yacht-200gt") return student; 
 
     // 1. Find the Course Event (Optional now)
     const courseEvent = await db.courseEvent.findFirst({
@@ -71,70 +71,102 @@ export async function applyTMMetadataToStudent(student: any, course: any, templa
     });
 
     // Determine base date. We pull it from the Event if they are in one, 
-    // otherwise we use the student's typed issue date. If both are missing, we throw an error.
+    // otherwise we use the student's typed issue date. If both are missing, we default to today for safe generation.
     let baseDate: Date;
     if (student.certificateIssueDate) {
         baseDate = new Date(student.certificateIssueDate);
     } else if (courseEvent) {
         baseDate = getNextWorkingDay(courseEvent.endDate);
     } else {
-        throw new Error("Cannot calculate certificate limits: Student must either have a 'Certificate Issue Date' saved in their profile or be enrolled in a Calendar Event.");
+        baseDate = new Date(); // fallback to today so it doesn't crash
     }
 
     const issueDate = baseDate;
-
-    // Check if we already have a generated sequence for this student + event
-    let suffix = "";
-    const certificateType = "stcw-basic-safety-group"; // Logical grouping type
-
-    // The grouping event ID. If no event exists, we use a generic placeholder like "no-event"
-    // so the database unique constraints don't crash when passing null.
     const effectiveEventId = courseEvent ? courseEvent.id : "no-event";
 
-    const existing = await db.studentCertificate.findUnique({
-        where: {
-            studentId_courseEventId_certificateType: {
-                studentId: student.id,
-                courseEventId: effectiveEventId,
-                certificateType
-            }
-        }
-    });
+    if (templateId === "stcw-basic-safety") {
+        let suffix = "";
+        const certificateType = "stcw-basic-safety-group"; 
 
-    if (existing && existing.certificateNo) {
-        suffix = existing.certificateNo;
-    } else {
-        const year = baseDate.getFullYear().toString().slice(-2);
-        const monthLetter = "M"; // Hardcoded for now based on user request
-        const prefixMatch = `${monthLetter}${year}`;
-
-        // Find total STCW certificates generated so far for this month/year combo
-        const currentCount = await db.studentCertificate.count({
+        const existing = await db.studentCertificate.findUnique({
             where: {
-                certificateType,
-                certificateNo: {
-                    startsWith: prefixMatch
+                studentId_courseEventId_certificateType: {
+                    studentId: student.id,
+                    courseEventId: effectiveEventId,
+                    certificateType
                 }
             }
         });
 
-        const sequence = (currentCount + 1).toString().padStart(4, '0');
-        suffix = `${prefixMatch}${sequence}`; // E.g. "M260001"
+        if (existing && existing.certificateNo) {
+            suffix = existing.certificateNo;
+        } else {
+            const year = baseDate.getFullYear().toString().slice(-2);
+            const monthLetter = "M"; // Hardcoded for now based on user request
+            const prefixMatch = `${monthLetter}${year}`;
+
+            const currentCount = await db.studentCertificate.count({
+                where: {
+                    certificateType,
+                    certificateNo: { startsWith: prefixMatch }
+                }
+            });
+
+            const sequence = (currentCount + 1).toString().padStart(4, '0');
+            suffix = `${prefixMatch}${sequence}`; // E.g. "M260001"
+        }
+
+        const expiryDate = student.certificateExpiryDate ? new Date(student.certificateExpiryDate) : addYears(issueDate, 5); 
+
+        student.certificateIssueDate = issueDate;
+        student.certificateExpiryDate = expiryDate;
+        student.studentNumber = suffix;
+        student.__courseEventId = effectiveEventId;
+        student.__certificateType = certificateType;
+
+        return student;
     }
 
-    const expiryDate = student.certificateExpiryDate ? new Date(student.certificateExpiryDate) : addYears(issueDate, 5); // 5 year validity
+    if (templateId === "master-of-yacht-200gt") {
+        const certificateType = "master-of-yacht-200gt";
+        
+        const existing = await db.studentCertificate.findUnique({
+            where: {
+                studentId_courseEventId_certificateType: {
+                    studentId: student.id,
+                    courseEventId: effectiveEventId,
+                    certificateType
+                }
+            }
+        });
 
-    // 3. Mutate the memory object
-    student.certificateIssueDate = issueDate;
-    student.certificateExpiryDate = expiryDate;
+        let certNo = "";
+        if (existing && existing.certificateNo) {
+            certNo = existing.certificateNo;
+        } else {
+            const fullYear = baseDate.getFullYear().toString(); // e.g. 2026
+            const prefixMatch = `${fullYear}-LMPW-`;
 
-    // Pass just the suffix (e.g. M260001). The pdf-filler will prepend PST-, FF- per page.
-    student.studentNumber = suffix;
+            const currentCount = await db.studentCertificate.count({
+                where: {
+                    certificateType,
+                    certificateNo: { startsWith: prefixMatch }
+                }
+            });
 
-    // We also attach courseEventId invisibly so saveGeneratedDocument can pick it up
-    student.__courseEventId = effectiveEventId;
-    // Inject custom cert type so the upsert logic uses our grouping
-    student.__certificateType = certificateType;
+            certNo = `${prefixMatch}${(currentCount + 1).toString().padStart(2, '0')}`; // e.g. "2026-LMPW-01"
+        }
+
+        const expiryDate = student.certificateExpiryDate ? new Date(student.certificateExpiryDate) : addYears(issueDate, 5); 
+
+        student.certificateIssueDate = issueDate;
+        student.certificateExpiryDate = expiryDate;
+        student.studentNumber = certNo; 
+        student.__courseEventId = effectiveEventId;
+        student.__certificateType = certificateType;
+
+        return student;
+    }
 
     return student;
 }

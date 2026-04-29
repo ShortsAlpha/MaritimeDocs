@@ -250,3 +250,43 @@ export async function updateChecklistNote(itemId: string, note: string) {
         return { success: false, message: "Failed to update note" }
     }
 }
+
+export async function addEventNote(eventId: string, note: string) {
+    try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
+        const userName = user.firstName && user.lastName 
+            ? `${user.firstName} ${user.lastName}` 
+            : (user.emailAddresses[0]?.emailAddress || "Admin")
+
+        const newNote = await db.courseEventNote.create({
+            data: {
+                courseEventId: eventId,
+                note,
+                createdBy: userName
+            }
+        })
+        revalidatePath("/admin/calendar")
+        return { success: true, note: newNote }
+    } catch (error) {
+        console.error("Add Event Note Error:", error)
+        return { success: false, message: "Failed to add event note" }
+    }
+}
+
+export async function deleteEventNote(noteId: string) {
+    try {
+        const user = await currentUser()
+        if (!user) return { success: false, message: "Unauthorized" }
+
+        await db.courseEventNote.delete({
+            where: { id: noteId }
+        })
+        revalidatePath("/admin/calendar")
+        return { success: true }
+    } catch (error) {
+        console.error("Delete Event Note Error:", error)
+        return { success: false, message: "Failed to delete note" }
+    }
+}

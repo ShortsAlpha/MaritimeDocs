@@ -271,9 +271,21 @@ model CourseEvent {
   updatedAt DateTime @updatedAt
 
   checklist   EventChecklistItem[]
+  eventNotes  CourseEventNote[]
   students    Student[]
   attendances Attendance[]
   certificates StudentCertificate[]
+}
+
+model CourseEventNote {
+  id            String      @id @default(cuid())
+  note          String      @db.Text
+  
+  courseEventId String
+  courseEvent   CourseEvent @relation(fields: [courseEventId], references: [id], onDelete: Cascade)
+
+  createdBy     String // Name of the user who created it
+  createdAt     DateTime    @default(now())
 }
 
 model EventChecklistItem {

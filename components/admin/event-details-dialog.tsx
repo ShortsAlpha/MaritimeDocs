@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { format } from "date-fns"
 import { Calendar, Clock, MapPin, Plus, Trash2, User, FileSpreadsheet } from "lucide-react"
-import { toggleEventChecklistItem, addChecklistItem, deleteEventChecklistItem, deleteCourseEvent, updateChecklistNote } from "@/app/actions/calendar"
+import { toggleEventChecklistItem, addChecklistItem, deleteEventChecklistItem, deleteCourseEvent, updateChecklistNote, addEventNote, deleteEventNote } from "@/app/actions/calendar"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -78,10 +78,16 @@ function EventCard({ event }: { event: any }) {
     const [isDeleting, setIsDeleting] = useState(false)
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [checklistItems, setChecklistItems] = useState(event.resource?.checklist || [])
+    
+    // Notes state
+    const [eventNotesList, setEventNotesList] = useState(event.resource?.eventNotes || [])
+    const [newNote, setNewNote] = useState("")
+    const [isSavingNote, setIsSavingNote] = useState(false)
 
     useEffect(() => {
         setChecklistItems(event.resource?.checklist || [])
-    }, [event.resource?.checklist])
+        setEventNotesList(event.resource?.eventNotes || [])
+    }, [event.resource])
 
 
     const handleAddItem = async () => {
@@ -145,6 +151,28 @@ function EventCard({ event }: { event: any }) {
     const handleDelete = async (itemId: string) => {
         setChecklistItems((prev: any[]) => prev.filter((item) => item.id !== itemId))
         await deleteEventChecklistItem(itemId)
+    }
+
+    const handleAddNote = async () => {
+        if (!newNote.trim()) return
+        setIsSavingNote(true)
+        const res = await addEventNote(event.id, newNote)
+        if (res.success && res.note) {
+            setEventNotesList((prev: any[]) => [res.note, ...prev])
+            setNewNote("")
+            toast.success("Note added")
+        } else {
+            toast.error("Failed to add note")
+        }
+        setIsSavingNote(false)
+    }
+
+    const handleDeleteNote = async (noteId: string) => {
+        setEventNotesList((prev: any[]) => prev.filter((n: any) => n.id !== noteId))
+        const res = await deleteEventNote(noteId)
+        if (!res.success) {
+            toast.error("Failed to delete note")
+        }
     }
 
     const handleExportExcel = async () => {
@@ -324,9 +352,10 @@ function EventCard({ event }: { event: any }) {
 
 
                     <Tabs defaultValue="overview" className="mt-4">
-                        <TabsList className="grid w-full grid-cols-2">
+                        <TabsList className="grid w-full grid-cols-3">
                             <TabsTrigger value="overview">Checklist</TabsTrigger>
                             <TabsTrigger value="students">Students</TabsTrigger>
+                            <TabsTrigger value="notes">Notes</TabsTrigger>
                         </TabsList>
 
                         <TabsContent value="overview" className="space-y-4 pt-4">
@@ -435,6 +464,52 @@ function EventCard({ event }: { event: any }) {
                                 eventStart={event.start}
                                 eventResource={event.resource}
                             />
+                        </TabsContent>
+
+                        <TabsContent value="notes" className="space-y-4 pt-4">
+                            <div className="flex flex-col gap-4">
+                                <div className="flex gap-2">
+                                    <Input
+                                        value={newNote}
+                                        onChange={(e) => setNewNote(e.target.value)}
+                                        placeholder="Type a new note here..."
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") handleAddNote()
+                                        }}
+                                        className="flex-1"
+                                    />
+                                    <Button onClick={handleAddNote} disabled={isSavingNote || !newNote.trim()}>
+                                        {isSavingNote ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
+                                        Add Note
+                                    </Button>
+                                </div>
+                                
+                                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
+                                    {eventNotesList.length === 0 ? (
+                                        <p className="text-sm text-muted-foreground text-center py-4">No notes added yet.</p>
+                                    ) : (
+                                        eventNotesList.map((note: any) => (
+                                            <div key={note.id} className="relative group bg-muted/50 p-3 rounded-lg border border-border/50 text-sm">
+                                                <div className="flex justify-between items-start mb-1">
+                                                    <span className="font-semibold text-primary/80">{note.createdBy}</span>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {format(new Date(note.createdAt), "dd MMM HH:mm")}
+                                                    </span>
+                                                </div>
+                                                <p className="text-foreground whitespace-pre-wrap leading-relaxed">
+                                                    {note.note}
+                                                </p>
+                                                <button
+                                                    onClick={() => handleDeleteNote(note.id)}
+                                                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-destructive bg-background p-1 rounded-md transition-opacity shadow-sm"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
                         </TabsContent>
                     </Tabs>
                 </div>
